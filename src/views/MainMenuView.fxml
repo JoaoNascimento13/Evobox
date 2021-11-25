@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="368.0" spacing="25.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.MainMenuController">
+   <children>
+      <Label text="EvoBox">
+         <font>
+            <Font name="Calibri Bold" size="55.0" />
+         </font>
+      </Label>
+      <Label text="An evolution simulator sandbox">
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+         <padding>
+            <Insets bottom="10.0" top="-20.0" />
+         </padding>
+         <font>
+            <Font name="Calibri Bold" size="23.0" />
+         </font>
+      </Label>
+      <Rectangle arcHeight="5.0" arcWidth="5.0" fill="DODGERBLUE" height="4.0" stroke="BLACK" strokeType="INSIDE" translateY="-10.0" width="311.0" />
+      <Button maxHeight="45.0" maxWidth="190.0" minHeight="45.0" minWidth="190.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="190.0" text="New Simulation">
+         <font>
+            <Font name="Calibri" size="22.0" />
+         </font>
+      </Button>
+      <Button maxHeight="45.0" maxWidth="190.0" minHeight="45.0" minWidth="190.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="190.0" text="Load Simulation">
+         <font>
+            <Font name="Calibri" size="22.0" />
+         </font>
+      </Button>
+      <Button maxHeight="45.0" maxWidth="190.0" minHeight="45.0" minWidth="190.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="190.0" text="Settings">
+         <font>
+            <Font name="Calibri" size="22.0" />
+         </font>
+      </Button>
+      <Button maxHeight="45.0" maxWidth="190.0" minHeight="45.0" minWidth="190.0" mnemonicParsing="false" onAction="#exit" prefHeight="45.0" prefWidth="190.0" text="Exit">
+         <font>
+            <Font name="Calibri" size="22.0" />
+         </font>
+      </Button>
+   </children>
+</VBox>
