@@ -1,13 +1,21 @@
 package application;
 
+import java.io.IOException;
+
+import org.junit.vintage.engine.descriptor.TestSourceProvider;
+
 import javafx.event.ActionEvent;
+import javafx.stage.Stage;
+import javafx.scene.Node;
 
 public class MainMenuController {
-
 	
-
-	public void newSim(ActionEvent e) {
+	
+	public void newSim(ActionEvent e) throws IOException {
 		
+		Stage stage = (Stage)((Node)e.getSource()).getScene().getWindow();
+				
+		new SceneManager().setSimulationScene(stage);
 	}
 	
 	public void loadSim(ActionEvent e) {

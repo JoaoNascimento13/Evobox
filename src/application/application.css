@@ -1,1 +1,12 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
+
+.root{
+	-fx-background-color: #95E1D3;
+}
+
+
+.canvas{
+	-fx-background-color: #000000;
+	-fx-border-color: #000000;
+	-fx-border-width: 4
+}

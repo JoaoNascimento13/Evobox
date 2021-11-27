@@ -6,17 +6,15 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(Stage stage) {
+		
 		
 		try {
 			
-			primaryStage.setTitle("Evobox");
-			primaryStage.setWidth(1280);
-			primaryStage.setHeight(800);
-			primaryStage.setMinWidth(1280);
-			primaryStage.setMinHeight(800);
+			configureMainStage(stage);
 			
-			new SceneManager().setMainMenuScene(primaryStage);
+			new SceneManager().setMainMenuScene(stage);
+			
 			
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -25,5 +23,16 @@ public class Main extends Application {
 	
 	public static void main(String[] args) {
 		launch(args);
+	}
+	
+	
+	
+	
+	void configureMainStage(Stage stage) {
+		stage.setTitle("Evobox");
+		stage.setWidth(1280);
+		stage.setHeight(800);
+		stage.setMinWidth(1280);
+		stage.setMinHeight(800);
 	}
 }
