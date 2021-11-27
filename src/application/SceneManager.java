@@ -1,15 +1,13 @@
 package application;
 
 import java.io.IOException;
+import java.net.URL;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class SceneManager {
@@ -32,7 +30,6 @@ public class SceneManager {
 		
 		
 		
-		
 		stage.setScene(mainMenuScene);
 		stage.show();
 	}
@@ -40,24 +37,56 @@ public class SceneManager {
 	
 	public void setSimulationScene(Stage stage) throws IOException {
 		
-		Parent root = FXMLLoader.load(getClass().getResource("/views/SimulationView.fxml"));
+		
+		URL viewURL = getClass().getResource("/views/SimulationView.fxml");
+		
+		//Parent root = FXMLLoader.load(viewURL);
+		
+		
+		FXMLLoader loader = new FXMLLoader(viewURL);
+		
+		Parent root = loader.load();
+				
+		
+		
 		Scene simulationScene = new Scene(root,windowWidth,windowHeight);
 
 		System.out.println(root);
 		
 
+		
+		
 		int canvasWidth = 640;
 		int canvasHeight = 640;
 		
 		Canvas canvas = new Canvas(canvasWidth, canvasHeight);
 		
-		((GridPane)root).add(canvas, 1, 1);
 		
-		Renderer renderer = new Renderer(canvas, canvasWidth, canvasHeight);
+		//((GridPane)root).setGridLinesVisible(true);
+		
+		MapScrollPane mapScrollPane = new MapScrollPane(canvas);
+		
+		
+		//ScrollPane scrollPane = (ScrollPane) ((GridPane)root).getChildren().get(0);
+		
+		
+		//scrollPane.setContent(canvas);
+		
+		((GridPane)root).add(mapScrollPane, 1, 1);
+		
+		Renderer renderer = new Renderer(canvas, mapScrollPane, canvasWidth, canvasHeight);
+		
+		
+
+		
 		
 		Simulator simulator = new Simulator(renderer);
 		
 		simulator.populateWorld();
+		
+		
+		
+		
 		
 		simulationScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		
@@ -65,13 +94,22 @@ public class SceneManager {
 		stage.setScene(simulationScene);
 		stage.show();
 		
-		Thread thread = null;
-		thread = new Thread(new Runnable() {
-		    public void run() {
-		    	simulator.animate();
-		    }
-		});
-		thread.start();
+		
+
+
+		SimulatorController controller = loader.getController();
+		
+		
+		//System.out.println(controller);
+		
+		controller.setSimulator(simulator);
+		controller.setRenderer(renderer);
+		
+		
+		
+		simulator.launchAnimationThread();
+		
+		
 		
 		
 		

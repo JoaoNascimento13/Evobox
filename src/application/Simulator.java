@@ -6,7 +6,7 @@ import java.util.Random;
 public class Simulator {
 	
 	public int frame;
-	public boolean breakSimulation;
+	//public boolean breakSimulation;
 	
 	private ArrayList<Creature> creatures;
 	private ArrayList<Integer> oldCreaturePositionsX;
@@ -14,13 +14,16 @@ public class Simulator {
 	
 	private Renderer renderer;
 	
+	private boolean paused;
+	
 	
 	public Simulator(Renderer renderer) {
 
 		this.renderer = renderer;
 		
 		this.frame = 0;
-		breakSimulation = false;
+		//breakSimulation = false;
+		paused = true;
 		creatures = new ArrayList<Creature>();
 		oldCreaturePositionsX = new ArrayList<Integer>();
 		oldCreaturePositionsY = new ArrayList<Integer>();
@@ -31,6 +34,8 @@ public class Simulator {
 	public void populateWorld() {
 		
 		for (int i = 0; i < 15000; i++) {
+
+			//creatures.add(new Creature(160, 160));
 			creatures.add(new Creature(new Random().nextInt(320), new Random().nextInt(320)));
 		}
 	}
@@ -39,7 +44,9 @@ public class Simulator {
 	
 	public void animate() {
 		
-		while (!breakSimulation) {
+		System.out.println("animating");
+		
+		while (!paused) {
 			
 			performFrameActions();
 			
@@ -53,6 +60,8 @@ public class Simulator {
 			}
 			
 		}
+
+		System.out.println("animation done");
 	}
 	
 	
@@ -91,5 +100,43 @@ public class Simulator {
 	
 	private void adjacentActions() {
 		
+	}
+
+
+
+	public void pause() {
+		paused = true;
+	}
+
+
+
+	public void unpause() {
+		if (!paused) {
+			return;
+		}
+		paused = false;
+		launchAnimationThread();
+	}
+
+
+	public void playOrPause() {
+		if (paused) {
+			unpause();
+		} else {
+			pause();
+		}
+	}
+
+
+
+	public void launchAnimationThread() {
+		Simulator simulator = this;
+		Thread thread = null;
+		thread = new Thread(new Runnable() {
+		    public void run() {
+		    	simulator.animate();
+		    }
+		});
+		thread.start();
 	}
 }

@@ -3,6 +3,7 @@ package application;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.effect.Light.Point;
@@ -17,21 +18,32 @@ public class Renderer {
     private final WritablePixelFormat<IntBuffer> pixelFormat = PixelFormat.getIntArgbPreInstance();
     
 	private Canvas canvas;
+	private MapScrollPane mapScrollPane;
 	private GraphicsContext gc;
 	private int[] buffer;
 	
 	
 	int canvasWidth;
 	int canvasHeight;
+	
+	
 
-	public Renderer(Canvas canvas, int canvasWidth, int canvasHeight) {
+	private int plantColor = toInt(Color.GREEN);
+	 
+	private int backgroundColor = toInt(Color.web("#95E1D3"));
+	
+
+	public Renderer(Canvas canvas, MapScrollPane mapScrollPane, int canvasWidth, int canvasHeight) {
 		
 		this.canvas = canvas;
+		this.mapScrollPane = mapScrollPane;
 
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		
+		
 		setCanvas();
+		
 	}
 
 
@@ -42,31 +54,26 @@ public class Renderer {
 	    gc = canvas.getGraphicsContext2D();
 	    
 	    buffer = new int[canvasWidth * canvasHeight];
-		
+	    
+	    
+	    for (int i = 0; i < canvasWidth * canvasHeight; i++) {
+        	buffer[i] = backgroundColor;
+	    }
+        PixelWriter p = gc.getPixelWriter();
+        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
 	}
 	
+	
 
+	
+	
 	public void render(ArrayList<Creature> creatures, 
 			ArrayList<Integer> oldCreaturePositionsX, ArrayList<Integer> oldCreaturePositionsY) {
 		
 		int creatureSize = 2;
 		
-		//Color background = new Color().
-				
-				
-				//new Color(#95E1D3);
 		
-		int plantColor = toInt(Color.GREEN);
-		 
-		int backgroundColor = toInt(Color.web("#95E1D3"));
 				
-				
-//		String backgroundHex = "#95E1D3";
-//		
-//		Color background = Color.rgb(
-//              Integer.valueOf(backgroundHex.substring( 1, 3 ), 16 ),
-//              Integer.valueOf(backgroundHex.substring( 3, 5 ), 16 ),
-//              Integer.valueOf(backgroundHex.substring( 5, 7 ), 16 ));
   
 		
 		for (int i = 0; i < oldCreaturePositionsX.size(); i++) {
@@ -91,20 +98,6 @@ public class Renderer {
 			}
 		}
 		
-		
-//        for (int i = 0; i < canvasWidth; i += creatureSize) {
-//            for (int j = 0; j < canvasHeight; j += creatureSize) {
-//            	
-//                for (int dx = 0; dx < creatureSize; dx++) {
-//                    for (int dy = 0 ; dy < creatureSize; dy++) {
-//                    	
-//                        buffer[i + dx + canvasWidth * (j + dy)] = plantColor;
-//                        
-//                    }
-//                }
-//            }
-//        }
-		
 
         PixelWriter p = gc.getPixelWriter();
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
@@ -116,9 +109,21 @@ public class Renderer {
 //			e.printStackTrace();
 //		}
         
-//        System.out.println("Rendered");
-        
 	}
+	
+	
+	
+	
+	public void zoomIn() {
+		mapScrollPane.zoomIn();
+	}
+	
+
+	public void zoomOut() {
+		mapScrollPane.zoomOut();
+	}
+	
+	
 	
 	
     private int toInt(Color c) {
@@ -129,8 +134,5 @@ public class Renderer {
                 ((int) (c.getBlue()  * 255));
     }
     
-//    private Color hex2Rgb(String colorStr) {
-//    	return new Color(0, 0, 0);
-////        return new 
 	
 }
