@@ -31,7 +31,7 @@
             <Font name="Calibri" size="22.0" />
          </font>
       </Button>
-      <Button maxHeight="45.0" maxWidth="190.0" minHeight="45.0" minWidth="190.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="190.0" text="Load Simulation">
+      <Button maxHeight="45.0" maxWidth="190.0" minHeight="45.0" minWidth="190.0" mnemonicParsing="false" onAction="#loadSim" prefHeight="45.0" prefWidth="190.0" text="Load Simulation">
          <font>
             <Font name="Calibri" size="22.0" />
          </font>

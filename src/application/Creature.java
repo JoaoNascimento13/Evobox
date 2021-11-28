@@ -1,7 +1,11 @@
 package application;
 
-public class Creature {
+import java.io.Serializable;
 
+public class Creature implements Cloneable, Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	public int x;
 	public int y;
 	
@@ -9,5 +13,9 @@ public class Creature {
 		this.x = x;
 		this.y = y;
 	}
+	
+	public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 	
 }

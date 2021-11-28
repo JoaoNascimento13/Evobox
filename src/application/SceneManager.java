@@ -1,8 +1,10 @@
 package application;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.net.URL;
-
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,16 +20,30 @@ public class SceneManager {
 	private int windowWidth = 1280;
 	private int windowHeight = 800; 
 	
+	private Scene simulationScene;
+	private FXMLLoader simulationLoader;
+	private Renderer renderer;
+	private Simulator simulator;
 	
 	
-	
-	public void setMainMenuScene(Stage stage) throws IOException {
+	public void setMainMenuScene(Stage stage, SceneManager sceneManager) throws IOException {
+
+		URL mainMenuViewURL = getClass().getResource("/views/MainMenuView.fxml");
 		
-		Parent root = FXMLLoader.load(getClass().getResource("/views/MainMenuView.fxml"));
+		FXMLLoader mainMenuLoader = new FXMLLoader(mainMenuViewURL);
+		
+		Parent root = mainMenuLoader.load();
+		
 		Scene mainMenuScene = new Scene(root,windowWidth,windowHeight);
 		
 		mainMenuScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		
+		
+		
+
+		MainMenuController controller = mainMenuLoader.getController();
+		
+		controller.setSceneManager(sceneManager);
 		
 		
 		stage.setScene(mainMenuScene);
@@ -35,25 +51,19 @@ public class SceneManager {
 	}
 
 	
+	
 	public void setSimulationScene(Stage stage) throws IOException {
 		
 		
 		URL viewURL = getClass().getResource("/views/SimulationView.fxml");
 		
-		//Parent root = FXMLLoader.load(viewURL);
+		
+		simulationLoader = new FXMLLoader(viewURL);
+		
+		Parent root = simulationLoader.load();
 		
 		
-		FXMLLoader loader = new FXMLLoader(viewURL);
-		
-		Parent root = loader.load();
-				
-		
-		
-		Scene simulationScene = new Scene(root,windowWidth,windowHeight);
-
-		System.out.println(root);
-		
-
+		simulationScene = new Scene(root,windowWidth,windowHeight);
 		
 		
 		int canvasWidth = 640;
@@ -61,58 +71,135 @@ public class SceneManager {
 		
 		Canvas canvas = new Canvas(canvasWidth, canvasHeight);
 		
-		
-		//((GridPane)root).setGridLinesVisible(true);
-		
 		MapScrollPane mapScrollPane = new MapScrollPane(canvas);
-		
-		
-		//ScrollPane scrollPane = (ScrollPane) ((GridPane)root).getChildren().get(0);
-		
-		
-		//scrollPane.setContent(canvas);
 		
 		((GridPane)root).add(mapScrollPane, 1, 1);
 		
-		Renderer renderer = new Renderer(canvas, mapScrollPane, canvasWidth, canvasHeight);
-		
-		
 
-		
-		
-		Simulator simulator = new Simulator(renderer);
-		
-		simulator.populateWorld();
-		
-		
-		
+		renderer = new Renderer(canvas, mapScrollPane, canvasWidth, canvasHeight);
 		
 		
 		simulationScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+
+		
+		
+		
+	}
+	
+	
+	
+	public void setNewSimulation() {
+		
+		simulator = new Simulator(renderer);
+		
+		simulator.populateWorld();
+		
+		simulator.setSimNumber();
+		
+	}
+	
+
+	public void loadSimulation() {
+		
+		
+    	SimulationState simulationToLoad = null;
+    	
+    	
+        try {
+
+    		File folder = new File("simulations");
+    		File[] listOfFiles = folder.listFiles();
+    		
+    		if (listOfFiles == null) {
+    			System.out.println("No files to load.");
+    			return;
+    		}
+			
+			
+    		String path = listOfFiles[listOfFiles.length-1].getPath();
+            
+    		FileInputStream simulationFile = new FileInputStream(path);
+    		
+    		ObjectInputStream in = new ObjectInputStream(simulationFile);
+    		
+    		
+    		simulationToLoad = (SimulationState)in.readObject();
+    		
+    		
+    		in.close();
+    		simulationFile.close();
+            
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+
+		simulator = new Simulator(renderer);
+		
+		
+		simulator.loadSimulation(simulationToLoad);
+		
+		
+	}
+	
+
+	
+	
+	public void setSimulationController() {
+
+		SimulatorController controller = simulationLoader.getController();
+		
+		controller.setSimulator(simulator);
+		controller.setRenderer(renderer);
+	}
+	
+	
+//	public void saveFirstSimulatorFrame() {
+//		try {
+//			simulator.recordFirstFrame();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//	}
+	
+	
+	public void showSimulation(Stage stage) {
+		
+		simulator.renderInitialFrame();
 		
 		
 		stage.setScene(simulationScene);
 		stage.show();
-		
-		
+
+		//simulator.launchAnimationThread();
+	}
 
 
-		SimulatorController controller = loader.getController();
+
+	public void exitCleanup() {
 		
-		
-		//System.out.println(controller);
-		
-		controller.setSimulator(simulator);
-		controller.setRenderer(renderer);
-		
-		
-		
-		simulator.launchAnimationThread();
-		
-		
-		
-		
-		
+		if (simulator != null) {
+			
+			try {
+				simulator.record();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+
+
+	public boolean hasLoadedSimulator() {
+		if (simulator == null) {
+			return false;
+		}
+		return true;
 	}
 	
 }

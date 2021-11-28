@@ -8,18 +8,22 @@ public class Main extends Application {
 	@Override
 	public void start(Stage stage) {
 		
-		
 		try {
 			
 			configureMainStage(stage);
 			
-			new SceneManager().setMainMenuScene(stage);
+			SceneManager sceneManager = new SceneManager();
 			
+			sceneManager.setMainMenuScene(stage, sceneManager);
+			
+
+			stage.setOnCloseRequest(e -> sceneManager.exitCleanup());
 			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
 	
 	public static void main(String[] args) {
 		launch(args);
