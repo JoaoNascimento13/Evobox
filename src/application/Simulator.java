@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
+import java.awt.Point;
 
 public class Simulator {
 	
@@ -13,6 +14,8 @@ public class Simulator {
 	private ArrayList<Creature> creatures;
 	private ArrayList<Integer> oldCreaturePositionsX;
 	private ArrayList<Integer> oldCreaturePositionsY;
+
+	private ArrayList<FlowGenerator> flowGenerators;
 	
 	private Renderer renderer;
 	
@@ -25,27 +28,44 @@ public class Simulator {
 	
 	private int simNumber;
 	
-	int periodicRecordings = 0;
 	
+	
+	
+	private Settings settings;
+
+	
+	private Point[][] flowMap;
 	
 	public Simulator(Renderer renderer) {
 
 		this.renderer = renderer;
+
+		settings = new Settings(0, 320, 320);
 		
-		this.frame = 0;
+		
+		frame = 0;
 		
 		paused = true;
 		recording = false;
 		
 		creatures = new ArrayList<Creature>();
+		flowGenerators = new ArrayList<FlowGenerator>();
+		
 		oldCreaturePositionsX = new ArrayList<Integer>();
 		oldCreaturePositionsY = new ArrayList<Integer>();
 		
 		
 		randomizer = new CloneableRandom();
 		
+		flowMap = new Point[settings.mapCellsX][settings.mapCellsY];
 		
-
+		for (int i = 0; i < settings.mapCellsX; i++) {
+			for (int j = 0; j < settings.mapCellsX; j++) {
+				flowMap[i][j] = new Point(0, 0);
+			}
+		}
+		
+		
 //		try {
 //			
 //			simulationFile = new FileOutputStream("simulations/simul");
@@ -62,9 +82,29 @@ public class Simulator {
 		
 		for (int i = 0; i < 15000; i++) {
 
-			creatures.add(new Creature(160, 160));
-			//creatures.add(new Creature(randomizer.nextInt(320), randomizer.nextInt(320)));
+//			creatures.add(new Creature(160, 160));
+			
+			creatures.add(new Creature(randomizer.nextInt(320), randomizer.nextInt(320)));
+
+			//creatures.add(new Creature(100+randomizer.nextInt(120), 100+randomizer.nextInt(120)));
 		}
+
+		for (int i = 0; i < 20; i++) {
+
+			flowGenerators.add(new PulsePointFlowGenerator(
+					100, 
+					1+randomizer.nextInt(5), 
+					new Point(randomizer.nextInt(settings.mapCellsX), randomizer.nextInt(settings.mapCellsY)), 
+					randomizer.nextInt(21)-10, 
+					randomizer.nextBoolean(), 
+					Direction.random(randomizer), 
+					settings));
+		}
+		
+		for (FlowGenerator f :flowGenerators) {
+			f.addFlow(flowMap);
+		}
+		
 		
 	}
 	
@@ -93,10 +133,19 @@ public class Simulator {
 	
 	
 	public void loadSimulation(SimulationState simulationToLoad) {
+		
 		this.simNumber = simulationToLoad.simulationNumber;
 		this.creatures = simulationToLoad.creatures;
+		this.flowGenerators = simulationToLoad.flowGenerators;
 		this.randomizer = simulationToLoad.randomizer;
 		this.frame = simulationToLoad.frame;
+		
+
+		this.settings = new Settings(0, 320, 320);
+		for (FlowGenerator f : flowGenerators) {
+			f.settings = this.settings;
+			f.addFlow(flowMap);
+		}
 	}
 
 	
@@ -118,16 +167,14 @@ public class Simulator {
 			
 			
 			
-			renderer.render(creatures, oldCreaturePositionsX, oldCreaturePositionsY);
+			renderer.render(creatures, flowMap, oldCreaturePositionsX, oldCreaturePositionsY);
 			
 			
-			if (periodicRecordings > 0 && frame % periodicRecordings == 0) {
+			if (settings.periodicRecordings > 0 && frame % settings.periodicRecordings == 0) {
 				
 
 				try {
 					
-
-//					SimulationState frameResult = getFrameResult();
 
 					waitForRecordingIfNeeded();
 					
@@ -140,6 +187,18 @@ public class Simulator {
 				
 			}
 			
+//			System.out.println(
+//					"flowMap[160][165] = " + flowMap[160][165].x + " " + flowMap[160][165].y + 
+//					" | flowMap[161][161] = " + flowMap[161][161].x + " " + flowMap[161][161].y + 
+//					" | flowMap[180][180] = " + flowMap[180][180].x + " " + flowMap[180][180].y);
+			
+			
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
 			
 		}
 		
@@ -179,42 +238,6 @@ public class Simulator {
 	}
 	
 	
-//	public void recordFirstFrame() throws IOException {
-//		
-//		try {
-//
-//			ObjectOutputStream out = new ObjectOutputStream(simulationFile);
-//			out.writeObject(getFrameResult());
-//			
-//		} catch (CloneNotSupportedException e) {
-//			e.printStackTrace();
-//		}
-//	}
-
-	
-//	public void recordSubsequentFrame(SimulationState simulationState) {
-//
-//		recording = true;
-//		
-//		Thread thread = new Thread(new Runnable() {
-//		    public void run() {
-//				try {
-//					AppendingObjectOutputStream out = getStream();
-//					out.writeObject(simulationState);
-//					
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//				}
-//				recording = false;
-//		    }
-//		});
-//		thread.start();
-//	}
-	
-	
-//	public AppendingObjectOutputStream getStream() throws IOException {
-//		return new AppendingObjectOutputStream(simulationFile);
-//	}
 	
 	
 	public SimulationState getFrameResult() throws CloneNotSupportedException {
@@ -223,10 +246,16 @@ public class Simulator {
 		for (Creature c : creatures) {
 			frameResultCreatures.add((Creature) c.clone());
 		}
+
+		ArrayList<FlowGenerator> frameResultFlowGenerators = new ArrayList<FlowGenerator>();
+		for (FlowGenerator f : flowGenerators) {
+			frameResultFlowGenerators.add((FlowGenerator) f.clone());
+		}
 		
 		CloneableRandom frameRandom = (CloneableRandom) randomizer.clone();
 		
-		SimulationState simulationState = new SimulationState(simNumber, frameResultCreatures, frameRandom, frame);
+		SimulationState simulationState = new SimulationState(
+				simNumber, frameResultCreatures, frameResultFlowGenerators, frameRandom, frame);
 		
 		return simulationState;
 	}
@@ -245,6 +274,10 @@ public class Simulator {
 	
 	private void moveGenerators() {
 		
+		for (FlowGenerator g : flowGenerators) {
+			g.tick(frame, randomizer, flowMap);
+		}
+		
 	}
 	
 	private void moveCreatures() {
@@ -257,11 +290,36 @@ public class Simulator {
 		
 		for (Creature c : creatures) {
 			
-			oldCreaturePositionsX.add(c.x);
-			oldCreaturePositionsY.add(c.y);
 			
-			c.x = Math.max(0,Math.min(lastPixelX, c.x + (randomizer.nextInt(3)-1)));
-			c.y = Math.max(0,Math.min(lastPixelY, c.y + (randomizer.nextInt(3)-1)));
+			if (randomizer.nextInt(1500) < Math.abs(flowMap[c.x][c.y].x)) {
+				
+				oldCreaturePositionsX.add(c.x);
+				oldCreaturePositionsY.add(c.y);
+				if (flowMap[c.x][c.y].x > 0) {
+					c.x = Math.max(0,Math.min(lastPixelX, c.x + 1));
+				} else if (flowMap[c.x][c.y].x < 0) {
+					c.x = Math.max(0,Math.min(lastPixelX, c.x - 1));
+				}
+				
+			}
+			
+			if (randomizer.nextInt(1500) < Math.abs(flowMap[c.x][c.y].y)) {
+				
+				oldCreaturePositionsX.add(c.x);
+				oldCreaturePositionsY.add(c.y);
+				
+				if (flowMap[c.x][c.y].y > 0) {
+					c.y = Math.max(0,Math.min(lastPixelY, c.y + 1));
+				} else if (flowMap[c.x][c.y].y < 0) {
+					c.y = Math.max(0,Math.min(lastPixelY, c.y - 1));
+				}
+			}
+			
+//			oldCreaturePositionsX.add(c.x);
+//			oldCreaturePositionsY.add(c.y);
+//			
+//			c.x = Math.max(0,Math.min(lastPixelX, c.x + (randomizer.nextInt(3)-1)));
+//			c.y = Math.max(0,Math.min(lastPixelY, c.y + (randomizer.nextInt(3)-1)));
 		}
 		
 	}
@@ -311,7 +369,7 @@ public class Simulator {
 
 
 	public void renderInitialFrame() {
-		renderer.render(creatures, new ArrayList<Integer>(), new ArrayList<Integer>());
+		renderer.render(creatures, flowMap, new ArrayList<Integer>(), new ArrayList<Integer>());
 	}
 
 

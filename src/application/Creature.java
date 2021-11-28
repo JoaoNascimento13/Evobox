@@ -1,8 +1,6 @@
 package application;
 
-import java.io.Serializable;
-
-public class Creature implements Cloneable, Serializable {
+public class Creature  extends DynamicMapElement {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -14,8 +12,5 @@ public class Creature implements Cloneable, Serializable {
 		this.y = y;
 	}
 	
-	public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
 	
 }

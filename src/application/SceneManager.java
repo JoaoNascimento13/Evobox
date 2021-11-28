@@ -129,7 +129,7 @@ public class SceneManager {
     		in.close();
     		simulationFile.close();
             
-			
+    		
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

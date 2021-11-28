@@ -1,12 +1,11 @@
 package application;
 
+import java.awt.Point;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.effect.Light.Point;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
@@ -19,7 +18,7 @@ public class Renderer {
     
 	private Canvas canvas;
 	private MapScrollPane mapScrollPane;
-	private GraphicsContext gc;
+	//private GraphicsContext gc;
 	private int[] buffer;
 	
 	
@@ -29,7 +28,9 @@ public class Renderer {
 	
 
 	private int plantColor = toInt(Color.GREEN);
-	 
+
+	private int debugColorA = toInt(Color.PURPLE);
+	
 	private int backgroundColor = toInt(Color.web("#95E1D3"));
 	
 
@@ -51,29 +52,39 @@ public class Renderer {
 	
 	private void setCanvas() {
 		
-	    gc = canvas.getGraphicsContext2D();
+		GraphicsContext gc = canvas.getGraphicsContext2D();
 	    
 	    buffer = new int[canvasWidth * canvasHeight];
 	    
-	    
-	    for (int i = 0; i < canvasWidth * canvasHeight; i++) {
-        	buffer[i] = backgroundColor;
-	    }
-        PixelWriter p = gc.getPixelWriter();
-        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+	    clearScreen();
 	}
 	
 	
+	public void clearScreen() {
+		clearBuffer();
 
+		GraphicsContext gc = canvas.getGraphicsContext2D();
+        PixelWriter p = gc.getPixelWriter();
+        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+	}
+
+	public void clearBuffer() {
+	    for (int i = 0; i < canvasWidth * canvasHeight; i++) {
+        	buffer[i] = backgroundColor;
+	    }
+	}
 	
 	
-	public void render(ArrayList<Creature> creatures, 
+	
+	public void render(ArrayList<Creature> creatures, Point[][] flowMap,
 			ArrayList<Integer> oldCreaturePositionsX, ArrayList<Integer> oldCreaturePositionsY) {
 		
 		int creatureSize = 2;
 		
-		
+//		clearBuffer();
 				
+		
+		
   
 		
 		for (int i = 0; i < oldCreaturePositionsX.size(); i++) {
@@ -88,6 +99,69 @@ public class Renderer {
 			}
 		}
 		
+		
+		
+		
+//		for (int i = 0; i < flowMap.length; i++) {
+//			for (int j = 0; j < flowMap[0].length; j++) {
+//				
+//				
+//				if (
+//					Math.abs(flowMap[i][j].x) 
+//					+
+//					Math.abs(flowMap[i][j].y) 
+//					
+//					> 0) {
+//
+//		            for (int dx = 0; dx < creatureSize; dx++) {
+//		                for (int dy = 0 ; dy < creatureSize; dy++) {
+//		                	
+//		                	buffer[i*creatureSize + dx + canvasWidth * (j*creatureSize + dy)] = 
+//
+//		                			debugColorA
+//		                			
+//		                			//toInt(new Color((flowMap[i][j].y)/100, 0.2, 0.8, 1))
+//		                			
+//		                			
+//		                			
+//		                			//toInt(new Color((100+flowMap[i][j].x)/200, (100+flowMap[i][j].y)/200, 0.5, 1))
+//		                			;
+//		                }
+//		            }
+//				}
+//				
+//	            
+//			}
+//		}
+		
+		
+//		for (FlowGenerator g : flowGenerators) {
+//
+//			for (Flow f : g.currentFlow) {
+//				
+//
+//	            for (int dx = 0; dx < creatureSize; dx++) {
+//	                for (int dy = 0 ; dy < creatureSize; dy++) {
+//	                	
+////	                	if (f.x > 0) {
+//
+//		                	buffer[f.x*creatureSize + dx + canvasWidth * (f.y*creatureSize + dy)] = 
+//		                			
+//		                			//toInt(new Color((100+f.valX)/200, (100+f.valY)/200, 0.5, 1))
+//		                			
+//		                			toInt(new Color((100+f.valX)/200, 0.5, 0.5, 1))
+//		                			;
+//		                	
+////	                	} else if (f.x < 0) {
+////
+////		                	buffer[f.x*creatureSize + dx + canvasWidth * (f.y*creatureSize + dy)] = debugColorB;
+////	                	}
+//	    			}
+//				}
+//			}
+//		}
+		
+		
 		for (Creature c : creatures) {
 
             for (int dx = 0; dx < creatureSize; dx++) {
@@ -99,8 +173,14 @@ public class Renderer {
 		}
 		
 
+		
+
+
+		GraphicsContext gc = canvas.getGraphicsContext2D();
         PixelWriter p = gc.getPixelWriter();
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+        
+        
         
 //        try {
 //			Thread.sleep(10);
