@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -20,7 +21,9 @@ public class Simulator {
 	private Renderer renderer;
 	
 	private boolean paused;
+	
 	private boolean recording;
+	private boolean rendering;
 	
 //	private FileOutputStream simulationFile;
 
@@ -47,6 +50,7 @@ public class Simulator {
 		
 		paused = true;
 		recording = false;
+		rendering = false;
 		
 		creatures = new ArrayList<Creature>();
 		flowGenerators = new ArrayList<FlowGenerator>();
@@ -157,6 +161,9 @@ public class Simulator {
 			
 
 			waitForRecordingIfNeeded();
+
+			waitForRenderingIfNeeded();
+
 			
 			
 			
@@ -166,25 +173,32 @@ public class Simulator {
 			
 			
 			
+
+			if (frame % 50 == 0) {
+				renderer.swapActiveCanvas();
+				//renderer.clearScreen();
+			}
 			
-			renderer.render(creatures, flowMap, oldCreaturePositionsX, oldCreaturePositionsY);
+			
+			render();
+
+			if (frame % 50 == 0) {
+				renderer.updateVisibleCanvas();
+				renderer.clearHiddenCanvas();
+			}
 			
 			
 			if (settings.periodicRecordings > 0 && frame % settings.periodicRecordings == 0) {
 				
-
-				try {
 					
-
-					waitForRecordingIfNeeded();
+					try {
+						
+						record();
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
 					
-					record();
-					
-				} catch (IOException e) {
-					recording = false;
-					e.printStackTrace();
-				}
-				
 			}
 			
 //			System.out.println(
@@ -217,24 +231,60 @@ public class Simulator {
 		}
 	}
 
+	public void waitForRenderingIfNeeded() {
+		while (rendering) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	
+
+	public void render() {
+
+		rendering = true;
+		
+		Thread thread = null;
+		thread = new Thread(new Runnable() {
+		    public void run() {
+		    	renderer.render(creatures, flowMap, oldCreaturePositionsX, oldCreaturePositionsY);
+
+				rendering = false;
+		    }
+		});
+		thread.start();
+	}
+	
 	
 	public void record() throws IOException {
 		
+		recording = true;
 		
-		try {
-			
-			
-			FileOutputStream simulationFile = new FileOutputStream(
-					"simulations/" + String.format("%04d", simNumber) + "-" + String.format("%09d", frame));
+		Thread thread = null;
+		thread = new Thread(new Runnable() {
+		    public void run() {
+
+				try {
+					
+					FileOutputStream simulationFile = new FileOutputStream(
+							"simulations/" + String.format("%04d", simNumber) + "-" + String.format("%09d", frame));
+				
+					ObjectOutputStream out = new ObjectOutputStream(simulationFile);
+					out.writeObject(getFrameResult());
+					out.close();
+					simulationFile.close();
+					recording = false;
+					
+				} catch (CloneNotSupportedException | IOException e) {
+					e.printStackTrace();
+				}
+		    }
+		});
+		thread.start();
 		
-			ObjectOutputStream out = new ObjectOutputStream(simulationFile);
-			out.writeObject(getFrameResult());
-			out.close();
-			simulationFile.close();
-			
-		} catch (CloneNotSupportedException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	

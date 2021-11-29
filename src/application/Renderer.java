@@ -10,13 +10,19 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 public class Renderer {
 	
 
     private final WritablePixelFormat<IntBuffer> pixelFormat = PixelFormat.getIntArgbPreInstance();
     
-	private Canvas canvas;
+	private Canvas canvasA;
+	private Canvas canvasB;
+	
+
+	private Canvas activeCanvas;
+	
 	private MapScrollPane mapScrollPane;
 	//private GraphicsContext gc;
 	private int[] buffer;
@@ -25,7 +31,6 @@ public class Renderer {
 	int canvasWidth;
 	int canvasHeight;
 	
-	
 
 	private int plantColor = toInt(Color.GREEN);
 
@@ -33,17 +38,24 @@ public class Renderer {
 	
 	private int backgroundColor = toInt(Color.web("#95E1D3"));
 	
-
-	public Renderer(Canvas canvas, MapScrollPane mapScrollPane, int canvasWidth, int canvasHeight) {
+	
+	public Renderer(Canvas canvasA, Canvas canvasB, MapScrollPane mapScrollPane, int canvasWidth, int canvasHeight) {
 		
-		this.canvas = canvas;
+		
+		this.canvasA = canvasA;
+		this.canvasB = canvasB;
+		
+		this.activeCanvas = canvasA;
+		
 		this.mapScrollPane = mapScrollPane;
 
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
 		
+		//ctiveCanvas
 		
 		setCanvas();
+
 		
 	}
 
@@ -52,7 +64,7 @@ public class Renderer {
 	
 	private void setCanvas() {
 		
-		GraphicsContext gc = canvas.getGraphicsContext2D();
+		GraphicsContext gc = canvasA.getGraphicsContext2D();
 	    
 	    buffer = new int[canvasWidth * canvasHeight];
 	    
@@ -60,21 +72,64 @@ public class Renderer {
 	}
 	
 	
+	
+	
 	public void clearScreen() {
+		
+		GraphicsContext gc = activeCanvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, activeCanvas.getWidth(), activeCanvas.getHeight());
+		
+		
 		clearBuffer();
 
-		GraphicsContext gc = canvas.getGraphicsContext2D();
         PixelWriter p = gc.getPixelWriter();
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+        
 	}
 
+	
+	
+	
 	public void clearBuffer() {
 	    for (int i = 0; i < canvasWidth * canvasHeight; i++) {
         	buffer[i] = backgroundColor;
 	    }
 	}
 	
+
+	public void clearHiddenCanvas() {
+		
+		Canvas hiddenCanvas = null;
+		if (this.activeCanvas == canvasA) {
+			hiddenCanvas = canvasB;
+		} else {
+			hiddenCanvas = canvasA;
+		}
+		GraphicsContext gc = hiddenCanvas.getGraphicsContext2D();
+		gc.clearRect(0, 0, hiddenCanvas.getWidth(), hiddenCanvas.getHeight());
+		
+		
+		clearBuffer();
+
+        PixelWriter p = gc.getPixelWriter();
+        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+        
+	}
 	
+	
+	
+	public void swapActiveCanvas() {
+		if (this.activeCanvas == canvasA) {
+			this.activeCanvas = canvasB;
+		} else {
+			this.activeCanvas = canvasA;
+		}
+	}
+
+	public void updateVisibleCanvas() {
+		mapScrollPane.updateTarget(activeCanvas);
+		mapScrollPane.layout(); 
+	}
 	
 	public void render(ArrayList<Creature> creatures, Point[][] flowMap,
 			ArrayList<Integer> oldCreaturePositionsX, ArrayList<Integer> oldCreaturePositionsY) {
@@ -82,10 +137,11 @@ public class Renderer {
 		int creatureSize = 2;
 		
 //		clearBuffer();
-				
+
+//		GraphicsContext gc = canvas.getGraphicsContext2D();
+//		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		
 		
-  
 		
 		for (int i = 0; i < oldCreaturePositionsX.size(); i++) {
 			int x = oldCreaturePositionsX.get(i);
@@ -98,6 +154,7 @@ public class Renderer {
     			}
 			}
 		}
+		
 		
 		
 		
@@ -176,10 +233,11 @@ public class Renderer {
 		
 
 
-		GraphicsContext gc = canvas.getGraphicsContext2D();
+		GraphicsContext gc = canvasA.getGraphicsContext2D();
+
+		
         PixelWriter p = gc.getPixelWriter();
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
-        
         
         
 //        try {

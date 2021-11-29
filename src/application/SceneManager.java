@@ -69,19 +69,26 @@ public class SceneManager {
 		int canvasWidth = 640;
 		int canvasHeight = 640;
 		
-		Canvas canvas = new Canvas(canvasWidth, canvasHeight);
+		Canvas canvasA = new Canvas(canvasWidth, canvasHeight);
+
+		Canvas canvasB = new Canvas(canvasWidth, canvasHeight);
 		
-		MapScrollPane mapScrollPane = new MapScrollPane(canvas);
+		MapScrollPane mapScrollPane = new MapScrollPane(canvasA, canvasB);
+		
+
+//		mapScrollPane.setStyle("-fx-background-color: red");
 		
 		((GridPane)root).add(mapScrollPane, 1, 1);
 		
+		
 
-		renderer = new Renderer(canvas, mapScrollPane, canvasWidth, canvasHeight);
+//		canvas.setStyle("-fx-background-color: red");
+		
+		renderer = new Renderer(canvasA, canvasB, mapScrollPane, canvasWidth, canvasHeight);
 		
 		
 		simulationScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
-		
 		
 		
 	}

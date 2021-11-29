@@ -16,7 +16,6 @@ public class Main extends Application {
 			
 			sceneManager.setMainMenuScene(stage, sceneManager);
 			
-
 			stage.setOnCloseRequest(e -> sceneManager.exitCleanup());
 			
 		} catch(Exception e) {

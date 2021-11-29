@@ -21,13 +21,16 @@ public class MapScrollPane extends ScrollPane {
     
     private Node target;
     private Node zoomNode;
+
+    private Node backup;
+//    private Node zoomNode;
     
     
     
-    
-    public MapScrollPane(Node target) {
+    public MapScrollPane(Node target, Node backup) {
         super();
         this.target = target;
+        this.backup = backup;
         this.zoomNode = new Group(target);
         setContent(outerNode(zoomNode));
 
@@ -41,6 +44,11 @@ public class MapScrollPane extends ScrollPane {
         updateScale();
     }
     
+    
+    public void updateTarget (Node newTarget) {
+    	this.backup = this.target;
+    	this.target = newTarget;
+    }
     
     private Node outerNode(Node node) {
         Node outerNode = centeredNode(node);
@@ -60,6 +68,8 @@ public class MapScrollPane extends ScrollPane {
     private void updateScale() {
         target.setScaleX(scaleValue);
         target.setScaleY(scaleValue);
+        backup.setScaleX(scaleValue);
+        backup.setScaleY(scaleValue);
     }
 
 
