@@ -11,6 +11,7 @@ public class Main extends Application {
 		
 		try {
 			
+			
 			configureMainStage(stage);
 			
 			SceneManager sceneManager = new SceneManager();

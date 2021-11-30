@@ -2,9 +2,12 @@ package application.core;
 
 import java.awt.Point;
 
+import application.dynamic.Creature;
+
 public class MapStateSingleton {
 
 	private Point[][] flowMap;
+	private Creature[][] creatureMap;
 
 	static private MapStateSingleton mapState;
 	
@@ -27,6 +30,7 @@ public class MapStateSingleton {
     
     public void initialize() {
     	initializeFlowMap();
+    	initializeCreatureMap();
     }
     
     public void initializeFlowMap() {
@@ -38,6 +42,26 @@ public class MapStateSingleton {
 			}
 		}
     }
+    public void initializeCreatureMap() {
+		SettingsSingleton settings = SettingsSingleton.getInstance();
+		creatureMap = new Creature[settings.mapCellsX][settings.mapCellsY];
+    }
    
    
+
+    public boolean hasCreature(int x, int y) {
+    	return (creatureMap[x][y] != null);
+    }
+    public void clearCreature(Creature creature) {
+   	 creatureMap[creature.x][creature.y] = null;
+   }
+    public void clearCreatureFrom(int x, int y) {
+    	creatureMap[x][y] = null;
+    }
+    public void setCreature(Creature creature) {
+    	 creatureMap[creature.x][creature.y] = creature;
+    }
+    public Creature getCreature(int x, int y) {
+    	return creatureMap[x][y];
+    }
 }

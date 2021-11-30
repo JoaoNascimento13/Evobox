@@ -1,6 +1,7 @@
 package application.dynamic;
 
 import application.core.CloneableRandom;
+import application.core.MapStateSingleton;
 import application.core.SettingsSingleton;
 
 public class PreexistingCreatureFactory implements CreatureFactory {
@@ -12,7 +13,20 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
-		Creature creature = new Creature(randomizer.nextInt(settings.mapCellsX), randomizer.nextInt(settings.mapCellsY));
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		int x = -1;
+		int y = -1;
+		
+		while (true) {
+			x = randomizer.nextInt(settings.mapCellsX);
+			y = randomizer.nextInt(settings.mapCellsY);
+			if (!mapState.hasCreature(x, y)) {
+				break;
+			}
+		}
+		
+		Creature creature = new Creature(x, y);
 		
 		creature.setNextActivation((long)randomizer.nextInt(10));
 		

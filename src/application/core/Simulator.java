@@ -117,6 +117,7 @@ public class Simulator {
 
 	public void populateWorldWithCreature(Creature creature) {
 		creatures.add(creature);
+		MapStateSingleton.getInstance().setCreature(creature);
 	}
 	
 	
