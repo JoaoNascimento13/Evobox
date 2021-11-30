@@ -1,7 +1,10 @@
-package application;
+package application.dynamic;
 
 
 import java.util.ArrayList;
+
+import application.core.Direction;
+import application.core.SettingsSingleton;
 
 import java.awt.Point;
 
@@ -18,7 +21,7 @@ public class PulsePointFlowGenerator extends FlowGenerator {
 	private Flow centralPointFlow;
 	
 	public PulsePointFlowGenerator(int maxFlow, int speed, Point startingCoords, 
-			int startPulseStage, boolean pulseReversed, Direction startDir, Settings settings) {
+			int startPulseStage, boolean pulseReversed, Direction startDir) {
 
 		this.maxFlow = maxFlow;
 		this.speed = Math.max(1, Math.min(10, speed));
@@ -26,40 +29,39 @@ public class PulsePointFlowGenerator extends FlowGenerator {
 		this.pulseStage = startPulseStage;
 		this.direction = startDir;
 		this.currentFlow = new ArrayList<Flow>();
-		this.settings = settings;
 		
 		calculateBaseFlow ();
 	}
 
-	public void removeFlow(Point[][] flowMap) {
+	public void removeFlow() {
 		int percent = getFlowCoef();
 		if (percent != 0) {
 			for (Flow f : currentFlow) {
-				f.removeFromMapWithCoef(flowMap, percent);
+				f.removeFromMapWithCoef(percent);
 //				f.removeFromMap(flowMap);
 			}
 		}
 		if (centralPointFlow != null) {
-			centralPointFlow.removeFromMap(flowMap);
+			centralPointFlow.removeFromMap();
 		}
 	}
 	public void moveGenerator(Direction dir) {
 		for (Flow f : currentFlow) {
-			f.moveFlowCoords(dir, settings);
+			f.moveFlowCoords(dir);
 		}
 		coords = getShiftedPointWithMapWrap(coords.x, dir.x, coords.y, dir.y);
 	}
 	
-	public void addFlow(Point[][] flowMap) {
+	public void addFlow() {
 		int percent = getFlowCoef();
 		if (percent != 0) {
 			for (Flow f : currentFlow) {
-				f.addToMapWithCoef(flowMap, percent);
+				f.addToMapWithCoef(percent);
 //				f.addToMap(flowMap);
 			}
 			if (percent > 0) {
 				centralPointFlow = new Flow(coords.x, coords.y, 100, 100);
-				centralPointFlow.addToMap(flowMap);
+				centralPointFlow.addToMap();
 			} else {
 				centralPointFlow = null;
 			}

@@ -6,9 +6,9 @@ import java.awt.Point;
 
 import org.junit.jupiter.api.Test;
 
-import application.Direction;
-import application.Flow;
-import application.PulsePointFlowGenerator;
+import application.core.Direction;
+import application.dynamic.Flow;
+import application.dynamic.PulsePointFlowGenerator;
 
 class PulsePointFlowGeneratorTest {
 
@@ -21,7 +21,7 @@ class PulsePointFlowGeneratorTest {
 		
 		Point coords = new Point(100, 100);
 		
-		Flow flow = new PulsePointFlowGenerator(0, 0, coords, 0, false, null, null).getBaseFlowOnPoint(flowPoint, 10, Direction.DOWN_RIGHT);
+		Flow flow = new PulsePointFlowGenerator(0, 0, coords, 0, false, null).getBaseFlowOnPoint(flowPoint, 10, Direction.DOWN_RIGHT);
 		
 		assertEquals(8, flow.valX);
 		

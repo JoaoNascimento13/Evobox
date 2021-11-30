@@ -1,4 +1,4 @@
-package application;
+package application.gui;
 
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;

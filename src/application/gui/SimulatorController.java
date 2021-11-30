@@ -1,4 +1,7 @@
-package application;
+package application.gui;
+
+import application.core.Renderer;
+import application.core.Simulator;
 
 public class SimulatorController {
 	

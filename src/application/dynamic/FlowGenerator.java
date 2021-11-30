@@ -1,11 +1,16 @@
-package application;
+package application.dynamic;
 
 import java.util.ArrayList;
 import java.util.Random;
+
+import application.core.Direction;
+import application.core.SettingsSingleton;
+
 import java.awt.Point;
+import java.io.Serializable;
 
 
-public abstract class FlowGenerator extends DynamicMapElement {
+public abstract class FlowGenerator  implements Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	
@@ -17,8 +22,9 @@ public abstract class FlowGenerator extends DynamicMapElement {
 	protected Direction direction;
 	
 	protected ArrayList<Flow> currentFlow;
+
+	protected int speed;
 	
-	transient protected Settings settings;
 
 	public int getActivationRemainderValue() {
 		return (11-speed)*slowdownFactor;
@@ -26,26 +32,30 @@ public abstract class FlowGenerator extends DynamicMapElement {
 	public int getFlowRemainderValue() {
 		return (11-speed)*slowdownFactor*slowdownFactor;
 	}
+
 	
-	public boolean flowsThisFrame(int frame) {
-		return (frame % getFlowRemainderValue() == 0);
+	protected boolean activatesThisFrame(long tick) {
+		return (tick % getActivationRemainderValue() == 0);
+	}
+	public boolean flowsThisFrame(long tick) {
+		return (tick % getFlowRemainderValue() == 0);
 	}
 	
-	public void tick(int frame, Random randomizer, Point[][] flowMap) {
+	public void tick(long tick, Random randomizer) {
 		
-		if (activatesThisFrame(frame)) {
+		if (activatesThisFrame(tick)) {
 			
 			tryDirectionChange(randomizer);
 
-			removeFlow(flowMap);
+			removeFlow();
 			
-			if (flowsThisFrame(frame)) {
+			if (flowsThisFrame(tick)) {
 				moveGenerator(direction);
 			}
 
 			modifyFlow();
 			
-			addFlow(flowMap);
+			addFlow();
 		}
 	}
 	
@@ -61,18 +71,19 @@ public abstract class FlowGenerator extends DynamicMapElement {
 		}
 	}
 
-	public void removeFlow(Point[][] flowMap) {
+	public void removeFlow() {
 	}
 	public void moveGenerator(Direction dir) {
 	}
 	public void modifyFlow() {
 	}
-	public void addFlow(Point[][] flowMap) {
+	public void addFlow() {
 	}
 	
 	
 	public Point getShiftedPointWithMapWrap(int pX, int deltaX, int pY, int deltaY) {
 		int newX = pX + deltaX;
+		SettingsSingleton settings = SettingsSingleton.getInstance();
 		if (newX >= settings.mapCellsX) {
 			newX -= settings.mapCellsX;
 		} else if (newX < 0) {
@@ -87,4 +98,8 @@ public abstract class FlowGenerator extends DynamicMapElement {
 		return new Point(newX, newY);
 	}
 
+	
+	public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.text.Font?>
 
-<GridPane alignment="CENTER" gridLinesVisible="true" prefHeight="771.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SimulatorController">
+<GridPane alignment="CENTER" gridLinesVisible="true" prefHeight="771.0" prefWidth="1260.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.gui.SimulatorController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" minWidth="320.0" prefWidth="320.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="642.0" minWidth="642.0" prefWidth="642.0" />

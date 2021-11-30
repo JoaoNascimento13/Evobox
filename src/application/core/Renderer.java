@@ -1,16 +1,16 @@
-package application;
+package application.core;
 
-import java.awt.Point;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import application.dynamic.Creature;
+import application.gui.MapScrollPane;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.paint.Color;
-import javafx.stage.Stage;
 
 public class Renderer {
 	
@@ -63,11 +63,7 @@ public class Renderer {
 	
 	
 	private void setCanvas() {
-		
-		GraphicsContext gc = canvasA.getGraphicsContext2D();
-	    
 	    buffer = new int[canvasWidth * canvasHeight];
-	    
 	    clearScreen();
 	}
 	
@@ -131,16 +127,14 @@ public class Renderer {
 		mapScrollPane.layout(); 
 	}
 	
-	public void render(ArrayList<Creature> creatures, Point[][] flowMap,
-			ArrayList<Integer> oldCreaturePositionsX, ArrayList<Integer> oldCreaturePositionsY) {
+	public void render(ArrayList<Creature> creatures) {
 		
 		int creatureSize = 2;
 		
-//		clearBuffer();
-
-//		GraphicsContext gc = canvas.getGraphicsContext2D();
-//		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		
+		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
+		ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
+		ArrayList<Integer> oldCreaturePositionsY = outdatedPositions.getOutdatedCreaturesY();
 		
 		
 		for (int i = 0; i < oldCreaturePositionsX.size(); i++) {
@@ -192,31 +186,6 @@ public class Renderer {
 //		}
 		
 		
-//		for (FlowGenerator g : flowGenerators) {
-//
-//			for (Flow f : g.currentFlow) {
-//				
-//
-//	            for (int dx = 0; dx < creatureSize; dx++) {
-//	                for (int dy = 0 ; dy < creatureSize; dy++) {
-//	                	
-////	                	if (f.x > 0) {
-//
-//		                	buffer[f.x*creatureSize + dx + canvasWidth * (f.y*creatureSize + dy)] = 
-//		                			
-//		                			//toInt(new Color((100+f.valX)/200, (100+f.valY)/200, 0.5, 1))
-//		                			
-//		                			toInt(new Color((100+f.valX)/200, 0.5, 0.5, 1))
-//		                			;
-//		                	
-////	                	} else if (f.x < 0) {
-////
-////		                	buffer[f.x*creatureSize + dx + canvasWidth * (f.y*creatureSize + dy)] = debugColorB;
-////	                	}
-//	    			}
-//				}
-//			}
-//		}
 		
 		
 		for (Creature c : creatures) {

@@ -1,6 +1,9 @@
-package application;
+package application.core;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+import application.dynamic.Creature;
+import application.dynamic.FlowGenerator;
 
 public class SimulationState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
@@ -8,7 +11,7 @@ public class SimulationState implements Serializable, Cloneable {
 	public ArrayList<Creature> creatures;
 	public ArrayList<FlowGenerator> flowGenerators;
 	public CloneableRandom randomizer;
-	public int frame;
+	public long tick;
 	public int simulationNumber;
 	
 	public Object clone() throws CloneNotSupportedException {
@@ -18,12 +21,12 @@ public class SimulationState implements Serializable, Cloneable {
 	public SimulationState(int simulationNumber, 
 			ArrayList<Creature> creatures, 
 			ArrayList<FlowGenerator> flowGenerators, 
-			CloneableRandom randomizer, int frame) {
+			CloneableRandom randomizer, long tick) {
 		this.simulationNumber = simulationNumber;
 		this.creatures = creatures;
 		this.flowGenerators = flowGenerators;
 		this.randomizer = randomizer;
-		this.frame = frame;
+		this.tick = tick;
 	}
 	
 }

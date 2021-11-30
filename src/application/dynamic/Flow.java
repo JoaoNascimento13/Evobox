@@ -1,8 +1,12 @@
-package application;
+package application.dynamic;
 
 
 import java.awt.Point;
 import java.io.Serializable;
+
+import application.core.Direction;
+import application.core.MapStateSingleton;
+import application.core.SettingsSingleton;
 
 public class Flow implements Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
@@ -20,25 +24,28 @@ public class Flow implements Cloneable, Serializable {
 	}
 	
 	
-	public void moveInMap (Point[][] flowMap, Direction dir, Settings settings) {
+	public void moveInMap (Direction dir, SettingsSingleton settings) {
 		
-		removeFromMap(flowMap);
+		removeFromMap();
 		
-		moveFlowCoords(dir, settings);
+		moveFlowCoords(dir);
 		
-		addToMap(flowMap);
+		addToMap();
 	}
 	
-	public void removeFromMap(Point[][] flowMap) {
+	public void removeFromMap() {
+		Point[][] flowMap = MapStateSingleton.getInstance().getFlowMap();
 		flowMap[x][y].x -= valX;
 		flowMap[x][y].y -= valY;
 	}
-	public void removeFromMapWithCoef(Point[][] flowMap, int percent) {
+	public void removeFromMapWithCoef(int percent) {
+		Point[][] flowMap = MapStateSingleton.getInstance().getFlowMap();
 		flowMap[x][y].x -= (valX * percent)/100;
 		flowMap[x][y].y -= (valY * percent)/100;
 	}
 	
-	public void moveFlowCoords(Direction dir, Settings settings) {
+	public void moveFlowCoords(Direction dir) {
+		SettingsSingleton settings = SettingsSingleton.getInstance();
 		this.x += dir.x;
 		if (this.x >= settings.mapCellsX) {
 			this.x -= settings.mapCellsX;
@@ -53,11 +60,13 @@ public class Flow implements Cloneable, Serializable {
 		}
 	}
 	
-	public void addToMap(Point[][] flowMap) {
+	public void addToMap() {
+		Point[][] flowMap = MapStateSingleton.getInstance().getFlowMap();
 		flowMap[x][y].x += valX;
 		flowMap[x][y].y += valY;
 	}
-	public void addToMapWithCoef(Point[][] flowMap, int percent) {
+	public void addToMapWithCoef(int percent) {
+		Point[][] flowMap = MapStateSingleton.getInstance().getFlowMap();
 		flowMap[x][y].x += (valX * percent)/100;
 		flowMap[x][y].y += (valY * percent)/100;
 	}

@@ -1,10 +1,14 @@
-package application;
+package application.gui;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
+
+import application.core.Renderer;
+import application.core.SimulationState;
+import application.core.Simulator;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -189,15 +193,14 @@ public class SceneManager {
 
 
 	public void exitCleanup() {
-		
 		if (simulator != null) {
-			
 			try {
 				simulator.record();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		}
+		System.exit(0);
 	}
 
 

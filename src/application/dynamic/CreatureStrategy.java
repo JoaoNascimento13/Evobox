@@ -1,8 +1,8 @@
-package application;
+package application.dynamic;
 
-import java.util.Random;
+import java.io.Serializable;
 
-public class CloneableRandom extends Random implements Cloneable {
+public abstract class CreatureStrategy implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;
 
 	public Object clone() throws CloneNotSupportedException {
