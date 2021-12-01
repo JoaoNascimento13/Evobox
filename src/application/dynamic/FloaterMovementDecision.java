@@ -4,8 +4,6 @@ import java.awt.Point;
 import application.core.CloneableRandom;
 import application.core.Direction;
 import application.core.MapStateSingleton;
-import application.core.OutdatedPositionsSingleton;
-import application.core.SettingsSingleton;
 
 public class FloaterMovementDecision extends CreatureStrategy implements MovementDecisionStrategy  {
 	private static final long serialVersionUID = 1L;
@@ -17,7 +15,8 @@ public class FloaterMovementDecision extends CreatureStrategy implements Movemen
 	}
 	
 	
-	
+
+	@Override
 	public Direction decideMovementDirection(CloneableRandom randomizer) {
 
 //		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();

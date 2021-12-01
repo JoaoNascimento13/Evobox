@@ -34,6 +34,8 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		
 		Genome genome = new Genome();
 
+		genome.setDiet(Diet.PHOTOSYNTHESIS);
+		
 		genome.setSpeed(0);
 		genome.setPerception(0);
 		genome.setStealth(0);
@@ -51,7 +53,12 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		creature.setGenome(genome);
 		
 		
-		creature.setMoveStrategy(new FloaterMovementDecision(creature));
+		creature.setMovementDecisionStrategy(new FloaterMovementDecision(creature));
+		creature.setFeedingStrategy(new Photosynthesis(creature));
+
+		
+		creature.setAge(randomizer.nextInt(200));
+		creature.setFood(creature.feedingStrategy.getStartingFoodStorage());
 		
 		return creature;
 	}

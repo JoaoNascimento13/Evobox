@@ -6,7 +6,8 @@ public class Genome implements Cloneable, Serializable {
 	private static final long serialVersionUID = 1L;
 	
 //	public Size size;
-//	public Diet diet;
+	
+	public Diet diet;
 //	public Species specificDiet;
 	
 	public int speed;
@@ -21,8 +22,11 @@ public class Genome implements Cloneable, Serializable {
 	public int fertility;
 	public int clutchSize;
 	
+
 	
-	
+	public void setDiet(Diet diet) {
+		this.diet = diet;
+	}
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}

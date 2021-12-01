@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 
 import application.dynamic.Creature;
+import application.dynamic.Diet;
 import application.dynamic.FlowGenerator;
 
 public class MapStateSingleton {
@@ -101,6 +102,18 @@ public class MapStateSingleton {
     }
     public boolean hasCreature(int x, int y) {
     	return (!isEmpty(x, y));
+    }
+    public boolean hasPlant(int x, int y) {
+    	Creature c = getCreature(x, y);
+    	if (c == null) {
+    		return false;
+    	} else {
+    		if (c.genome.diet == Diet.HERBIVOROUS) {
+    			return true;
+    		} else {
+    			return false;
+    		}
+    	}
     }
     public void clearCreature(Creature creature) {
     	creatureMap[creature.x][creature.y] = null;

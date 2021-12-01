@@ -23,6 +23,7 @@ public class Creature implements Cloneable, Serializable  {
 	public Genome genome;
 	
 	public int age;
+	public int food;
 	
 	public long id;
 	
@@ -32,14 +33,15 @@ public class Creature implements Cloneable, Serializable  {
 	}
 	
 	private MovementDecisionStrategy movementDecisionStrategy;
-	
+
+	public FeedingStrategy feedingStrategy;
 	
 	
 	
 	public void actOrPostpone(long currentTick, CloneableRandom randomizer) {
 		if (this.nextActivation == currentTick) {
 			act(randomizer);
-			nextActivation = currentTick + (11-this.genome.speed);
+			nextActivation = currentTick + ticksPerTurn();
 		}
 	}
 	
@@ -47,22 +49,45 @@ public class Creature implements Cloneable, Serializable  {
 	public void act(CloneableRandom randomizer) {
 		
 		age();
+		useFood();
 		
-		dieFromOldAgeOrContinue(randomizer);
-		
+		if(die(randomizer)) {
+			return;
+		}
 		
 		move(randomizer);
+		
+		feed(randomizer);
+		
+		//reproduce();
 	}
 	
 	
+	public int ticksPerTurn() {
+		return (11-this.genome.speed);
+	}
 
 
 	public void age() {
-		this.age += (11-this.genome.speed);
+		this.age += ticksPerTurn();
+	}
+	public void useFood() {
+		this.food -= ticksPerTurn()*feedingStrategy.getfoodUsedPerTick();
 	}
 
+
+	public boolean die(CloneableRandom randomizer) {
+		if (dieFromOldAgeOrContinue(randomizer)) {
+			return true;
+		}
+		if (dieFromStarvationOrContinue()) {
+			return true;
+		}
+		return false;
+	}
 	
-	public void dieFromOldAgeOrContinue(CloneableRandom randomizer) {
+	
+	public boolean dieFromOldAgeOrContinue(CloneableRandom randomizer) {
 
 		int chanceOfDeath = 0;
 		
@@ -81,9 +106,22 @@ public class Creature implements Cloneable, Serializable  {
 		
 		if (randomizer.nextInt(100) < chanceOfDeath) {
 			die();
+			return true;
+		} else {
+			return false;
 		}
 	}
 	
+
+	public boolean dieFromStarvationOrContinue() {
+		
+		if (food <= 0) {
+			die();
+			return true;
+		} else {
+			return false;
+		}
+	}
 	
 
 	public void die() {
@@ -104,9 +142,22 @@ public class Creature implements Cloneable, Serializable  {
 	}
 
 
+
+	public void feed(CloneableRandom randomizer) {
+		
+		this.feedingStrategy.feed(randomizer);
+		
+	}
+
+	
+	
+	
+	
+	
+	
+	
 	public boolean canMoveInDir(Direction dir, MapStateSingleton mapState, int maxX, int maxY) {
 		
-//		System.out.println("testing dir: " + dir);
 		return (
 				x + dir.x < maxX && x + dir.x > -1 && 
 				y + dir.y < maxY && y + dir.y > -1 && 
@@ -120,9 +171,6 @@ public class Creature implements Cloneable, Serializable  {
 		if (mainDir == Direction.NONE) {
 			return;
 		}
-		
-//		System.out.println();
-//		System.out.println("moveInDir");
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		int maxX = SettingsSingleton.getInstance().mapCellsX;
@@ -179,8 +227,6 @@ public class Creature implements Cloneable, Serializable  {
 		
 		if (movementDir != Direction.NONE) {
 			
-//			System.out.println("moving");
-			
 			OutdatedPositionsSingleton.getInstance().addCreaturePosition(x, y);
 			mapState.clearCreature(this);
 			
@@ -189,9 +235,6 @@ public class Creature implements Cloneable, Serializable  {
 			
 			mapState.setCreatureInPoint(this);
 			
-		} else {
-
-//			System.out.println("not moving");
 		}
 	}
 	
@@ -208,10 +251,20 @@ public class Creature implements Cloneable, Serializable  {
 	public void setGenome(Genome genome) {
 		this.genome = genome;
 	}
+	public void setAge(int age) {
+		this.age = age;
+	}
+	public void setFood(int food) {
+		this.food = food;
+	}
 	
-	public void setMoveStrategy(MovementDecisionStrategy moveStrategy) {
+	public void setMovementDecisionStrategy(MovementDecisionStrategy moveStrategy) {
 		this.movementDecisionStrategy = moveStrategy;
 	}
+	public void setFeedingStrategy(FeedingStrategy feedingStrategy) {
+		this.feedingStrategy = feedingStrategy;
+	}
+
 
 	
 	public Object clone() throws CloneNotSupportedException {
