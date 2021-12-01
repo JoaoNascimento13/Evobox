@@ -10,6 +10,7 @@ import application.core.Renderer;
 import application.core.SimulationState;
 import application.core.Simulator;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -77,18 +78,35 @@ public class SceneManager {
 
 		Canvas canvasB = new Canvas(canvasWidth, canvasHeight);
 		
-		MapScrollPane mapScrollPane = new MapScrollPane(canvasA, canvasB);
-		
+		MapScrollPane mapScrollPaneA = new MapScrollPane(canvasA);
 
+		MapScrollPane mapScrollPaneB = new MapScrollPane(canvasB);
+
+		mapScrollPaneA.backup = mapScrollPaneB;
+		
+		mapScrollPaneB.backup = mapScrollPaneA;
+		
 //		mapScrollPane.setStyle("-fx-background-color: red");
 		
-		((GridPane)root).add(mapScrollPane, 1, 1);
+		((GridPane)root).add(mapScrollPaneA, 1, 1);
 		
 		
 
+		
+		GridPane rootTest = ((GridPane)mapScrollPaneA.getParent());
+		
+
+		System.out.println("Nodes: ");
+		for (Node n : rootTest.getChildren()) {
+			System.out.println(n);
+		}
+		
+		
+		
+		
 //		canvas.setStyle("-fx-background-color: red");
 		
-		renderer = new Renderer(canvasA, canvasB, mapScrollPane, canvasWidth, canvasHeight);
+		renderer = new Renderer(canvasA, canvasB, mapScrollPaneA, canvasWidth, canvasHeight);
 		
 		
 		simulationScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -112,9 +130,7 @@ public class SceneManager {
 
 	public void loadSimulation() {
 		
-		
     	SimulationState simulationToLoad = null;
-    	
     	
         try {
 
@@ -170,24 +186,13 @@ public class SceneManager {
 	}
 	
 	
-//	public void saveFirstSimulatorFrame() {
-//		try {
-//			simulator.recordFirstFrame();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//	}
-	
 	
 	public void showSimulation(Stage stage) {
 		
 		simulator.renderInitialFrame();
 		
-		
 		stage.setScene(simulationScene);
 		stage.show();
-
-		//simulator.launchAnimationThread();
 	}
 
 
@@ -196,6 +201,7 @@ public class SceneManager {
 		if (simulator != null) {
 			try {
 				simulator.record();
+				simulator.waitForRecordingIfNeeded();
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

@@ -30,7 +30,28 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		
 		creature.setNextActivation((long)randomizer.nextInt(10));
 		
-		creature.setMoveStrategy(new FloaterMoveStrategy(creature));
+		
+		
+		Genome genome = new Genome();
+
+		genome.setSpeed(0);
+		genome.setPerception(0);
+		genome.setStealth(0);
+		genome.setAgression(0);
+		genome.setReactiveness(0);
+
+		genome.setAttackDamage(0);
+		genome.setDefenseDamage(0);
+		genome.setToughness(1);
+		
+		genome.setAgeExpectancy(1000);
+		genome.setFertility(8);
+		genome.setClutchSize(2);
+		
+		creature.setGenome(genome);
+		
+		
+		creature.setMoveStrategy(new FloaterMovementDecision(creature));
 		
 		return creature;
 	}

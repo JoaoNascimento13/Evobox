@@ -22,15 +22,15 @@ public class MapScrollPane extends ScrollPane {
     private Node target;
     private Node zoomNode;
 
-    private Node backup;
+//    private Node backup;
 //    private Node zoomNode;
     
+    public MapScrollPane backup;
     
-    
-    public MapScrollPane(Node target, Node backup) {
+    public MapScrollPane(Node target) {
         super();
         this.target = target;
-        this.backup = backup;
+//        this.backup = backup;
         this.zoomNode = new Group(target);
         setContent(outerNode(zoomNode));
 
@@ -44,11 +44,18 @@ public class MapScrollPane extends ScrollPane {
         updateScale();
     }
     
+
+	public Node getTarget () {
+		return target;
+	}
     
-    public void updateTarget (Node newTarget) {
-    	this.backup = this.target;
-    	this.target = newTarget;
-    }
+    
+    
+//    public void updateTarget (Node newTarget) {
+//    	this.backup = this.target;
+//    	this.target = newTarget;
+//    	//onScroll(0, new Point2D(1, 1));
+//    }
     
     private Node outerNode(Node node) {
         Node outerNode = centeredNode(node);
@@ -68,10 +75,7 @@ public class MapScrollPane extends ScrollPane {
     private void updateScale() {
         target.setScaleX(scaleValue);
         target.setScaleY(scaleValue);
-        backup.setScaleX(scaleValue);
-        backup.setScaleY(scaleValue);
     }
-
 
     
 
@@ -133,7 +137,9 @@ public class MapScrollPane extends ScrollPane {
                 scaleValue = scaleValue * zoomFactor;
             }
         }
-        
+
+    	backup.scaleValue = scaleValue;
+    	
             
         Bounds innerBounds = zoomNode.getLayoutBounds();
         Bounds viewportBounds = getViewportBounds();
@@ -144,9 +150,11 @@ public class MapScrollPane extends ScrollPane {
         
         
         updateScale();
+        backup.updateScale();
         
         // refresh ScrollPane scroll positions & target bounds
-        this.layout(); 
+        this.layout();
+        backup.layout(); 
 
         // convert target coordinates to zoomTarget coordinates
         Point2D posInZoomTarget = target.parentToLocal(zoomNode.parentToLocal(mousePoint));
@@ -158,7 +166,11 @@ public class MapScrollPane extends ScrollPane {
         // convert back to [0, 1] range
         // (too large/small values are automatically corrected by ScrollPane)
         Bounds updatedInnerBounds = zoomNode.getBoundsInLocal();
+        
         this.setHvalue((valX + adjustment.getX()) / (updatedInnerBounds.getWidth() - viewportBounds.getWidth()));
         this.setVvalue((valY + adjustment.getY()) / (updatedInnerBounds.getHeight() - viewportBounds.getHeight()));
+
+        backup.setHvalue((valX + adjustment.getX()) / (updatedInnerBounds.getWidth() - viewportBounds.getWidth()));
+        backup.setVvalue((valY + adjustment.getY()) / (updatedInnerBounds.getHeight() - viewportBounds.getHeight()));
     }
 }

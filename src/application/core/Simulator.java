@@ -18,11 +18,7 @@ public class Simulator {
 	
 	public long tick;
 	
-	private ArrayList<Creature> creatures;
 	
-	
-
-	private ArrayList<FlowGenerator> flowGenerators;
 	
 	private Renderer renderer;
 	
@@ -56,8 +52,6 @@ public class Simulator {
 		recording = false;
 		rendering = false;
 		
-		creatures = new ArrayList<Creature>();
-		flowGenerators = new ArrayList<FlowGenerator>();
 		
 		
 		
@@ -87,7 +81,7 @@ public class Simulator {
 	
 	
 	public void populateWorld() {
-		
+
 		CreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
 		
 		for (int i = 0; i < 15000; i++) {
@@ -97,11 +91,13 @@ public class Simulator {
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
-		for (int i = 0; i < 20; i++) {
+		ArrayList<FlowGenerator> flowGenerators = MapStateSingleton.getInstance().flowGenerators;
+		
+		for (int i = 0; i < 10; i++) {
 
 			flowGenerators.add(new PulsePointFlowGenerator(
-					100, 
-					1+randomizer.nextInt(5), 
+					200, 
+					8+randomizer.nextInt(3), 
 					new Point(randomizer.nextInt(settings.mapCellsX), randomizer.nextInt(settings.mapCellsY)), 
 					randomizer.nextInt(21)-10, 
 					randomizer.nextBoolean(), 
@@ -116,8 +112,8 @@ public class Simulator {
 	
 
 	public void populateWorldWithCreature(Creature creature) {
-		creatures.add(creature);
-		MapStateSingleton.getInstance().setCreature(creature);
+		MapStateSingleton.getInstance().registerCreature(creature);
+		MapStateSingleton.getInstance().setCreatureInPoint(creature);
 	}
 	
 	
@@ -146,18 +142,39 @@ public class Simulator {
 	
 	
 	public void loadSimulation(SimulationState simulationToLoad) {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		this.simNumber = simulationToLoad.simulationNumber;
-		this.creatures = simulationToLoad.creatures;
-		this.flowGenerators = simulationToLoad.flowGenerators;
 		this.randomizer = simulationToLoad.randomizer;
 		this.tick = simulationToLoad.tick;
 		
 
-//		this.settings = new SettingsSingleton(0, 320, 320);
-		for (FlowGenerator f : flowGenerators) {
+		mapState.creatures = simulationToLoad.creatures;
+		mapState.flowGenerators = simulationToLoad.flowGenerators;
+		
+		for (FlowGenerator f : mapState.flowGenerators) {
 			f.addFlow();
 		}
+		
+
+//		for (Creature c : mapState.creatures) {
+//			for (Creature d : mapState.creatures) {
+//				if (c.id == d.id && !(c == d)) {
+//					System.out.println("ID ERROR!");
+//				}
+//				if (c.x == d.x && c.y == d.y && !(c == d)) {
+//					System.out.println("LOCATION ERROR!");
+//				}
+//			}
+//		}
+
+		
+		for (Creature c : mapState.creatures) {
+			mapState.setCreatureInPoint(c);
+		}
+		
+		
 	}
 
 	
@@ -166,6 +183,7 @@ public class Simulator {
 		
 
 		SettingsSingleton settings = SettingsSingleton.getInstance();
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		while (!paused) {
 			
@@ -175,22 +193,19 @@ public class Simulator {
 
 			waitForRenderingIfNeeded();
 
-			
 			performTickActions();
 			
 			tick++;
+
+			mapState.unregisterDeadCreatures();
+
 			
 			if (tick % 50 == 0) {
-				renderer.swapActiveCanvas();
+				renderer.changeVisibleMapScrollPane();
 			}
 			
 			render();
 
-			if (tick % 50 == 0) {
-				renderer.updateVisibleCanvas();
-				renderer.clearHiddenCanvas();
-			}
-			
 			
 			if (settings.periodicRecordings > 0 && tick % settings.periodicRecordings == 0) {
 					
@@ -204,18 +219,6 @@ public class Simulator {
 					
 			}
 			
-			
-//			System.out.println(
-//					"flowMap[160][165] = " + flowMap[160][165].x + " " + flowMap[160][165].y + 
-//					" | flowMap[161][161] = " + flowMap[161][161].x + " " + flowMap[161][161].y + 
-//					" | flowMap[180][180] = " + flowMap[180][180].x + " " + flowMap[180][180].y);
-			
-			
-//			try {
-//				Thread.sleep(10);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
 			
 		}
 		
@@ -243,6 +246,34 @@ public class Simulator {
 			}
 		}
 	}
+//	public void waitForSwappingCanvasIfNeeded() {
+//		while (swappingCanvas) {
+//			try {
+//				Thread.sleep(10);
+//			} catch (InterruptedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+	
+	
+//	private boolean swappingCanvas;
+//	
+//	public void swapVisibleCanvas() {
+//		
+//		renderer.changeVisibleMapScrollPane();
+////		swappingCanvas = true;
+////		Thread thread = new Thread(new Runnable() {
+////		    public void run() {
+////				renderer.updateVisibleCanvas();
+////				renderer.clearHiddenCanvas();
+////				
+////				swappingCanvas = false;
+////		    }
+////		});
+////		thread.setPriority(10);
+////		thread.start();
+//	}
 	
 	
 
@@ -250,10 +281,9 @@ public class Simulator {
 
 		rendering = true;
 		
-		Thread thread = null;
-		thread = new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 		    public void run() {
-		    	renderer.render(creatures);
+		    	renderer.render();
 
 				rendering = false;
 		    }
@@ -266,15 +296,12 @@ public class Simulator {
 		
 		recording = true;
 		
-		Thread thread = null;
-		thread = new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 		    public void run() {
 
 				try {
-					
 					FileOutputStream simulationFile = new FileOutputStream(
 							"simulations/" + String.format("%04d", simNumber) + "-" + String.format("%09d", tick));
-				
 					ObjectOutputStream out = new ObjectOutputStream(simulationFile);
 					out.writeObject(getStateOnTick());
 					out.close();
@@ -296,12 +323,15 @@ public class Simulator {
 	public SimulationState getStateOnTick() throws CloneNotSupportedException {
 		
 		ArrayList<Creature> frameResultCreatures = new ArrayList<Creature>();
-		for (Creature c : creatures) {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		for (Creature c : mapState.creatures) {
 			frameResultCreatures.add((Creature) c.clone());
 		}
 
 		ArrayList<FlowGenerator> frameResultFlowGenerators = new ArrayList<FlowGenerator>();
-		for (FlowGenerator f : flowGenerators) {
+		for (FlowGenerator f : mapState.flowGenerators) {
 			frameResultFlowGenerators.add((FlowGenerator) f.clone());
 		}
 		
@@ -317,6 +347,7 @@ public class Simulator {
 	
 	
 	public void performTickActions() {
+
 		moveGenerators();
 		animateCreatures();
 		adjacentActions();
@@ -326,8 +357,9 @@ public class Simulator {
 	
 	
 	private void moveGenerators() {
-		
-		for (FlowGenerator g : flowGenerators) {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		for (FlowGenerator g : mapState.flowGenerators) {
 			g.tick(tick, randomizer);
 		}
 		
@@ -337,57 +369,16 @@ public class Simulator {
 		
 		OutdatedPositionsSingleton.getInstance().clearPositions();
 		
-		for (Creature c : creatures) {
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		for (Creature c : mapState.creatures) {
 			c.actOrPostpone(tick, randomizer);
 		}
 	}
 	
-//	private void moveCreatures() {
-//		
-//		int lastPixelX = 319;
-//		int lastPixelY = 319;
-//		
-//		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
-//		ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
-//		ArrayList<Integer> oldCreaturePositionsY = outdatedPositions.getOutdatedCreaturesY();
-//		
-//		for (Creature c : creatures) {
-//			
-//			
-//			
-//			if (randomizer.nextInt(1500) < Math.abs(flowMap[c.x][c.y].x)) {
-//				
-//				oldCreaturePositionsX.add(c.x);
-//				oldCreaturePositionsY.add(c.y);
-//				if (flowMap[c.x][c.y].x > 0) {
-//					c.x = Math.max(0,Math.min(lastPixelX, c.x + 1));
-//				} else if (flowMap[c.x][c.y].x < 0) {
-//					c.x = Math.max(0,Math.min(lastPixelX, c.x - 1));
-//				}
-//				
-//			}
-//			
-//			if (randomizer.nextInt(1500) < Math.abs(flowMap[c.x][c.y].y)) {
-//				
-//				oldCreaturePositionsX.add(c.x);
-//				oldCreaturePositionsY.add(c.y);
-//				
-//				if (flowMap[c.x][c.y].y > 0) {
-//					c.y = Math.max(0,Math.min(lastPixelY, c.y + 1));
-//				} else if (flowMap[c.x][c.y].y < 0) {
-//					c.y = Math.max(0,Math.min(lastPixelY, c.y - 1));
-//				}
-//			}
-//			
-//			
-//		}
-//		
-//	}
 	
 	private void adjacentActions() {
 		
 	}
-
 
 
 	public void pause() {
@@ -429,7 +420,7 @@ public class Simulator {
 
 
 	public void renderInitialFrame() {
-		renderer.render(creatures);
+		renderer.render();
 	}
 
 

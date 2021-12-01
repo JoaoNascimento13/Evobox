@@ -5,11 +5,14 @@ import java.util.ArrayList;
 
 import application.dynamic.Creature;
 import application.gui.MapScrollPane;
+import javafx.application.Platform;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
 public class Renderer {
@@ -17,13 +20,14 @@ public class Renderer {
 
     private final WritablePixelFormat<IntBuffer> pixelFormat = PixelFormat.getIntArgbPreInstance();
     
-	private Canvas canvasA;
-	private Canvas canvasB;
+//	private Canvas canvasA;
+//	private Canvas canvasB;
 	
 
 	private Canvas activeCanvas;
 	
-	private MapScrollPane mapScrollPane;
+	private MapScrollPane activeMapScrollPane;
+	
 	//private GraphicsContext gc;
 	private int[] buffer;
 	
@@ -42,12 +46,12 @@ public class Renderer {
 	public Renderer(Canvas canvasA, Canvas canvasB, MapScrollPane mapScrollPane, int canvasWidth, int canvasHeight) {
 		
 		
-		this.canvasA = canvasA;
-		this.canvasB = canvasB;
+//		this.canvasA = canvasA;
+//		this.canvasB = canvasB;
 		
 		this.activeCanvas = canvasA;
 		
-		this.mapScrollPane = mapScrollPane;
+		this.activeMapScrollPane = mapScrollPane;
 
 		this.canvasWidth = canvasWidth;
 		this.canvasHeight = canvasHeight;
@@ -92,45 +96,49 @@ public class Renderer {
 	    }
 	}
 	
+	
 
-	public void clearHiddenCanvas() {
-		
-		Canvas hiddenCanvas = null;
-		if (this.activeCanvas == canvasA) {
-			hiddenCanvas = canvasB;
-		} else {
-			hiddenCanvas = canvasA;
-		}
-		GraphicsContext gc = hiddenCanvas.getGraphicsContext2D();
-		gc.clearRect(0, 0, hiddenCanvas.getWidth(), hiddenCanvas.getHeight());
+	public void changeVisibleMapScrollPane() {
 		
 		
-		clearBuffer();
+		GraphicsContext gc = ((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D();
 
+		
         PixelWriter p = gc.getPixelWriter();
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
-        
-	}
-	
-	
-	
-	public void swapActiveCanvas() {
-		if (this.activeCanvas == canvasA) {
-			this.activeCanvas = canvasB;
-		} else {
-			this.activeCanvas = canvasA;
-		}
-	}
+		
+		
+		GridPane root = ((GridPane)activeMapScrollPane.getParent());
+		
+		
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
 
-	public void updateVisibleCanvas() {
-		mapScrollPane.updateTarget(activeCanvas);
-		mapScrollPane.layout(); 
+				root.getChildren().remove(activeMapScrollPane);
+				
+				root.add(activeMapScrollPane.backup, 1, 1);
+				
+				root.layout();
+				
+				activeMapScrollPane = activeMapScrollPane.backup;
+
+				activeCanvas = (Canvas) activeMapScrollPane.getTarget();
+				
+
+				((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D().
+					clearRect(0, 0, activeCanvas.getWidth(), activeCanvas.getHeight());
+		    }
+		});
+		
 	}
 	
-	public void render(ArrayList<Creature> creatures) {
+	
+	public void render() {
 		
 		int creatureSize = 2;
-		
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
 		ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
@@ -185,10 +193,21 @@ public class Renderer {
 //			}
 //		}
 		
+
+//		for (Creature c : mapState.creatures) {
+//			for (Creature d : mapState.creatures) {
+//				if (c.x == d.x && c.y == d.y && !(c == d)) {
+//					System.out.println("ERROR");
+//					System.out.println("c.id: " + c.id);
+//					System.out.println("d.id: " + d.id);
+//					System.out.println("coords: " + c.x + ", " + c.y);
+//					int crash = 1/0;
+//				}
+//			}
+//		}
 		
 		
-		
-		for (Creature c : creatures) {
+		for (Creature c : mapState.creatures) {
 
             for (int dx = 0; dx < creatureSize; dx++) {
                 for (int dy = 0 ; dy < creatureSize; dy++) {
@@ -202,7 +221,7 @@ public class Renderer {
 		
 
 
-		GraphicsContext gc = canvasA.getGraphicsContext2D();
+		GraphicsContext gc = activeCanvas.getGraphicsContext2D();
 
 		
         PixelWriter p = gc.getPixelWriter();
@@ -222,12 +241,12 @@ public class Renderer {
 	
 	
 	public void zoomIn() {
-		mapScrollPane.zoomIn();
+		activeMapScrollPane.zoomIn();
 	}
 	
 
 	public void zoomOut() {
-		mapScrollPane.zoomOut();
+		activeMapScrollPane.zoomOut();
 	}
 	
 	
