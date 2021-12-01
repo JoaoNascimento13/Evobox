@@ -8,9 +8,12 @@ import java.util.ArrayList;
 
 import application.dynamic.Creature;
 import application.dynamic.CreatureFactory;
+import application.dynamic.FeedingStrategy;
 import application.dynamic.FlowGenerator;
+import application.dynamic.MovementDecisionStrategy;
 import application.dynamic.PreexistingCreatureFactory;
 import application.dynamic.PulsePointFlowGenerator;
+import application.dynamic.ReproductionStrategy;
 
 import java.awt.Point;
 
@@ -23,7 +26,8 @@ public class Simulator {
 	private Renderer renderer;
 	
 	private boolean paused;
-	
+
+	public boolean running;
 	private boolean recording;
 	private boolean rendering;
 	
@@ -85,7 +89,7 @@ public class Simulator {
 		CreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
 		
 		for (int i = 0; i < 15000; i++) {
-			populateWorldWithCreature(preexistingCreatureFactory.createCreature(randomizer));
+			populateWorldWithCreature(preexistingCreatureFactory.createCreature(randomizer, 0));
 		}
 		
 		
@@ -117,67 +121,6 @@ public class Simulator {
 	}
 	
 	
-	public void setSimNumber() {
-
-		int maxSimNumber = 0;
-		
-		File folder = new File("simulation");
-		File[] listOfFiles = folder.listFiles();
-		
-		if (listOfFiles != null) {
-
-			for (int i = 0; i < listOfFiles.length; i++) {
-				
-				String filename = listOfFiles[i].getName();
-				
-				int dashIndex = filename.indexOf('-');
-				
-				System.out.println(filename.substring(0, dashIndex) + " -> " + Integer.valueOf(filename.substring(0, dashIndex)));
-				maxSimNumber = Math.max(maxSimNumber, Integer.valueOf(filename.substring(0, dashIndex)));
-			}
-		}
-		
-		simNumber = maxSimNumber + 1;
-	}
-	
-	
-	public void loadSimulation(SimulationState simulationToLoad) {
-
-		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		
-		this.simNumber = simulationToLoad.simulationNumber;
-		this.randomizer = simulationToLoad.randomizer;
-		this.tick = simulationToLoad.tick;
-		
-
-		mapState.creatures = simulationToLoad.creatures;
-		mapState.flowGenerators = simulationToLoad.flowGenerators;
-		
-		for (FlowGenerator f : mapState.flowGenerators) {
-			f.addFlow();
-		}
-		
-
-//		for (Creature c : mapState.creatures) {
-//			for (Creature d : mapState.creatures) {
-//				if (c.id == d.id && !(c == d)) {
-//					System.out.println("ID ERROR!");
-//				}
-//				if (c.x == d.x && c.y == d.y && !(c == d)) {
-//					System.out.println("LOCATION ERROR!");
-//				}
-//			}
-//		}
-
-		
-		for (Creature c : mapState.creatures) {
-			mapState.setCreatureInPoint(c);
-		}
-		
-		
-	}
-
-	
 	
 	public void animate() {
 		
@@ -188,16 +131,33 @@ public class Simulator {
 		while (!paused) {
 			
 			
-
+			
 			waitForRecordingIfNeeded();
 
 			waitForRenderingIfNeeded();
 
-			performTickActions();
+			running = true;
+			
+			performTickSimulations();
+
+			mapState.unregisterDeadCreatures();
+			
+			mapState.registerBornCreatures();
+			
+
+			running = false;
+			
+			
+			int creatureNumber = mapState.creatures.size();
+			
+			System.out.println(creatureNumber + " creatures");
+			
+			if (creatureNumber == 0) {
+				paused = true;
+			}
 			
 			tick++;
 
-			mapState.unregisterDeadCreatures();
 
 			
 			if (tick % 50 == 0) {
@@ -225,7 +185,17 @@ public class Simulator {
 		
 	}
 	
+
 	
+	public void waitForRunningIfNeeded() {
+		while (running) {
+			try {
+				Thread.sleep(10);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 	public void waitForRecordingIfNeeded() {
 		while (recording) {
@@ -292,9 +262,21 @@ public class Simulator {
 	}
 	
 	
+	
+	
 	public void record() throws IOException {
 		
 		recording = true;
+		
+		boolean unpauseWhenDone = false;
+		if (!paused) {
+			pause();
+			unpauseWhenDone = true;
+		}
+		
+		final boolean unpauseWhenDoneFinal = unpauseWhenDone;
+		
+		waitForRunningIfNeeded();
 		
 		Thread thread = new Thread(new Runnable() {
 		    public void run() {
@@ -308,7 +290,11 @@ public class Simulator {
 					simulationFile.close();
 					recording = false;
 					
-				} catch (CloneNotSupportedException | IOException e) {
+					if (unpauseWhenDoneFinal) {
+						unpause();
+					}
+					
+				} catch (IOException e) {
 					e.printStackTrace();
 				}
 		    }
@@ -320,22 +306,26 @@ public class Simulator {
 	
 	
 	
-	public SimulationState getStateOnTick() throws CloneNotSupportedException {
+	public SimulationState getStateOnTick() {
 		
 		ArrayList<Creature> frameResultCreatures = new ArrayList<Creature>();
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		for (Creature c : mapState.creatures) {
-			frameResultCreatures.add((Creature) c.clone());
+			frameResultCreatures.add(c);
+//			frameResultCreatures.add((Creature) c.clone());
 		}
 
 		ArrayList<FlowGenerator> frameResultFlowGenerators = new ArrayList<FlowGenerator>();
 		for (FlowGenerator f : mapState.flowGenerators) {
-			frameResultFlowGenerators.add((FlowGenerator) f.clone());
+			frameResultFlowGenerators.add(f);
+//			frameResultFlowGenerators.add((FlowGenerator) f.clone());
 		}
+
+		CloneableRandom frameRandom = randomizer;
 		
-		CloneableRandom frameRandom = (CloneableRandom) randomizer.clone();
+//		CloneableRandom frameRandom = (CloneableRandom) randomizer.clone();
 		
 		SimulationState simulationState = new SimulationState(
 				simNumber, frameResultCreatures, frameResultFlowGenerators, frameRandom, tick);
@@ -343,10 +333,73 @@ public class Simulator {
 		return simulationState;
 	}
 	
+
+	public void setSimNumber() {
+
+		int maxSimNumber = 0;
+		
+		File folder = new File("simulation");
+		File[] listOfFiles = folder.listFiles();
+		
+		if (listOfFiles != null) {
+
+			for (int i = 0; i < listOfFiles.length; i++) {
+				
+				String filename = listOfFiles[i].getName();
+				
+				int dashIndex = filename.indexOf('-');
+				
+				System.out.println(filename.substring(0, dashIndex) + " -> " + Integer.valueOf(filename.substring(0, dashIndex)));
+				maxSimNumber = Math.max(maxSimNumber, Integer.valueOf(filename.substring(0, dashIndex)));
+			}
+		}
+		
+		simNumber = maxSimNumber + 1;
+	}
+	
+	
+	public void loadSimulation(SimulationState simulationToLoad) {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		this.simNumber = simulationToLoad.simulationNumber;
+		this.randomizer = simulationToLoad.randomizer;
+		this.tick = simulationToLoad.tick;
+		
+
+		mapState.creatures = simulationToLoad.creatures;
+		mapState.flowGenerators = simulationToLoad.flowGenerators;
+		
+		for (FlowGenerator f : mapState.flowGenerators) {
+			f.addFlow();
+		}
+		
+
+//		for (Creature c : mapState.creatures) {
+//			for (Creature d : mapState.creatures) {
+//				if (c.id == d.id && !(c == d)) {
+//					System.out.println("ID ERROR!");
+//				}
+//				if (c.x == d.x && c.y == d.y && !(c == d)) {
+//					System.out.println("LOCATION ERROR!");
+//				}
+//			}
+//		}
+
+		
+		for (Creature c : mapState.creatures) {
+			mapState.setCreatureInPoint(c);
+		}
+		
+		
+	}
+
 	
 	
 	
-	public void performTickActions() {
+	
+	
+	public void performTickSimulations() {
 
 		moveGenerators();
 		animateCreatures();

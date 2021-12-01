@@ -1,5 +1,8 @@
 package application.dynamic;
 
+import java.awt.Point;
+import java.awt.geom.Point2D;
+
 import application.core.CloneableRandom;
 import application.core.MapStateSingleton;
 import application.core.SettingsSingleton;
@@ -8,8 +11,9 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 
 	
 	
-	
-	public Creature createCreature(CloneableRandom randomizer) {
+
+	@Override
+	public Creature createCreature(CloneableRandom randomizer, long currentTick) {
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
@@ -55,12 +59,25 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		
 		creature.setMovementDecisionStrategy(new FloaterMovementDecision(creature));
 		creature.setFeedingStrategy(new Photosynthesis(creature));
-
+		creature.setReproductionStrategy(new SexualReproduction(creature));
 		
-		creature.setAge(randomizer.nextInt(200));
-		creature.setFood(creature.feedingStrategy.getStartingFoodStorage());
+		
+		creature.setAge(randomizer.nextInt(1000));
+		creature.setFood(
+				((randomizer.nextInt(100)+50) * creature.feedingStrategy.getStartingFoodStorage())/100
+				);
+		creature.setFertility(false);
 		
 		return creature;
 	}
+
+	@Override
+	public void setParents(Creature parentA, Creature parentB) {
+	}
+
+	@Override
+	public void setSpawnPoint(Point spawnPoint) {
+	}
+
 
 }

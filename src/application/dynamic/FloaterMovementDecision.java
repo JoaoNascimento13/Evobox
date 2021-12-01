@@ -5,7 +5,7 @@ import application.core.CloneableRandom;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 
-public class FloaterMovementDecision extends CreatureStrategy implements MovementDecisionStrategy  {
+public class FloaterMovementDecision extends MovementDecisionStrategy  {
 	private static final long serialVersionUID = 1L;
 	
 	private Creature creature;

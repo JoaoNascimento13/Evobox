@@ -24,6 +24,7 @@ public class Creature implements Cloneable, Serializable  {
 	
 	public int age;
 	public int food;
+	public boolean isFertile;
 	
 	public long id;
 	
@@ -32,21 +33,27 @@ public class Creature implements Cloneable, Serializable  {
 		this.y = y;
 	}
 	
-	private MovementDecisionStrategy movementDecisionStrategy;
+	
+	public MovementDecisionStrategy movementDecisionStrategy;
 
 	public FeedingStrategy feedingStrategy;
+
+	public ReproductionStrategy reproductionStrategy;
 	
 	
 	
 	public void actOrPostpone(long currentTick, CloneableRandom randomizer) {
 		if (this.nextActivation == currentTick) {
-			act(randomizer);
+			act(randomizer, currentTick);
 			nextActivation = currentTick + ticksPerTurn();
 		}
 	}
 	
 
-	public void act(CloneableRandom randomizer) {
+	public void act(CloneableRandom randomizer, long tick) {
+
+//		System.out.println();
+//		System.out.println("activating creature: " + this);
 		
 		age();
 		useFood();
@@ -59,7 +66,10 @@ public class Creature implements Cloneable, Serializable  {
 		
 		feed(randomizer);
 		
-		//reproduce();
+		reproduce(randomizer, tick);
+		
+
+//		System.out.println("creature finished: " + this);
 	}
 	
 	
@@ -105,6 +115,7 @@ public class Creature implements Cloneable, Serializable  {
 		}
 		
 		if (randomizer.nextInt(100) < chanceOfDeath) {
+//			System.out.println("- 1 old age");
 			die();
 			return true;
 		} else {
@@ -116,6 +127,7 @@ public class Creature implements Cloneable, Serializable  {
 	public boolean dieFromStarvationOrContinue() {
 		
 		if (food <= 0) {
+//			System.out.println("- 1 starved");
 			die();
 			return true;
 		} else {
@@ -150,20 +162,21 @@ public class Creature implements Cloneable, Serializable  {
 	}
 
 	
-	
-	
-	
-	
-	
-	
-	public boolean canMoveInDir(Direction dir, MapStateSingleton mapState, int maxX, int maxY) {
+
+	public void reproduce(CloneableRandom randomizer, long tick) {
 		
-		return (
-				x + dir.x < maxX && x + dir.x > -1 && 
-				y + dir.y < maxY && y + dir.y > -1 && 
-				(mapState.isEmpty(x + dir.x, y + dir.y)) 
-				);
+		this.reproductionStrategy.reproduce(randomizer, tick);
+		
 	}
+
+	
+	
+	
+	
+	
+//	public boolean canMoveInDir(Direction dir, MapStateSingleton mapState) {
+//		return (mapState.isAvailable(x + dir.x, y + dir.y);
+//	}
 	
 	
 	public void moveInDir(Direction mainDir, CloneableRandom randomizer) {
@@ -172,13 +185,17 @@ public class Creature implements Cloneable, Serializable  {
 			return;
 		}
 		
+//		System.out.println("moveInDir: " + this);
+		
+		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		int maxX = SettingsSingleton.getInstance().mapCellsX;
-		int maxY = SettingsSingleton.getInstance().mapCellsY;
 		
 		Direction movementDir = mainDir;
 		
-		if (!canMoveInDir(movementDir, mapState, maxX, maxY)) {
+		if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
+			
+
+//			System.out.println("can't move in dir: " + movementDir);
 			
 			if (obstacleAvoidanceRotation == 0) {
 				obstacleAvoidanceRotation = (2*randomizer.nextInt(2))-1;
@@ -188,11 +205,17 @@ public class Creature implements Cloneable, Serializable  {
 				
 				movementDir = movementDir.clockwise();
 				
-				if (!canMoveInDir(movementDir, mapState, maxX, maxY)) {
+				if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
 
+//					System.out.println("can't move in dir: " + movementDir);
+					
 					movementDir = movementDir.clockwise();
 					
-					if (!canMoveInDir(movementDir, mapState, maxX, maxY)) {
+					if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
+
+//						System.out.println("can't move in dir: " + movementDir);
+						
+						
 						
 						//If we can't move in a perpendicular direction to the original, 
 						//we'll stop on this turn and move on the opposite direction on the next
@@ -206,11 +229,19 @@ public class Creature implements Cloneable, Serializable  {
 
 				movementDir = movementDir.counterClockwise();
 				
-				if (!canMoveInDir(movementDir, mapState, maxX, maxY)) {
+				if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
 
+
+//					System.out.println("can't move in dir: " + movementDir);
+					
+					
 					movementDir = movementDir.counterClockwise();
 					
-					if (!canMoveInDir(movementDir, mapState, maxX, maxY)) {
+					if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
+
+
+//						System.out.println("can't move in dir: " + movementDir);
+						
 						
 						//If we can't move in a perpendicular direction to the original, 
 						//we'll stop on this turn and move on the opposite direction on the next
@@ -223,9 +254,21 @@ public class Creature implements Cloneable, Serializable  {
 			
 		} else {
 			obstacleAvoidanceRotation = 0;
+
+//			System.out.println("can move in main dir: " + movementDir);
+			
+			
 		}
 		
 		if (movementDir != Direction.NONE) {
+
+//			System.out.println("moving in dir: " + movementDir);
+			
+//			if (mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
+//				System.out.println("is available");
+//			} else {
+//				System.out.println("IS NOT AVAILABLE");
+//			}
 			
 			OutdatedPositionsSingleton.getInstance().addCreaturePosition(x, y);
 			mapState.clearCreature(this);
@@ -263,6 +306,12 @@ public class Creature implements Cloneable, Serializable  {
 	}
 	public void setFeedingStrategy(FeedingStrategy feedingStrategy) {
 		this.feedingStrategy = feedingStrategy;
+	}
+	public void setReproductionStrategy(ReproductionStrategy reproductionStrategy) {
+		this.reproductionStrategy = reproductionStrategy;
+	}
+	public void setFertility(boolean fertility) {
+		this.isFertile = fertility;
 	}
 
 

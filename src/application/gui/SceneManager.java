@@ -201,6 +201,7 @@ public class SceneManager {
 		if (simulator != null) {
 			try {
 				simulator.record();
+				
 				simulator.waitForRecordingIfNeeded();
 			} catch (IOException e) {
 				e.printStackTrace();

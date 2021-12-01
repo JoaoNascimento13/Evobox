@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import application.dynamic.Creature;
 import application.gui.MapScrollPane;
 import javafx.application.Platform;
-import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;

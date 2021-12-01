@@ -3,9 +3,9 @@ package application.dynamic;
 import application.core.CloneableRandom;
 import application.core.Direction;
 
-public interface MovementDecisionStrategy {
+public abstract class MovementDecisionStrategy extends CreatureStrategy {
+	private static final long serialVersionUID = 1L;
 
-	
-	Direction decideMovementDirection(CloneableRandom randomizer);
+	abstract Direction decideMovementDirection(CloneableRandom randomizer);
 	
 }

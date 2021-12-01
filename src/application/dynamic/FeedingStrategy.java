@@ -2,15 +2,16 @@ package application.dynamic;
 
 import application.core.CloneableRandom;
 
-public interface FeedingStrategy {
+public abstract class FeedingStrategy extends CreatureStrategy {
+	private static final long serialVersionUID = 1L;
+	
 
-	
-	void feed(CloneableRandom randomizer);
+	abstract void feed(CloneableRandom randomizer);
 
-	int getfoodUsedPerTick();
+	abstract int getfoodUsedPerTick();
 	
-	int getStartingFoodStorage();
+	abstract int getStartingFoodStorage();
 	
-	int getMaximumFoodStorage();
+	abstract int getMaximumFoodStorage();
 	
 }
