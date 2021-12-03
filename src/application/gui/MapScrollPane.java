@@ -26,6 +26,8 @@ public class MapScrollPane extends ScrollPane {
 
     private SimulatorController simulatorController;
     
+    public boolean mouseBeingPressed;
+    
 //    private Node backup;
 //    private Node zoomNode;
     
@@ -35,6 +37,8 @@ public class MapScrollPane extends ScrollPane {
         super();
         this.target = target;
         this.simulatorController = simulatorController;
+        
+        this.mouseBeingPressed = false;
         
         this.zoomNode = new Group(target);
         setContent(outerNode(zoomNode));
@@ -73,7 +77,12 @@ public class MapScrollPane extends ScrollPane {
             e.consume();
             onClick(new Point2D(e.getX(), e.getY()));
         });
-        
+        outerNode.setOnMousePressed(e -> {
+            onMousePressed();
+        });
+        outerNode.setOnMouseReleased(e -> {
+            onMouseReleased();
+        });
         return outerNode;
     }
     
@@ -110,6 +119,17 @@ public class MapScrollPane extends ScrollPane {
     }
     
 
+    private void onMousePressed() {
+    	mouseBeingPressed = true;
+    	backup.mouseBeingPressed = true;
+    }
+    
+    private void onMouseReleased() {
+    	mouseBeingPressed = false;
+    	backup.mouseBeingPressed = false;
+    }
+    
+    
     private void onClick(Point2D mousePoint) {
     	
 //    	System.out.println("Click on: " + (mousePoint.getX()/(scaleValue))/2 + ", " + (mousePoint.getY()/(scaleValue))/2);

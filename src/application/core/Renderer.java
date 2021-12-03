@@ -6,11 +6,14 @@ import java.util.ArrayList;
 import application.dynamic.Creature;
 import application.gui.MapScrollPane;
 import javafx.application.Platform;
+import javafx.event.Event;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 
@@ -40,6 +43,7 @@ public class Renderer {
 
 	private int debugColorA = toInt(Color.PURPLE);
 	
+	private int numberOfCanvasSwapsDelayed;
 	
 	
 	private int backgroundColor = toInt(Color.web("#BBFAF7"));
@@ -60,6 +64,8 @@ public class Renderer {
 		this.canvasHeight = canvasHeight;
 		
 		//ctiveCanvas
+		
+		this.numberOfCanvasSwapsDelayed = 0;
 		
 		setCanvas();
 
@@ -103,6 +109,23 @@ public class Renderer {
 
 	public void changeVisibleMapScrollPane() {
 		
+		if (activeMapScrollPane.mouseBeingPressed) {
+			
+			if (numberOfCanvasSwapsDelayed > 10) {
+				
+				Event.fireEvent(activeMapScrollPane, new MouseEvent(MouseEvent.MOUSE_RELEASED, 0,
+		                0, 0, 0, MouseButton.PRIMARY, 1, true, true, true, true,
+		                true, true, true, true, true, true, null));
+				
+			} else {
+
+				numberOfCanvasSwapsDelayed++;
+				return;
+			}
+			
+		}
+		
+		numberOfCanvasSwapsDelayed = 0;
 		
 		GraphicsContext gc = ((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D();
 
@@ -114,10 +137,15 @@ public class Renderer {
 		GridPane root = ((GridPane)activeMapScrollPane.getParent());
 		
 		
+
+		
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
 
+				activeMapScrollPane.backup.setHvalue(activeMapScrollPane.getHvalue());
+				activeMapScrollPane.backup.setVvalue(activeMapScrollPane.getVvalue());
+				
 				root.getChildren().remove(activeMapScrollPane);
 				
 				root.add(activeMapScrollPane.backup, 1, 1);

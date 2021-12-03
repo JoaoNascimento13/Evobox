@@ -32,6 +32,7 @@ public class Simulator {
 	private boolean recording;
 	private boolean rendering;
 	
+	
 //	private FileOutputStream simulationFile;
 
 	private CloneableRandom randomizer;
@@ -141,7 +142,8 @@ public class Simulator {
 			
 			performTickSimulations();
 			
-			requestOverviewUpdateIfNeeded();
+			requestOverviewUpdateIfNeeded(); 
+			//Needs to be done BEFORE unregisterDeadCreatures(), otherwise the selected point won't get cleared.
 			
 			mapState.unregisterDeadCreatures();
 			

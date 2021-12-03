@@ -93,10 +93,20 @@ public class SimulatorController {
 	
 	
 	public void fillDynamicCreatureDetails(Creature creature) {
-
-    	foodBar.setProgress(((double)creature.food)/creature.feedingStrategy.getMaximumFoodStorage());
-    	
-    	ageBar.setProgress(((double)creature.age)/creature.genome.ageExpectancy);
+		
+    	try {
+    		
+			foodBar.setProgress(((double)creature.food)/creature.feedingStrategy.getMaximumFoodStorage());
+			
+			ageBar.setProgress(((double)creature.age)/creature.genome.ageExpectancy);
+			
+		} catch (IllegalStateException e) {
+			
+			//Will throw an exception if creature is already dead.
+			
+			//Can be ignored, the focus will be cleared afterwards.
+			
+		}
 	}
 	
 
