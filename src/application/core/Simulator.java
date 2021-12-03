@@ -14,6 +14,7 @@ import application.dynamic.MovementDecisionStrategy;
 import application.dynamic.PreexistingCreatureFactory;
 import application.dynamic.PulsePointFlowGenerator;
 import application.dynamic.ReproductionStrategy;
+import application.gui.SimulatorController;
 
 import java.awt.Point;
 
@@ -25,7 +26,7 @@ public class Simulator {
 	
 	private Renderer renderer;
 	
-	private boolean paused;
+	public boolean paused;
 
 	public boolean running;
 	private boolean recording;
@@ -37,7 +38,7 @@ public class Simulator {
 	
 	private int simNumber;
 	
-	
+	public SimulatorController simulatorController;
 	
 
 	
@@ -139,7 +140,9 @@ public class Simulator {
 			running = true;
 			
 			performTickSimulations();
-
+			
+			requestOverviewUpdateIfNeeded();
+			
 			mapState.unregisterDeadCreatures();
 			
 			mapState.registerBornCreatures();
@@ -186,6 +189,39 @@ public class Simulator {
 	}
 	
 
+	public void requestOverviewUpdateIfNeeded() {
+		
+		if (simulatorController.inCreatureView()) {
+
+			MapStateSingleton mapState = MapStateSingleton.getInstance();
+			
+			boolean focusIsDead = false;
+			for (long i : mapState.deadCreaturesToRemoveIds) {
+				if (mapState.focusedCreature.id == i) {
+					focusIsDead = true;
+					break;
+				}
+			}
+			if (!focusIsDead) {
+				simulatorController.fillDynamicCreatureDetails(mapState.focusedCreature);
+			} else {
+				mapState.focusedCreature = null;
+				simulatorController.showGeneralView();
+				
+//				try {
+//					Thread.sleep(500);
+//				} catch (InterruptedException e) {
+//					e.printStackTrace();
+//				}
+//				int crash = 1/0;
+				
+				System.out.println("FOCUS IS DEAD");
+			}
+			
+		}
+		
+	}
+	
 	
 	public void waitForRunningIfNeeded() {
 		while (running) {
@@ -426,6 +462,17 @@ public class Simulator {
 		for (Creature c : mapState.creatures) {
 			c.actOrPostpone(tick, randomizer);
 		}
+		
+		
+		Creature focusedCreature = MapStateSingleton.getInstance().focusedCreature;
+		
+		if (focusedCreature != null) {
+			simulatorController.fillDynamicCreatureDetails(focusedCreature);
+		} else {
+			simulatorController.showGeneralView();
+		}
+			
+
 	}
 	
 	
@@ -449,13 +496,8 @@ public class Simulator {
 	}
 
 
-	public void playOrPause() {
-		if (paused) {
-			unpause();
-		} else {
-			pause();
-		}
-	}
+//	public void playOrPause() {
+//	}
 
 
 
@@ -474,6 +516,12 @@ public class Simulator {
 
 	public void renderInitialFrame() {
 		renderer.render();
+	}
+
+
+
+	public void setController(SimulatorController simulatorController) {
+		this.simulatorController = simulatorController;
 	}
 
 

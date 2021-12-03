@@ -36,10 +36,14 @@ public class Renderer {
 	
 
 	private int plantColor = toInt(Color.GREEN);
+	private int focusColor = toInt(Color.ORANGE);
 
 	private int debugColorA = toInt(Color.PURPLE);
 	
-	private int backgroundColor = toInt(Color.web("#95E1D3"));
+	
+	
+	private int backgroundColor = toInt(Color.web("#BBFAF7"));
+//	private int backgroundColor = toInt(Color.web("#95E1D3"));
 	
 	
 	public Renderer(Canvas canvasA, Canvas canvasB, MapScrollPane mapScrollPane, int canvasWidth, int canvasHeight) {
@@ -135,7 +139,7 @@ public class Renderer {
 	
 	public void render() {
 		
-		int creatureSize = 2;
+		int creaturePixels = 2;
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -148,10 +152,10 @@ public class Renderer {
 			int x = oldCreaturePositionsX.get(i);
 			int y = oldCreaturePositionsY.get(i);
 			
-            for (int dx = 0; dx < creatureSize; dx++) {
-                for (int dy = 0 ; dy < creatureSize; dy++) {
+            for (int dx = 0; dx < creaturePixels; dx++) {
+                for (int dy = 0 ; dy < creaturePixels; dy++) {
                 	
-                	buffer[x*creatureSize + dx + canvasWidth * (y*creatureSize + dy)] = backgroundColor;
+                	buffer[x*creaturePixels + dx + canvasWidth * (y*creaturePixels + dy)] = backgroundColor;
     			}
 			}
 		}
@@ -208,15 +212,23 @@ public class Renderer {
 		
 		for (Creature c : mapState.creatures) {
 
-            for (int dx = 0; dx < creatureSize; dx++) {
-                for (int dy = 0 ; dy < creatureSize; dy++) {
+            for (int dx = 0; dx < creaturePixels; dx++) {
+                for (int dy = 0 ; dy < creaturePixels; dy++) {
                 	
-                	buffer[c.x*creatureSize + dx + canvasWidth * (c.y*creatureSize + dy)] = plantColor;
+                	buffer[c.x*creaturePixels + dx + canvasWidth * (c.y*creaturePixels + dy)] = plantColor;
     			}
 			}
 		}
 		
 
+		if (mapState.focusedCreature != null) {
+	        for (int dx = 0; dx < creaturePixels; dx++) {
+	            for (int dy = 0 ; dy < creaturePixels; dy++) {
+	            	
+	            	buffer[mapState.focusedCreature.x*creaturePixels + dx + canvasWidth * (mapState.focusedCreature.y*creaturePixels + dy)] = focusColor;
+				}
+			}
+		}
 		
 
 

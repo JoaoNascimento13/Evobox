@@ -7,6 +7,7 @@ import application.core.Direction;
 import application.core.MapStateSingleton;
 import application.core.OutdatedPositionsSingleton;
 import application.core.SettingsSingleton;
+import application.core.Simulator;
 
 public class Creature implements Cloneable, Serializable  {
 	
@@ -68,7 +69,6 @@ public class Creature implements Cloneable, Serializable  {
 		
 		reproduce(randomizer, tick);
 		
-
 //		System.out.println("creature finished: " + this);
 	}
 	

@@ -67,6 +67,8 @@ public class SceneManager {
 		
 		Parent root = simulationLoader.load();
 		
+
+		SimulatorController simulatorController = (SimulatorController) simulationLoader.getController();
 		
 		simulationScene = new Scene(root,windowWidth,windowHeight);
 		
@@ -78,9 +80,9 @@ public class SceneManager {
 
 		Canvas canvasB = new Canvas(canvasWidth, canvasHeight);
 		
-		MapScrollPane mapScrollPaneA = new MapScrollPane(canvasA);
+		MapScrollPane mapScrollPaneA = new MapScrollPane(canvasA, simulatorController);
 
-		MapScrollPane mapScrollPaneB = new MapScrollPane(canvasB);
+		MapScrollPane mapScrollPaneB = new MapScrollPane(canvasB, simulatorController);
 
 		mapScrollPaneA.backup = mapScrollPaneB;
 		
@@ -96,10 +98,10 @@ public class SceneManager {
 		GridPane rootTest = ((GridPane)mapScrollPaneA.getParent());
 		
 
-		System.out.println("Nodes: ");
-		for (Node n : rootTest.getChildren()) {
-			System.out.println(n);
-		}
+//		System.out.println("Nodes: ");
+//		for (Node n : rootTest.getChildren()) {
+//			System.out.println(n);
+//		}
 		
 		
 		
@@ -183,6 +185,8 @@ public class SceneManager {
 		
 		controller.setSimulator(simulator);
 		controller.setRenderer(renderer);
+		
+		simulator.setController(controller);
 	}
 	
 	

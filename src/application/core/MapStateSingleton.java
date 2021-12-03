@@ -23,7 +23,8 @@ public class MapStateSingleton {
 	public long nextCreatureId;
 	
 	static private MapStateSingleton mapState;
-	
+
+	public Creature focusedCreature;
 	
 	
 	private MapStateSingleton() {}
@@ -180,4 +181,9 @@ public class MapStateSingleton {
 		}
     	return c;
     }
+
+    
+	public void setFocusedCreature(Creature focusedCreature) {
+		this.focusedCreature = focusedCreature;
+	}
 }

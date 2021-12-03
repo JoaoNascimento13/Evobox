@@ -12,6 +12,6 @@ public abstract class FeedingStrategy extends CreatureStrategy {
 	
 	abstract int getStartingFoodStorage();
 	
-	abstract int getMaximumFoodStorage();
+	public abstract int getMaximumFoodStorage();
 	
 }

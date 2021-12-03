@@ -1,7 +1,17 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
 
+
+
 .root{
-	-fx-background-color: #95E1D3;
+	
+	/* -fx-background-color: #95E1D3; */
+	
+	
+	-fx-background-color: #ECE6D5;
+}
+
+.vbox{
+	-fx-background-color: #ECE6D5;
 }
 
 

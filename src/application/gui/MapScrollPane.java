@@ -1,5 +1,7 @@
 package application.gui;
 
+import application.core.MapStateSingleton;
+import application.dynamic.Creature;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
@@ -22,15 +24,18 @@ public class MapScrollPane extends ScrollPane {
     private Node target;
     private Node zoomNode;
 
+    private SimulatorController simulatorController;
+    
 //    private Node backup;
 //    private Node zoomNode;
     
     public MapScrollPane backup;
     
-    public MapScrollPane(Node target) {
+    public MapScrollPane(Node target, SimulatorController simulatorController) {
         super();
         this.target = target;
-//        this.backup = backup;
+        this.simulatorController = simulatorController;
+        
         this.zoomNode = new Group(target);
         setContent(outerNode(zoomNode));
 
@@ -63,9 +68,16 @@ public class MapScrollPane extends ScrollPane {
             e.consume();
             onScroll(e.getTextDeltaY(), new Point2D(e.getX(), e.getY()));
         });
+
+        outerNode.setOnMouseClicked(e -> {
+            e.consume();
+            onClick(new Point2D(e.getX(), e.getY()));
+        });
+        
         return outerNode;
     }
-
+    
+    
     private Node centeredNode(Node node) {
         VBox vBox = new VBox(node);
         vBox.setAlignment(Pos.CENTER);
@@ -96,6 +108,29 @@ public class MapScrollPane extends ScrollPane {
     public void zoomOut() {
     	zoomToCenterOfViewArea(-1*buttonZoomIntensity);
     }
+    
+
+    private void onClick(Point2D mousePoint) {
+    	
+//    	System.out.println("Click on: " + (mousePoint.getX()/(scaleValue))/2 + ", " + (mousePoint.getY()/(scaleValue))/2);
+    	
+//    	int locationX = (int)((mousePoint.getX()/(scaleValue))/2);
+//    	
+//    	int locationY = (int)((mousePoint.getY()/(scaleValue))/2);
+//    			
+//    	MapStateSingleton.getInstance().getCreature(locationX, locationY);
+    			
+    			
+    	Creature creature = MapStateSingleton.getInstance().getCreature(
+    			(int)((mousePoint.getX()/(scaleValue))/2), 
+    			(int)((mousePoint.getY()/(scaleValue))/2));
+    	
+    	
+    	if (creature != null) {
+    		simulatorController.fillCreatureDetails(creature);
+    	}
+    }
+    
     
     
     private void onScroll(double wheelDelta, Point2D mousePoint) {
