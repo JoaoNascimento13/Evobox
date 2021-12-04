@@ -2,14 +2,14 @@ package application.dynamic;
 
 import java.io.Serializable;
 
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 import application.core.OutdatedPositionsSingleton;
 import application.core.SettingsSingleton;
 import application.core.Simulator;
 
-public class Creature implements Cloneable, Serializable  {
+public class Creature implements Serializable  {
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -22,12 +22,14 @@ public class Creature implements Cloneable, Serializable  {
 	public long nextActivation;
 	
 	public Genome genome;
+	public Species species;
 	
 	public int age;
 	public int food;
 	public boolean isFertile;
 	
 	public long id;
+	public long numberInSpecies;
 	
 	public Creature (int x, int y) {
 		this.x = x;
@@ -43,15 +45,15 @@ public class Creature implements Cloneable, Serializable  {
 	
 	
 	
-	public void actOrPostpone(long currentTick, CloneableRandom randomizer) {
+	public void actOrPostpone(long currentTick) {
 		if (this.nextActivation == currentTick) {
-			act(randomizer, currentTick);
+			act(currentTick);
 			nextActivation = currentTick + ticksPerTurn();
 		}
 	}
 	
 
-	public void act(CloneableRandom randomizer, long tick) {
+	public void act(long tick) {
 
 //		System.out.println();
 //		System.out.println("activating creature: " + this);
@@ -59,15 +61,15 @@ public class Creature implements Cloneable, Serializable  {
 		age();
 		useFood();
 		
-		if(die(randomizer)) {
+		if(dieOrContinue()) {
 			return;
 		}
 		
-		move(randomizer);
+		move();
 		
-		feed(randomizer);
+		feed();
 		
-		reproduce(randomizer, tick);
+		reproduce(tick);
 		
 //		System.out.println("creature finished: " + this);
 	}
@@ -86,8 +88,8 @@ public class Creature implements Cloneable, Serializable  {
 	}
 
 
-	public boolean die(CloneableRandom randomizer) {
-		if (dieFromOldAgeOrContinue(randomizer)) {
+	public boolean dieOrContinue() {
+		if (dieFromOldAgeOrContinue()) {
 			return true;
 		}
 		if (dieFromStarvationOrContinue()) {
@@ -97,7 +99,7 @@ public class Creature implements Cloneable, Serializable  {
 	}
 	
 	
-	public boolean dieFromOldAgeOrContinue(CloneableRandom randomizer) {
+	public boolean dieFromOldAgeOrContinue() {
 
 		int chanceOfDeath = 0;
 		
@@ -113,6 +115,8 @@ public class Creature implements Cloneable, Serializable  {
 			
 			chanceOfDeath = 1;
 		}
+
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
 		if (randomizer.nextInt(100) < chanceOfDeath) {
 //			System.out.println("- 1 old age");
@@ -143,29 +147,30 @@ public class Creature implements Cloneable, Serializable  {
 
 		MapStateSingleton.getInstance().queueCreatureUnregister(this);
 		
+		this.species.currentMembers--;
 	}
 	
 	
-	public void move(CloneableRandom randomizer) {
+	public void move() {
 		
-		Direction dir = this.movementDecisionStrategy.decideMovementDirection(randomizer);
+		Direction dir = this.movementDecisionStrategy.decideMovementDirection();
 
-		moveInDir(dir, randomizer);
+		moveInDir(dir);
 	}
 
 
 
-	public void feed(CloneableRandom randomizer) {
+	public void feed() {
 		
-		this.feedingStrategy.feed(randomizer);
+		this.feedingStrategy.feed();
 		
 	}
 
 	
 
-	public void reproduce(CloneableRandom randomizer, long tick) {
+	public void reproduce(long tick) {
 		
-		this.reproductionStrategy.reproduce(randomizer, tick);
+		this.reproductionStrategy.reproduce(tick);
 		
 	}
 
@@ -179,13 +184,15 @@ public class Creature implements Cloneable, Serializable  {
 //	}
 	
 	
-	public void moveInDir(Direction mainDir, CloneableRandom randomizer) {
+	public void moveInDir(Direction mainDir) {
 
 		if (mainDir == Direction.NONE) {
 			return;
 		}
 		
 //		System.out.println("moveInDir: " + this);
+		
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
@@ -290,7 +297,10 @@ public class Creature implements Cloneable, Serializable  {
 	public void setNextActivation(long nextActivation) {
 		this.nextActivation = nextActivation;
 	}
-	
+
+	public void setSpecies(Species species) {
+		this.species = species;
+	}
 	public void setGenome(Genome genome) {
 		this.genome = genome;
 	}
@@ -315,10 +325,7 @@ public class Creature implements Cloneable, Serializable  {
 	}
 
 
-	
-	public Object clone() throws CloneNotSupportedException {
-        return super.clone();
-    }
+
 
 
 }

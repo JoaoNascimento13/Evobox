@@ -10,7 +10,7 @@ public class SimulationState implements Serializable, Cloneable {
 	
 	public ArrayList<Creature> creatures;
 	public ArrayList<FlowGenerator> flowGenerators;
-	public CloneableRandom randomizer;
+	public RandomizerSingleton randomizer;
 	public long tick;
 	public int simulationNumber;
 	
@@ -21,7 +21,7 @@ public class SimulationState implements Serializable, Cloneable {
 	public SimulationState(int simulationNumber, 
 			ArrayList<Creature> creatures, 
 			ArrayList<FlowGenerator> flowGenerators, 
-			CloneableRandom randomizer, long tick) {
+			RandomizerSingleton randomizer, long tick) {
 		this.simulationNumber = simulationNumber;
 		this.creatures = creatures;
 		this.flowGenerators = flowGenerators;

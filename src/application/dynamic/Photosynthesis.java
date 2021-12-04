@@ -1,6 +1,6 @@
 package application.dynamic;
 
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 import application.core.SettingsSingleton;
@@ -13,7 +13,7 @@ public class Photosynthesis extends FeedingStrategy  {
 	}
 	
 	@Override
-	public void feed(CloneableRandom randomizer) {
+	public void feed() {
 		
 		if (creature.food >= getMaximumFoodStorage()) {
 			return;

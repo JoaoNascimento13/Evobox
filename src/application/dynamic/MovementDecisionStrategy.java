@@ -1,11 +1,11 @@
 package application.dynamic;
 
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.Direction;
 
 public abstract class MovementDecisionStrategy extends CreatureStrategy {
 	private static final long serialVersionUID = 1L;
 
-	abstract Direction decideMovementDirection(CloneableRandom randomizer);
+	abstract Direction decideMovementDirection();
 	
 }

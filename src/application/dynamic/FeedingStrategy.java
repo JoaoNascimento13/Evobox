@@ -1,12 +1,12 @@
 package application.dynamic;
 
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 
 public abstract class FeedingStrategy extends CreatureStrategy {
 	private static final long serialVersionUID = 1L;
 	
 
-	abstract void feed(CloneableRandom randomizer);
+	abstract void feed();
 
 	abstract int getfoodUsedPerTick();
 	

@@ -14,6 +14,7 @@ import application.dynamic.MovementDecisionStrategy;
 import application.dynamic.PreexistingCreatureFactory;
 import application.dynamic.PulsePointFlowGenerator;
 import application.dynamic.ReproductionStrategy;
+import application.dynamic.Species;
 import application.gui.SimulatorController;
 
 import java.awt.Point;
@@ -35,7 +36,7 @@ public class Simulator {
 	
 //	private FileOutputStream simulationFile;
 
-	private CloneableRandom randomizer;
+	private RandomizerSingleton randomizer;
 	
 	private int simNumber;
 	
@@ -61,7 +62,7 @@ public class Simulator {
 		
 		
 		
-		randomizer = new CloneableRandom();
+		randomizer = RandomizerSingleton.getInstance();
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
@@ -87,11 +88,13 @@ public class Simulator {
 	
 	
 	public void populateWorld() {
-
-		CreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
+		
+		PreexistingCreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
+		Species originalSpecies = new Species();
+		preexistingCreatureFactory.setStarterSpecies(originalSpecies);
 		
 		for (int i = 0; i < 15000; i++) {
-			populateWorldWithCreature(preexistingCreatureFactory.createCreature(randomizer, 0));
+			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 		
 		
@@ -120,6 +123,7 @@ public class Simulator {
 	public void populateWorldWithCreature(Creature creature) {
 		MapStateSingleton.getInstance().registerCreature(creature);
 		MapStateSingleton.getInstance().setCreatureInPoint(creature);
+		
 	}
 	
 	
@@ -131,8 +135,6 @@ public class Simulator {
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		while (!paused) {
-			
-			
 			
 			waitForRecordingIfNeeded();
 
@@ -153,7 +155,7 @@ public class Simulator {
 			running = false;
 			
 			
-			int creatureNumber = mapState.creatures.size();
+			int creatureNumber = mapState.activeCreatures.size();
 			
 			System.out.println(creatureNumber + " creatures");
 			
@@ -350,7 +352,7 @@ public class Simulator {
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
-		for (Creature c : mapState.creatures) {
+		for (Creature c : mapState.activeCreatures) {
 			frameResultCreatures.add(c);
 //			frameResultCreatures.add((Creature) c.clone());
 		}
@@ -361,7 +363,7 @@ public class Simulator {
 //			frameResultFlowGenerators.add((FlowGenerator) f.clone());
 		}
 
-		CloneableRandom frameRandom = randomizer;
+		RandomizerSingleton frameRandom = randomizer;
 		
 //		CloneableRandom frameRandom = (CloneableRandom) randomizer.clone();
 		
@@ -405,7 +407,7 @@ public class Simulator {
 		this.tick = simulationToLoad.tick;
 		
 
-		mapState.creatures = simulationToLoad.creatures;
+		mapState.activeCreatures = simulationToLoad.creatures;
 		mapState.flowGenerators = simulationToLoad.flowGenerators;
 		
 		for (FlowGenerator f : mapState.flowGenerators) {
@@ -425,7 +427,7 @@ public class Simulator {
 //		}
 
 		
-		for (Creature c : mapState.creatures) {
+		for (Creature c : mapState.activeCreatures) {
 			mapState.setCreatureInPoint(c);
 		}
 		
@@ -461,8 +463,8 @@ public class Simulator {
 		OutdatedPositionsSingleton.getInstance().clearPositions();
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		for (Creature c : mapState.creatures) {
-			c.actOrPostpone(tick, randomizer);
+		for (Creature c : mapState.activeCreatures) {
+			c.actOrPostpone(tick);
 		}
 		
 		

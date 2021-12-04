@@ -3,7 +3,7 @@ package application.dynamic;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 
@@ -22,7 +22,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	
 	@Override
-	public void reproduce(CloneableRandom randomizer, long tick) {
+	public void reproduce(long tick) {
 		
 		if (reproductionCooldown > 0) {
 			reproductionCooldown -= creature.ticksPerTurn();
@@ -41,6 +41,8 @@ public class SexualReproduction extends ReproductionStrategy  {
 		}
 		
 		if (creature.isFertile) {
+
+			RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 			
 			Direction partnerDir = getReproductionDirection(randomizer);
 			
@@ -67,7 +69,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 
 						factory.setSpawnPoint(p);
 						
-						Creature spawn = factory.createCreature(randomizer, tick);
+						Creature spawn = factory.createCreature(tick);
 						
 						MapStateSingleton.getInstance().queueCreatureRegister(spawn);
 						
@@ -89,7 +91,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 	}
 	
 
-	public Direction getReproductionDirection(CloneableRandom randomizer) {
+	public Direction getReproductionDirection(RandomizerSingleton randomizer) {
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		ArrayList<Direction> RandomDirs = Direction.randomArrayList(randomizer);
@@ -107,7 +109,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 	}
 	
 
-	public ArrayList<Point> getSpawnPoints(Direction partnerDir, CloneableRandom randomizer) {
+	public ArrayList<Point> getSpawnPoints(Direction partnerDir, RandomizerSingleton randomizer) {
 		
 		int childrenToSpawn = Math.max(1, creature.genome.clutchSize + randomizer.nextInt(3) - 1);
 		

@@ -34,9 +34,9 @@ public class Main extends Application {
 	
 	void configureMainStage(Stage stage) {
 		stage.setTitle("Evobox");
-		stage.setWidth(1280);
-		stage.setHeight(800);
-		stage.setMinWidth(1280);
-		stage.setMinHeight(800);
+		stage.setWidth(1024);
+		stage.setHeight(780);
+		stage.setMinWidth(1024);
+		stage.setMinHeight(780);
 	}
 }

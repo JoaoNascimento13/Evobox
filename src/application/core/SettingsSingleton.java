@@ -6,15 +6,12 @@ public class SettingsSingleton {
 	public int mapCellsX;
 	public int mapCellsY;
 
-	static private SettingsSingleton settings;
+	static private SettingsSingleton settings = new SettingsSingleton();
 	
 	private SettingsSingleton() {}
 	
 	
     public static SettingsSingleton getInstance(){
-    	if (settings == null) {
-		   settings = new SettingsSingleton();
-	    }
     	return settings;
     }
     

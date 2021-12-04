@@ -22,8 +22,8 @@ public class SceneManager {
 	
 	
 
-	private int windowWidth = 1280;
-	private int windowHeight = 800; 
+	private int windowWidth = 1024;
+	private int windowHeight = 760; 
 	
 	private Scene simulationScene;
 	private FXMLLoader simulationLoader;
@@ -90,14 +90,12 @@ public class SceneManager {
 		
 //		mapScrollPane.setStyle("-fx-background-color: red");
 		
-		((GridPane)root).add(mapScrollPaneA, 1, 1);
+//		((GridPane)root).add(mapScrollPaneA, 1, 1);
 		
-		
+		simulatorController.setMapScrollPane(mapScrollPaneA);
 
 		
-		GridPane rootTest = ((GridPane)mapScrollPaneA.getParent());
-		
-
+//		GridPane rootTest = ((GridPane)mapScrollPaneA.getParent());
 //		System.out.println("Nodes: ");
 //		for (Node n : rootTest.getChildren()) {
 //			System.out.println(n);
@@ -112,8 +110,6 @@ public class SceneManager {
 		
 		
 		simulationScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
-		
 		
 	}
 	

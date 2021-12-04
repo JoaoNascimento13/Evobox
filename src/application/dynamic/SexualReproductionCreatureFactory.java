@@ -1,7 +1,7 @@
 package application.dynamic;
 
 import java.awt.Point;
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.MapStateSingleton;
 import application.core.SettingsSingleton;
 
@@ -14,7 +14,7 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 	private Creature parentB;
 	private Point spawnPoint;
 
-	public Creature createCreature(CloneableRandom randomizer, long currentTick) {
+	public Creature createCreature(long currentTick) {
 		
 //		SettingsSingleton settings = SettingsSingleton.getInstance();
 //		MapStateSingleton mapState = MapStateSingleton.getInstance();
@@ -27,6 +27,8 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		
 		Genome genome = new Genome();
 
+
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
 		//TODO: all this should be set based on parents' genomes and mutation
 				
@@ -46,6 +48,8 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 				genome.setFertility(8);
 				genome.setClutchSize(2);
 				
+				
+				creature.species = parentA.species;
 				creature.setGenome(genome);
 				
 				creature.setMovementDecisionStrategy(new FloaterMovementDecision(creature));

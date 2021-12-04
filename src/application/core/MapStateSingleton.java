@@ -6,13 +6,17 @@ import java.util.ArrayList;
 import application.dynamic.Creature;
 import application.dynamic.Diet;
 import application.dynamic.FlowGenerator;
+import application.dynamic.Species;
 
 public class MapStateSingleton {
 
-	private Point[][] flowMap;
-	private Creature[][] creatureMap;
+	transient private Point[][] flowMap;
+	transient private Creature[][] creatureMap;
 
-	public ArrayList<Creature> creatures;
+	
+	
+	public ArrayList<Creature> activeCreatures;
+	public ArrayList<Species> activeSpecies;
 	
 	public ArrayList<Long> deadCreaturesToRemoveIds;
 	public ArrayList<Creature> bornCreaturesToAdd;
@@ -21,8 +25,10 @@ public class MapStateSingleton {
 	
 
 	public long nextCreatureId;
+	public int nextSpeciesId;
+
 	
-	static private MapStateSingleton mapState;
+	private static final MapStateSingleton mapState = new MapStateSingleton();
 
 	public Creature focusedCreature;
 	
@@ -30,10 +36,7 @@ public class MapStateSingleton {
 	private MapStateSingleton() {}
 	
 	
-    public static MapStateSingleton getInstance(){
-    	if (mapState == null) {
-    		mapState = new MapStateSingleton();
-	    }
+    static public MapStateSingleton getInstance(){
     	return mapState;
     }
 
@@ -49,7 +52,7 @@ public class MapStateSingleton {
     	initializeCreatureMap();
     	
     	nextCreatureId = 1;
-		creatures = new ArrayList<Creature>();
+		activeCreatures = new ArrayList<Creature>();
 		bornCreaturesToAdd = new ArrayList<Creature>();
 		deadCreaturesToRemoveIds = new ArrayList<Long>();
 		flowGenerators = new ArrayList<FlowGenerator>();
@@ -72,12 +75,22 @@ public class MapStateSingleton {
    
 
     public void registerCreature(Creature creature) {
+    	
     	creature.id = nextCreatureId;
     	nextCreatureId++;
-    	creatures.add(creature);
+    	activeCreatures.add(creature);
+    	
+    	creature.species.currentMembers++;
+    	creature.species.totalMembers++;
+    	creature.numberInSpecies = creature.species.totalMembers;
     }
     
-    
+
+    public void registerSpecies(Species species) {
+    	species.id = nextSpeciesId;
+    	nextSpeciesId++;
+    	activeSpecies.add(species);
+    }
     
     
     
@@ -99,11 +112,11 @@ public class MapStateSingleton {
 		ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
 		ArrayList<Integer> oldCreaturePositionsY = outdatedPositions.getOutdatedCreaturesY();
     	for (long id : deadCreaturesToRemoveIds) {
-    		for (int i = 0; i < creatures.size(); i++) {
-        		if (creatures.get(i).id == id) {
-        			oldCreaturePositionsX.add(creatures.get(i).x);
-        			oldCreaturePositionsY.add(creatures.get(i).y);
-        			creatures.remove(i);
+    		for (int i = 0; i < activeCreatures.size(); i++) {
+        		if (activeCreatures.get(i).id == id) {
+        			oldCreaturePositionsX.add(activeCreatures.get(i).x);
+        			oldCreaturePositionsY.add(activeCreatures.get(i).y);
+        			activeCreatures.remove(i);
         			break;
         		}
     		}

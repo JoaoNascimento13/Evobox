@@ -1,7 +1,7 @@
 package application.dynamic;
 
 import java.awt.Point;
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 
@@ -17,14 +17,15 @@ public class FloaterMovementDecision extends MovementDecisionStrategy  {
 	
 
 	@Override
-	public Direction decideMovementDirection(CloneableRandom randomizer) {
+	public Direction decideMovementDirection() {
 
 //		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
 
 
 //		int lastPixelX = SettingsSingleton.getInstance().mapCellsX-1;
 //		int lastPixelY = SettingsSingleton.getInstance().mapCellsY-1;;
-		
+
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
 		Point[][] flowMap = MapStateSingleton.getInstance().getFlowMap();
 		

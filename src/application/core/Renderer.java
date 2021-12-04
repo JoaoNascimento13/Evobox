@@ -15,6 +15,7 @@ import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
 public class Renderer {
@@ -134,10 +135,11 @@ public class Renderer {
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
 		
 		
-		GridPane root = ((GridPane)activeMapScrollPane.getParent());
+		GridPane container = ((GridPane)activeMapScrollPane.getParent());
 		
 		
-
+//        Pane container = ((Pane)activeMapScrollPane.getParent());
+        
 		
 		Platform.runLater(new Runnable() {
 		    @Override
@@ -146,11 +148,17 @@ public class Renderer {
 				activeMapScrollPane.backup.setHvalue(activeMapScrollPane.getHvalue());
 				activeMapScrollPane.backup.setVvalue(activeMapScrollPane.getVvalue());
 				
-				root.getChildren().remove(activeMapScrollPane);
+
+				container.getChildren().remove(activeMapScrollPane);
 				
-				root.add(activeMapScrollPane.backup, 1, 1);
+				container.getChildren().add(activeMapScrollPane.backup);
 				
-				root.layout();
+					
+//				root.getChildren().remove(activeMapScrollPane);
+//				
+//				root.add(activeMapScrollPane.backup, 1, 1);
+				
+				container.layout();
 				
 				activeMapScrollPane = activeMapScrollPane.backup;
 
@@ -238,7 +246,7 @@ public class Renderer {
 //		}
 		
 		
-		for (Creature c : mapState.creatures) {
+		for (Creature c : mapState.activeCreatures) {
 
             for (int dx = 0; dx < creaturePixels; dx++) {
                 for (int dy = 0 ; dy < creaturePixels; dy++) {

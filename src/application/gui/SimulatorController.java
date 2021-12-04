@@ -10,6 +10,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 
@@ -30,6 +32,15 @@ public class SimulatorController {
 	@FXML
 	private VBox creatureView;
 	
+	@FXML
+	private GridPane mapContainer;
+	
+	
+
+	@FXML
+	private Label creatureSpecies;
+	@FXML
+	private Label creatureSpeciesNumber;
 	@FXML
 	private ProgressBar healthBar;
 	@FXML
@@ -81,6 +92,7 @@ public class SimulatorController {
 		
     	System.out.println("Clicked on creature: " + creature + " on " + creature.x + ", " + creature.y);
     	
+    	fillStaticCreatureDetails(creature);
     	fillDynamicCreatureDetails(creature);
 
     	showCreatureView();
@@ -90,6 +102,12 @@ public class SimulatorController {
     	simulator.render();
 	}
 	
+
+	public void fillStaticCreatureDetails(Creature creature) {
+
+		creatureSpecies.setText(creature.species.name);
+		creatureSpeciesNumber.setText(String.valueOf(creature.numberInSpecies));
+	}
 	
 	
 	public void fillDynamicCreatureDetails(Creature creature) {
@@ -158,6 +176,13 @@ public class SimulatorController {
 		} else {
 			return false;
 		}
+	}
+	public void setMapScrollPane(MapScrollPane mapScrollPane) {
+		this.mapContainer.add(mapScrollPane, 0, 0);
+//		this.mapContainer.getChildren().add(mapScrollPane);
+	}
+	public void removeMapScrollPane() {
+		this.mapContainer.getChildren().clear();
 	}
 	
 }

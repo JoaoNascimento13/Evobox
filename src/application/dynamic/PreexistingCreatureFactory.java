@@ -3,21 +3,23 @@ package application.dynamic;
 import java.awt.Point;
 import java.awt.geom.Point2D;
 
-import application.core.CloneableRandom;
+import application.core.RandomizerSingleton;
 import application.core.MapStateSingleton;
 import application.core.SettingsSingleton;
 
 public class PreexistingCreatureFactory implements CreatureFactory {
 
 	
-	
+	private Species species;
 
 	@Override
-	public Creature createCreature(CloneableRandom randomizer, long currentTick) {
+	public Creature createCreature(long currentTick) {
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
+
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
 		int x = -1;
 		int y = -1;
@@ -54,6 +56,7 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		genome.setFertility(8);
 		genome.setClutchSize(2);
 		
+		creature.setSpecies(species);
 		creature.setGenome(genome);
 		
 		
@@ -68,9 +71,19 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 				);
 		creature.setFertility(false);
 		
+
+		System.out.println("creature species: " + creature.species);
+		
 		return creature;
 	}
-
+	
+	
+	public void setStarterSpecies(Species species) {
+		System.out.println("species set for factory: " + species);
+		this.species = species;
+	}
+	
+	
 	@Override
 	public void setParents(Creature parentA, Creature parentB) {
 	}
