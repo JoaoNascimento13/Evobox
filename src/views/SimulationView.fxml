@@ -25,7 +25,7 @@
          <children>
             <StackPane fx:id="overviewPane" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0">
                <children>
-                  <VBox fx:id="creatureView" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ECE6D5;">
+                  <VBox fx:id="creatureView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                      <children>
                         <HBox prefHeight="35.0" prefWidth="320.0">
                            <children>
@@ -223,7 +223,7 @@
                         <Insets />
                      </StackPane.margin>
                   </VBox>
-                  <VBox fx:id="speciesView" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ECE6D5;">
+                  <VBox fx:id="speciesView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                      <children>
                         <Label alignment="CENTER" prefHeight="341.0" prefWidth="318.0" text="SPECIES">
                            <font>
@@ -232,13 +232,22 @@
                         </Label>
                      </children>
                   </VBox>
-                  <VBox fx:id="generalView" prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #ECE6D5;">
+                  <VBox fx:id="generalView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                      <children>
-                        <Label alignment="CENTER" prefHeight="341.0" prefWidth="318.0" text="GENERAL">
-                           <font>
-                              <Font name="System Bold" size="53.0" />
-                           </font>
-                        </Label>
+                        <HBox maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0">
+                           <children>
+                              <VBox fx:id="overviewSpeciesName" maxHeight="642.0" maxWidth="120.0" minHeight="642.0" minWidth="120.0" prefHeight="642.0" prefWidth="120.0" spacing="10.0">
+                                 <padding>
+                                    <Insets left="20.0" top="10.0" />
+                                 </padding>
+                              </VBox>
+                              <VBox fx:id="overviewSpeciesPercentage" maxHeight="642.0" maxWidth="222.0" minHeight="642.0" minWidth="222.0" prefHeight="642.0" prefWidth="222.0" spacing="10.0">
+                                 <padding>
+                                    <Insets top="10.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
                      </children>
                   </VBox>
                </children>

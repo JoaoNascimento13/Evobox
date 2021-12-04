@@ -1,11 +1,17 @@
 package application.gui;
 
+import java.util.ArrayList;
+
 import application.core.MapStateSingleton;
 import application.core.Renderer;
 import application.core.Simulator;
 import application.dynamic.Creature;
+import application.dynamic.Species;
 import javafx.application.Platform;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -36,6 +42,11 @@ public class SimulatorController {
 	private GridPane mapContainer;
 	
 	
+	
+	@FXML
+	private VBox overviewSpeciesName;
+	@FXML
+	private VBox overviewSpeciesPercentage;
 
 	@FXML
 	private Label creatureSpecies;
@@ -88,6 +99,37 @@ public class SimulatorController {
 	
 	
 	
+	
+	public void updateSidePane() {
+		
+		if (inGeneralView()) {
+			
+			updateOverview();
+			
+		} else if (inSpeciesView()) {
+			
+			
+		} else {
+			
+			MapStateSingleton mapState = MapStateSingleton.getInstance();
+			
+			boolean focusIsDead = false;
+			for (long i : mapState.deadCreaturesToRemoveIds) {
+				if (mapState.focusedCreature.id == i) {
+					focusIsDead = true;
+					break;
+				}
+			}
+			if (!focusIsDead) {
+				fillDynamicCreatureDetails(mapState.focusedCreature);
+			} else {
+				mapState.focusedCreature = null;
+				showGeneralView();
+			}
+		}
+	}
+	
+	
 	public void fillCreatureDetails(Creature creature) {
 		
     	System.out.println("Clicked on creature: " + creature + " on " + creature.x + ", " + creature.y);
@@ -115,22 +157,46 @@ public class SimulatorController {
     	try {
     		
 			foodBar.setProgress(((double)creature.food)/creature.feedingStrategy.getMaximumFoodStorage());
-			
 			ageBar.setProgress(((double)creature.age)/creature.genome.ageExpectancy);
 			
 		} catch (IllegalStateException e) {
-			
 			//Will throw an exception if creature is already dead.
-			
 			//Can be ignored, the focus will be cleared afterwards.
-			
 		}
 	}
 	
+	
 
-	public void showGeneralView() {
+	public void addSpeciesToOverview(Species originalSpecies) {
+		Label name = new Label(originalSpecies.name);
+		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+		ProgressBar percentage = new ProgressBar(((double)originalSpecies.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
+		name.setId("name"+originalSpecies.id);
+		percentage.setId("percentage"+originalSpecies.id);
+		percentage.setPrefHeight(16);
+		percentage.setPrefWidth(202);
+		percentage.setPadding(new Insets(3, 0, -1, 0));
+		overviewSpeciesName.getChildren().add(name);
+		overviewSpeciesPercentage.getChildren().add(percentage);
+	}
+
+	
+	public void updateOverview() {
 		
-
+		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+		ObservableList<Node> percentage = overviewSpeciesPercentage.getChildren();
+		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
+		for (Species s : activeSpecies) {
+			for (Node n : percentage) {
+				if (n.getId().equals("percentage"+s.id)) {
+					((ProgressBar)n).setProgress(((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
+				}
+			}
+		}
+	}
+	
+	
+	public void showGeneralView() {
 		
 		Platform.runLater(new Runnable() {
 		    @Override

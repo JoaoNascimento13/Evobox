@@ -27,6 +27,8 @@ public class MainMenuController {
 		
 		sceneManager.setSimulationController();
 		
+		sceneManager.simulator.populateWorld();
+		
 		sceneManager.showSimulation(stage);
 		
 //		sceneManager.saveFirstSimulatorFrame();

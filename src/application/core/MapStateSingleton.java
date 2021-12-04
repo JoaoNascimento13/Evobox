@@ -7,9 +7,11 @@ import application.dynamic.Creature;
 import application.dynamic.Diet;
 import application.dynamic.FlowGenerator;
 import application.dynamic.Species;
+import application.gui.SimulatorController;
 
 public class MapStateSingleton {
 
+	
 	transient private Point[][] flowMap;
 	transient private Creature[][] creatureMap;
 
@@ -52,7 +54,9 @@ public class MapStateSingleton {
     	initializeCreatureMap();
     	
     	nextCreatureId = 1;
+    	nextSpeciesId = 1;
 		activeCreatures = new ArrayList<Creature>();
+		activeSpecies = new ArrayList<Species>();
 		bornCreaturesToAdd = new ArrayList<Creature>();
 		deadCreaturesToRemoveIds = new ArrayList<Long>();
 		flowGenerators = new ArrayList<FlowGenerator>();
@@ -91,7 +95,14 @@ public class MapStateSingleton {
     	nextSpeciesId++;
     	activeSpecies.add(species);
     }
-    
+
+	public int getMaxNumberOfCreaturesOfSameSpecies() {
+		int maxnumber = 0;
+		for (Species s : activeSpecies) {
+			maxnumber = Math.max(maxnumber, s.currentMembers);
+		}
+		return maxnumber;
+	}
     
     
 
@@ -199,4 +210,8 @@ public class MapStateSingleton {
 	public void setFocusedCreature(Creature focusedCreature) {
 		this.focusedCreature = focusedCreature;
 	}
+
+
+
+
 }

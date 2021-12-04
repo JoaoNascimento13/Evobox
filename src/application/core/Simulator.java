@@ -7,13 +7,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import application.dynamic.Creature;
-import application.dynamic.CreatureFactory;
-import application.dynamic.FeedingStrategy;
 import application.dynamic.FlowGenerator;
-import application.dynamic.MovementDecisionStrategy;
 import application.dynamic.PreexistingCreatureFactory;
 import application.dynamic.PulsePointFlowGenerator;
-import application.dynamic.ReproductionStrategy;
 import application.dynamic.Species;
 import application.gui.SimulatorController;
 
@@ -33,6 +29,7 @@ public class Simulator {
 	private boolean recording;
 	private boolean rendering;
 	
+	public int totalActiveCreatures;
 	
 //	private FileOutputStream simulationFile;
 
@@ -90,13 +87,30 @@ public class Simulator {
 	public void populateWorld() {
 		
 		PreexistingCreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
+		
 		Species originalSpecies = new Species();
+		
+		MapStateSingleton.getInstance().registerSpecies(originalSpecies);
+
+		simulatorController.addSpeciesToOverview(originalSpecies);
+		
 		preexistingCreatureFactory.setStarterSpecies(originalSpecies);
 		
 		for (int i = 0; i < 15000; i++) {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
+
+		Species originalSpeciesB = new Species();
 		
+		MapStateSingleton.getInstance().registerSpecies(originalSpeciesB);
+
+		simulatorController.addSpeciesToOverview(originalSpeciesB);
+		
+		preexistingCreatureFactory.setStarterSpecies(originalSpeciesB);
+		
+		for (int i = 0; i < 5000; i++) {
+			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
+		}
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
@@ -117,6 +131,8 @@ public class Simulator {
 		for (FlowGenerator f :flowGenerators) {
 			f.addFlow();
 		}
+		
+		simulatorController.updateSidePane();
 	}
 	
 
@@ -144,7 +160,7 @@ public class Simulator {
 			
 			performTickSimulations();
 			
-			requestOverviewUpdateIfNeeded(); 
+			simulatorController.updateSidePane(); 
 			//Needs to be done BEFORE unregisterDeadCreatures(), otherwise the selected point won't get cleared.
 			
 			mapState.unregisterDeadCreatures();
@@ -193,38 +209,28 @@ public class Simulator {
 	}
 	
 
-	public void requestOverviewUpdateIfNeeded() {
-		
-		if (simulatorController.inCreatureView()) {
-
-			MapStateSingleton mapState = MapStateSingleton.getInstance();
-			
-			boolean focusIsDead = false;
-			for (long i : mapState.deadCreaturesToRemoveIds) {
-				if (mapState.focusedCreature.id == i) {
-					focusIsDead = true;
-					break;
-				}
-			}
-			if (!focusIsDead) {
-				simulatorController.fillDynamicCreatureDetails(mapState.focusedCreature);
-			} else {
-				mapState.focusedCreature = null;
-				simulatorController.showGeneralView();
-				
-//				try {
-//					Thread.sleep(500);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
+//	public void requestOverviewUpdateIfNeeded() {
+//		
+//		if (simulatorController.inCreatureView()) {
+//
+//			MapStateSingleton mapState = MapStateSingleton.getInstance();
+//			
+//			boolean focusIsDead = false;
+//			for (long i : mapState.deadCreaturesToRemoveIds) {
+//				if (mapState.focusedCreature.id == i) {
+//					focusIsDead = true;
+//					break;
 //				}
-//				int crash = 1/0;
-				
-				System.out.println("FOCUS IS DEAD");
-			}
-			
-		}
-		
-	}
+//			}
+//			if (!focusIsDead) {
+//				simulatorController.fillDynamicCreatureDetails(mapState.focusedCreature);
+//			} else {
+//				mapState.focusedCreature = null;
+//				simulatorController.showGeneralView();
+//				
+//			}
+//		}
+//	}
 	
 	
 	public void waitForRunningIfNeeded() {

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 
+import application.core.MapStateSingleton;
 import application.core.Renderer;
 import application.core.SimulationState;
 import application.core.Simulator;
@@ -28,7 +29,7 @@ public class SceneManager {
 	private Scene simulationScene;
 	private FXMLLoader simulationLoader;
 	private Renderer renderer;
-	private Simulator simulator;
+	public Simulator simulator;
 	
 	
 	public void setMainMenuScene(Stage stage, SceneManager sceneManager) throws IOException {
@@ -119,8 +120,6 @@ public class SceneManager {
 		
 		simulator = new Simulator(renderer);
 		
-		simulator.populateWorld();
-		
 		simulator.setSimNumber();
 		
 	}
@@ -183,6 +182,7 @@ public class SceneManager {
 		controller.setRenderer(renderer);
 		
 		simulator.setController(controller);
+		
 	}
 	
 	
