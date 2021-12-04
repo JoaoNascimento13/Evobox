@@ -1,9 +1,7 @@
 package application.dynamic;
 
-import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
-import application.core.SettingsSingleton;
 
 public class Photosynthesis extends FeedingStrategy  {
 	private static final long serialVersionUID = 1L;

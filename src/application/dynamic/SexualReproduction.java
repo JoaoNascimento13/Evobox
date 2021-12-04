@@ -58,7 +58,6 @@ public class SexualReproduction extends ReproductionStrategy  {
 					
 					Creature partner = MapStateSingleton.getInstance().getCreature(creature.x+partnerDir.x, creature.y+partnerDir.y);
 					
-					
 					SexualReproductionCreatureFactory factory = new SexualReproductionCreatureFactory();
 					
 					factory.setParents(creature, partner);

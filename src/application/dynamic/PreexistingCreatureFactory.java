@@ -1,10 +1,9 @@
 package application.dynamic;
 
 import java.awt.Point;
-import java.awt.geom.Point2D;
 
-import application.core.RandomizerSingleton;
 import application.core.MapStateSingleton;
+import application.core.RandomizerSingleton;
 import application.core.SettingsSingleton;
 
 public class PreexistingCreatureFactory implements CreatureFactory {
@@ -37,32 +36,10 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		creature.setNextActivation((long)randomizer.nextInt(10));
 		
 		
-		
-		Genome genome = new Genome();
-
-		genome.setDiet(Diet.PHOTOSYNTHESIS);
-		
-		genome.setSpeed(0);
-		genome.setPerception(0);
-		genome.setStealth(0);
-		genome.setAgression(0);
-		genome.setReactiveness(0);
-
-		genome.setAttackDamage(0);
-		genome.setDefenseDamage(0);
-		genome.setToughness(1);
-		
-		genome.setAgeExpectancy(1000);
-		genome.setFertility(8);
-		genome.setClutchSize(2);
-		
 		creature.setSpecies(species);
-		creature.setGenome(genome);
+		creature.setGenome(species.getGenomeFromBase());
 		
-		
-		creature.setMovementDecisionStrategy(new FloaterMovementDecision(creature));
-		creature.setFeedingStrategy(new Photosynthesis(creature));
-		creature.setReproductionStrategy(new SexualReproduction(creature));
+		creature.setStrategiesFromGenome();
 		
 		
 		creature.setAge(randomizer.nextInt(1000));
@@ -71,15 +48,11 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 				);
 		creature.setFertility(false);
 		
-
-		System.out.println("creature species: " + creature.species);
-		
 		return creature;
 	}
 	
 	
 	public void setStarterSpecies(Species species) {
-		System.out.println("species set for factory: " + species);
 		this.species = species;
 	}
 	

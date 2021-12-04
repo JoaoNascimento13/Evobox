@@ -1,12 +1,10 @@
 package application.dynamic;
 
 
+import java.awt.Point;
 import java.util.ArrayList;
 
 import application.core.Direction;
-import application.core.SettingsSingleton;
-
-import java.awt.Point;
 
 public class PulsePointFlowGenerator extends FlowGenerator {
 	private static final long serialVersionUID = 1L;

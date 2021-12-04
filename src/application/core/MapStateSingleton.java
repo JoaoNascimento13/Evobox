@@ -7,7 +7,6 @@ import application.dynamic.Creature;
 import application.dynamic.Diet;
 import application.dynamic.FlowGenerator;
 import application.dynamic.Species;
-import application.gui.SimulatorController;
 
 public class MapStateSingleton {
 

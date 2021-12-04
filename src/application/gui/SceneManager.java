@@ -6,16 +6,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.URL;
 
-import application.core.MapStateSingleton;
 import application.core.Renderer;
 import application.core.SimulationState;
 import application.core.Simulator;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
 public class SceneManager {

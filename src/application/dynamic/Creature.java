@@ -325,6 +325,14 @@ public class Creature implements Serializable  {
 	}
 
 
+	
+	
+	
+	public void setStrategiesFromGenome() {
+		this.genome.setStrategiesFromGenome(this);
+	}
+
+
 
 
 

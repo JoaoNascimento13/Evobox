@@ -85,10 +85,12 @@ public class Simulator {
 	
 	
 	public void populateWorld() {
+
+		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
 		PreexistingCreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
 		
-		Species originalSpecies = new Species();
+		Species originalSpecies = new Species(settings.getStarterGenome());
 		
 		MapStateSingleton.getInstance().registerSpecies(originalSpecies);
 
@@ -100,7 +102,7 @@ public class Simulator {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 
-		Species originalSpeciesB = new Species();
+		Species originalSpeciesB = new Species(settings.getStarterGenome());
 		
 		MapStateSingleton.getInstance().registerSpecies(originalSpeciesB);
 
@@ -112,7 +114,6 @@ public class Simulator {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 		
-		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
 		ArrayList<FlowGenerator> flowGenerators = MapStateSingleton.getInstance().flowGenerators;
 		

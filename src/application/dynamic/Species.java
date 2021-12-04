@@ -15,8 +15,14 @@ public class Species implements Serializable {
 	public int currentMembers;
 	public long totalMembers;
 	
-	public Species() {
+	public Species(Creature founderCreature) {
 		setName();
+		setBaseGenome(founderCreature);
+		currentMembers = 0;
+	}
+	public Species(Genome founderGenome) {
+		setName();
+		setBaseGenome(founderGenome);
 		currentMembers = 0;
 	}
 	
@@ -126,5 +132,15 @@ public class Species implements Serializable {
 				"zo"	
 		};
 		return mid[RandomizerSingleton.getInstance().nextInt(mid.length)];
+	}
+	
+	public void setBaseGenome(Creature founderCreature) {
+		this.baseGenome = founderCreature.genome.getBaseGenome();
+	}
+	public void setBaseGenome(Genome founderGenome) {
+		this.baseGenome = founderGenome.getBaseGenome();
+	}
+	public Genome getGenomeFromBase() {
+		return this.baseGenome.getBaseGenome();
 	}
 }

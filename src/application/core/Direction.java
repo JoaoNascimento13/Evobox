@@ -418,7 +418,8 @@ public enum Direction {
 				return -1;
 			}
 			break;
-		
+		default:
+			break;
 		}
 		
 		return 0;

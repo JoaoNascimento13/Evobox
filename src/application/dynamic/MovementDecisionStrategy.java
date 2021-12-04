@@ -1,6 +1,5 @@
 package application.dynamic;
 
-import application.core.RandomizerSingleton;
 import application.core.Direction;
 
 public abstract class MovementDecisionStrategy extends CreatureStrategy {
