@@ -7,8 +7,8 @@ import java.awt.Point;
 import org.junit.jupiter.api.Test;
 
 import application.core.Direction;
-import application.dynamic.Flow;
-import application.dynamic.PulsePointFlowGenerator;
+import application.dynamic.flow.Flow;
+import application.dynamic.flow.PulsePointFlowGenerator;
 
 class PulsePointFlowGeneratorTest {
 

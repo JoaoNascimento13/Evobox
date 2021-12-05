@@ -16,213 +16,15 @@
 
 <VBox maxHeight="740.0" maxWidth="1024.0" minHeight="740.0" minWidth="1024.0" prefHeight="740.0" prefWidth="1024.0" style="-fx-background-color: #ECE6D5;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.gui.SimulatorController">
    <children>
-      <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="40.0" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="-Infinity" prefHeight="40.0" style="-fx-background-color: #ECE6D5;" text="Simulation1" textAlignment="CENTER">
+      <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="40.0" maxWidth="1.7976931348623157E308" minHeight="40.0" minWidth="-Infinity" prefHeight="40.0" style="-fx-background-color: #ECE6D5;" text="EvoBox" textAlignment="CENTER">
          <font>
-            <Font size="20.0" />
+            <Font name="Calibri Bold" size="24.0" />
          </font>
       </Label>
       <HBox maxHeight="642.0" maxWidth="1024.0" minHeight="642.0" minWidth="1024.0" prefHeight="642.0" prefWidth="1024.0">
          <children>
             <StackPane fx:id="overviewPane" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0">
                <children>
-                  <VBox fx:id="creatureView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
-                     <children>
-                        <HBox prefHeight="35.0" prefWidth="320.0">
-                           <children>
-                              <Label id="creatureSpecies" fx:id="creatureSpecies" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="31.0" prefWidth="158.0" text="Species " textAlignment="CENTER">
-                                 <font>
-                                    <Font name="Calibri Bold" size="20.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets right="3.0" />
-                                 </padding>
-                              </Label>
-                              <Label id="creatureSpeciesNumber" fx:id="creatureSpeciesNumber" contentDisplay="CENTER" prefHeight="31.0" prefWidth="130.0" text="#number" textAlignment="CENTER">
-                                 <font>
-                                    <Font name="Calibri Bold" size="20.0" />
-                                 </font>
-                                 <padding>
-                                    <Insets left="3.0" />
-                                 </padding>
-                              </Label>
-                           </children>
-                           <VBox.margin>
-                              <Insets top="10.0" />
-                           </VBox.margin>
-                        </HBox>
-                        <GridPane>
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="67.0" />
-                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="255.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <children>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Health:">
-                                 <font>
-                                    <Font name="Calibri" size="18.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Food:" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="Calibri" size="18.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Age:" GridPane.rowIndex="2">
-                                 <font>
-                                    <Font name="Calibri" size="18.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Diet:" GridPane.rowIndex="3">
-                                 <font>
-                                    <Font name="Calibri" size="18.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <ProgressBar id="healthBar" fx:id="healthBar" prefHeight="16.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1">
-                                 <padding>
-                                    <Insets bottom="-1.0" top="3.0" />
-                                 </padding>
-                              </ProgressBar>
-                              <ProgressBar id="foodBar" fx:id="foodBar" prefHeight="16.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                                 <padding>
-                                    <Insets bottom="-1.0" top="3.0" />
-                                 </padding>
-                              </ProgressBar>
-                              <ProgressBar id="ageBar" fx:id="ageBar" prefHeight="16.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                                 <padding>
-                                    <Insets bottom="-1.0" top="3.0" />
-                                 </padding>
-                              </ProgressBar>
-                           </children>
-                           <opaqueInsets>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </opaqueInsets>
-                           <VBox.margin>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
-                           </VBox.margin>
-                        </GridPane>
-                        <GridPane>
-                           <columnConstraints>
-                              <ColumnConstraints hgrow="NEVER" maxWidth="70.0" minWidth="70.0" prefWidth="70.0" />
-                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                              <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="80.0" />
-                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
-                           </columnConstraints>
-                           <rowConstraints>
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                           </rowConstraints>
-                           <padding>
-                              <Insets left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                           <children>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Size:">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Lifespan:" GridPane.columnIndex="2">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Speed:" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Toughness:" GridPane.columnIndex="2" GridPane.rowIndex="1">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Attack:" GridPane.rowIndex="2">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Defense:" GridPane.columnIndex="2" GridPane.rowIndex="2">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Perception:" GridPane.rowIndex="3">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Stealth:" GridPane.columnIndex="2" GridPane.rowIndex="3">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Fertility:" GridPane.rowIndex="4">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Clutch Size:" GridPane.columnIndex="2" GridPane.rowIndex="4">
-                                 <font>
-                                    <Font name="Calibri" size="14.0" />
-                                 </font>
-                                 <opaqueInsets>
-                                    <Insets left="10.0" />
-                                 </opaqueInsets>
-                              </Label>
-                           </children>
-                        </GridPane>
-                     </children>
-                     <StackPane.margin>
-                        <Insets />
-                     </StackPane.margin>
-                  </VBox>
                   <VBox fx:id="speciesView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                      <children>
                         <Label alignment="CENTER" prefHeight="341.0" prefWidth="318.0" text="SPECIES">
@@ -249,6 +51,350 @@
                            </children>
                         </HBox>
                      </children>
+                  </VBox>
+                  <VBox fx:id="creatureView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
+                     <children>
+                        <HBox prefHeight="35.0" prefWidth="320.0">
+                           <children>
+                              <Label id="creatureSpecies" fx:id="creatureSpecies" alignment="CENTER_RIGHT" contentDisplay="CENTER" prefHeight="31.0" prefWidth="158.0" text="Species " textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Calibri Bold" size="20.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets right="3.0" />
+                                 </padding>
+                              </Label>
+                              <Label id="creatureSpeciesNumber" fx:id="creatureSpeciesNumber" contentDisplay="CENTER" prefHeight="31.0" prefWidth="130.0" text="#number" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="Calibri Bold" size="20.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets left="3.0" />
+                                 </padding>
+                              </Label>
+                           </children>
+                           <VBox.margin>
+                              <Insets top="10.0" />
+                           </VBox.margin>
+                        </HBox>
+                        <GridPane style="-fx-border-color: #000000;">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="145.0" minWidth="10.0" prefWidth="51.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="255.0" minWidth="10.0" prefWidth="249.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                           </rowConstraints>
+                           <children>
+                              <Label alignment="CENTER" maxHeight="22.0" maxWidth="80.0" minHeight="22.0" minWidth="80.0" prefHeight="22.0" prefWidth="80.0" style="-fx-background-color: #ECE6D5; -fx-border-color: #000000;" text="Status" translateY="-15.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Health:" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Food:" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Age:" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Diet:" GridPane.rowIndex="4">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label fx:id="creatureDiet" maxHeight="-Infinity" maxWidth="180.0" minHeight="-Infinity" minWidth="180.0" prefWidth="180.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="5.0" />
+                                 </padding>
+                              </Label>
+                              <ProgressBar id="healthBar" fx:id="healthBar" prefHeight="12.0" prefWidth="260.0" progress="0.08" style="-fx-control-inner-background: #f8f6ef;" styleClass="STYLESHEET_CASPIAN" GridPane.columnIndex="1" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="foodBar" fx:id="foodBar" prefHeight="12.0" prefWidth="260.0" progress="0.0" style="-fx-control-inner-background: #f8f6ef;" GridPane.columnIndex="1" GridPane.rowIndex="2" GridPane.vgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="ageBar" fx:id="ageBar" prefHeight="12.0" prefWidth="260.0" progress="0.0" style="-fx-control-inner-background: #f8f6ef;" GridPane.columnIndex="1" GridPane.rowIndex="3" GridPane.vgrow="ALWAYS">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                           </children>
+                           <opaqueInsets>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                           </opaqueInsets>
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+                           </VBox.margin>
+                           <padding>
+                              <Insets bottom="5.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                        </GridPane>
+                        <GridPane style="-fx-border-color: #000000;">
+                           <columnConstraints>
+                              <ColumnConstraints hgrow="NEVER" maxWidth="68.0" minWidth="68.0" prefWidth="68.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                              <ColumnConstraints hgrow="NEVER" maxWidth="85.0" minWidth="85.0" prefWidth="85.0" />
+                              <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0" />
+                           </columnConstraints>
+                           <rowConstraints>
+                              <RowConstraints maxHeight="10.0" minHeight="10.0" prefHeight="10.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="32.0" minHeight="28.0" prefHeight="32.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="NEVER" />
+                              <RowConstraints maxHeight="28.0" minHeight="28.0" prefHeight="28.0" vgrow="NEVER" />
+                           </rowConstraints>
+                           <padding>
+                              <Insets bottom="5.0" left="10.0" right="10.0" top="10.0" />
+                           </padding>
+                           <children>
+                              <Label alignment="CENTER" contentDisplay="CENTER" maxHeight="22.0" maxWidth="80.0" minHeight="22.0" minWidth="80.0" prefHeight="22.0" prefWidth="80.0" style="-fx-background-color: #ECE6D5; -fx-border-color: #000000;" text="Genome" translateY="-15.0" GridPane.columnSpan="2" GridPane.halignment="LEFT" GridPane.hgrow="NEVER" GridPane.valignment="CENTER" GridPane.vgrow="NEVER">
+                                 <font>
+                                    <Font name="Calibri Bold" size="14.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Size:" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Speed:" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Attack:" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Perception:" GridPane.rowIndex="4">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Fertility:" GridPane.rowIndex="5">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Aggression:" GridPane.rowIndex="6">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Lifespan:" GridPane.columnIndex="2" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Toughness:" GridPane.columnIndex="2" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Defense:" GridPane.columnIndex="2" GridPane.rowIndex="3">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Stealth:" GridPane.columnIndex="2" GridPane.rowIndex="4">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Clutch Size:" GridPane.columnIndex="2" GridPane.rowIndex="5">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Reactiveness:" GridPane.columnIndex="2" GridPane.rowIndex="6">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <Label maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" text="Evolution:" GridPane.columnIndex="2" GridPane.rowIndex="7">
+                                 <font>
+                                    <Font name="Calibri Bold" size="12.0" />
+                                 </font>
+                                 <opaqueInsets>
+                                    <Insets left="10.0" />
+                                 </opaqueInsets>
+                                 <padding>
+                                    <Insets left="12.0" />
+                                 </padding>
+                              </Label>
+                              <ProgressBar id="creatureSize" fx:id="creatureSize" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureSpeed" fx:id="creatureSpeed" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureAttack" fx:id="creatureAttack" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creaturePerception" fx:id="creaturePerception" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureFertility" fx:id="creatureFertility" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureAgression" fx:id="creatureAgression" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="1" GridPane.rowIndex="6">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureLifespan" fx:id="creatureLifespan" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="1">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureToughness" fx:id="creatureToughness" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="2">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureDefense" fx:id="creatureDefense" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="3">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureStealth" fx:id="creatureStealth" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureClutchSize" fx:id="creatureClutchSize" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="5">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureReactiveness" fx:id="creatureReactiveness" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="6">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                              <ProgressBar id="creatureEvolution" fx:id="creatureEvolution" prefHeight="10.0" prefWidth="222.0" progress="0.0" GridPane.columnIndex="3" GridPane.rowIndex="7">
+                                 <GridPane.margin>
+                                    <Insets />
+                                 </GridPane.margin>
+                              </ProgressBar>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
+                           </VBox.margin>
+                        </GridPane>
+                     </children>
+                     <StackPane.margin>
+                        <Insets />
+                     </StackPane.margin>
                   </VBox>
                </children>
             </StackPane>

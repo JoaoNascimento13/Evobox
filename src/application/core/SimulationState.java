@@ -2,8 +2,8 @@ package application.core;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import application.dynamic.Creature;
-import application.dynamic.FlowGenerator;
+import application.dynamic.creatures.Creature;
+import application.dynamic.flow.FlowGenerator;
 
 public class SimulationState implements Serializable, Cloneable {
 	private static final long serialVersionUID = 1L;

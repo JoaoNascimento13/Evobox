@@ -1,6 +1,8 @@
-package application.dynamic;
+package application.dynamic.factories;
 
 import java.awt.Point;
+
+import application.dynamic.creatures.Creature;
 
 public interface CreatureFactory {
 	

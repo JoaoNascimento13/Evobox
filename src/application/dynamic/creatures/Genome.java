@@ -1,4 +1,4 @@
-package application.dynamic;
+package application.dynamic.creatures;
 
 import java.io.Serializable;
 
@@ -9,26 +9,30 @@ public class Genome implements Serializable {
 	
 	public Diet diet;
 	public Species specificDiet;
-	public Size size;
 	
-	public int speed;
-	public int attackDamage;
-	public int defenseDamage;
-	public int toughness;
-	public int perception;
-	public int stealth;
-	public int agression;
-	public int reactiveness;
-	public int ageExpectancy;
-	public int fertility;
-	public int clutchSize;
+	 Size size;
 	
+
+	private int speed;
+	private int attackDamage;
+	private int defenseDamage;
+	private int toughness;
+	private int perception;
+	private int stealth;
+	private int agression;
+	private int reactiveness;
+	private int ageExpectancy;
+	private int fertility;
+	private int clutchSize;
+
+	private int freeEvoPoints;
+	private int maxEvoPoints;
 
 	
 	public void setDiet(Diet diet) {
 		this.diet = diet;
 	}
-	public void setSoecificDiet(Species specificDiet) {
+	public void setSpecificDiet(Species specificDiet) {
 		this.specificDiet = specificDiet;
 	}
 	public void setSize(Size size) {
@@ -66,6 +70,25 @@ public class Genome implements Serializable {
 	}
 	public void setClutchSize(int clutchSize) {
 		this.clutchSize = clutchSize;
+	}
+	
+	
+	
+
+	public int getActivationSpeed() {
+		return this.speed;
+	}
+	public int getMaxHealth() {
+		return this.toughness;
+	}
+	public int getMaxAge() {
+		return (this.ageExpectancy*500);
+	}
+	public int getTotalChildren() {
+		return ((this.fertility*2)+1);
+	}
+	public int getChildrenPerBirth() {
+		return this.clutchSize;
 	}
 	
 	
@@ -198,6 +221,86 @@ public class Genome implements Serializable {
 		return deviationRate;
 	}
 	
+	public void calculateAvailableEvoPoints() {
+		
+		int maxEvoPoints = diet.getEvoPointsGranted() + size.getEvoPointsGranted();
+		if (specificDiet != null) {
+			maxEvoPoints += 10;
+		}
+		this.maxEvoPoints = maxEvoPoints;
+		
+		int freeEvoPoints = maxEvoPoints;
+		
+		freeEvoPoints -= speed;
+		freeEvoPoints -= attackDamage;
+		freeEvoPoints -= defenseDamage;
+		freeEvoPoints -= toughness;
+		freeEvoPoints -= perception;
+		freeEvoPoints -= stealth;
+		freeEvoPoints -= fertility;
+		freeEvoPoints -= clutchSize;
+		freeEvoPoints -= agression;
+		freeEvoPoints -= reactiveness;
+		freeEvoPoints -= ageExpectancy;
+		
+
+		this.freeEvoPoints = freeEvoPoints;
+	}
+	
+	
+	
+
+	public Diet getDiet() {
+		return diet;
+	}
+	public Species getSpecificDiet() {
+		return specificDiet;
+	}
+	public Size getSize() {
+		return size;
+	}
+	public int getSpeed() {
+		return speed;
+	}
+	public int getAttackDamage() {
+		return attackDamage;
+	}
+	public int getDefenseDamage() {
+		return defenseDamage;
+	}
+	public int getToughness() {
+		return toughness;
+	}
+	public int getPerception() {
+		return perception;
+	}
+	public int getStealth() {
+		return stealth;
+	}
+	public int getAgression() {
+		return agression;
+	}
+	public int getReactiveness() {
+		return reactiveness;
+	}
+	public int getAgeExpectancy() {
+		return ageExpectancy;
+	}
+	public int getFertility() {
+		return fertility;
+	}
+	public int getClutchSize() {
+		return clutchSize;
+	}
+	public int getFreeEvoPoints() {
+		return freeEvoPoints;
+	}
+	public int getMaxEvoPoints() {
+		return maxEvoPoints;
+	}
+	public int getUsedEvoPoints() {
+		return (maxEvoPoints-freeEvoPoints);
+	}
 }
 
 

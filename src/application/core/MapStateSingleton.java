@@ -3,10 +3,10 @@ package application.core;
 import java.awt.Point;
 import java.util.ArrayList;
 
-import application.dynamic.Creature;
-import application.dynamic.Diet;
-import application.dynamic.FlowGenerator;
-import application.dynamic.Species;
+import application.dynamic.creatures.Creature;
+import application.dynamic.creatures.Diet;
+import application.dynamic.creatures.Species;
+import application.dynamic.flow.FlowGenerator;
 
 public class MapStateSingleton {
 

@@ -1,4 +1,4 @@
-package application.dynamic;
+package application.dynamic.creatures;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package application.dynamic;
+package application.dynamic.creatures;
 
 import java.io.Serializable;
 
@@ -26,6 +26,7 @@ public class Creature implements Serializable  {
 	
 	public int age;
 	public int food;
+	public int health;
 	public boolean isFertile;
 	
 	public long id;
@@ -76,7 +77,7 @@ public class Creature implements Serializable  {
 	
 	
 	public int ticksPerTurn() {
-		return (11-this.genome.speed);
+		return (11-this.genome.getActivationSpeed());
 	}
 
 
@@ -103,15 +104,15 @@ public class Creature implements Serializable  {
 
 		int chanceOfDeath = 0;
 		
-		if (this.age > (6*this.genome.ageExpectancy)/5) {
+		if (this.age > (6*this.genome.getMaxAge())/5) {
 			
 			chanceOfDeath = 25;
 			
-		} else if (this.age > this.genome.ageExpectancy) {
+		} else if (this.age > this.genome.getMaxAge()) {
 
 			chanceOfDeath = 5;
 		
-		} else if (this.age > (4*this.genome.ageExpectancy)/5) {
+		} else if (this.age > (4*this.genome.getMaxAge())/5) {
 			
 			chanceOfDeath = 1;
 		}
@@ -310,6 +311,9 @@ public class Creature implements Serializable  {
 	public void setFood(int food) {
 		this.food = food;
 	}
+	public void setFullHealth() {
+		this.health = this.genome.getMaxHealth();
+	}
 	
 	public void setMovementDecisionStrategy(MovementDecisionStrategy moveStrategy) {
 		this.movementDecisionStrategy = moveStrategy;
@@ -325,6 +329,13 @@ public class Creature implements Serializable  {
 	}
 
 
+	
+	
+	
+
+	public int getMaximumFoodStorage() {
+		return this.feedingStrategy.getMaximumFoodStorage();
+	}
 	
 	
 	

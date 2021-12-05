@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import application.dynamic.Genome;
+import application.dynamic.creatures.Genome;
 
 class GenomeTest {
 

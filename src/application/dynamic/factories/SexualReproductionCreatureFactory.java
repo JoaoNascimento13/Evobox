@@ -1,6 +1,9 @@
-package application.dynamic;
+package application.dynamic.factories;
 
 import java.awt.Point;
+
+import application.dynamic.creatures.Creature;
+import application.dynamic.creatures.Genome;
 
 public class SexualReproductionCreatureFactory implements CreatureFactory {
 
@@ -33,6 +36,8 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		creature.setAge(0);
 		
 		creature.setFood(creature.feedingStrategy.getStartingFoodStorage());
+
+		creature.setFullHealth();
 		
 		creature.setFertility(false);
 				

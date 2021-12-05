@@ -1,4 +1,4 @@
-package application.dynamic;
+package application.dynamic.creatures;
 
 public abstract class FeedingStrategy extends CreatureStrategy {
 	private static final long serialVersionUID = 1L;
@@ -8,7 +8,7 @@ public abstract class FeedingStrategy extends CreatureStrategy {
 
 	abstract int getfoodUsedPerTick();
 	
-	abstract int getStartingFoodStorage();
+	public abstract int getStartingFoodStorage();
 	
 	public abstract int getMaximumFoodStorage();
 	

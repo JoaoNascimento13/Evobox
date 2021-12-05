@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import application.core.MapStateSingleton;
 import application.core.Renderer;
 import application.core.Simulator;
-import application.dynamic.Creature;
-import application.dynamic.Species;
+import application.dynamic.creatures.Creature;
+import application.dynamic.creatures.Species;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -57,6 +57,34 @@ public class SimulatorController {
 	@FXML
 	private ProgressBar ageBar;
 	
+	@FXML
+	private Label creatureDiet;
+	@FXML
+	private ProgressBar creatureSize;
+	@FXML
+	private ProgressBar creatureLifespan;
+	@FXML
+	private ProgressBar creatureSpeed;
+	@FXML
+	private ProgressBar creatureToughness;
+	@FXML
+	private ProgressBar creatureAttack;
+	@FXML
+	private ProgressBar creatureDefense;
+	@FXML
+	private ProgressBar creaturePerception;
+	@FXML
+	private ProgressBar creatureStealth;
+	@FXML
+	private ProgressBar creatureFertility;
+	@FXML
+	private ProgressBar creatureClutchSize;
+	@FXML
+	private ProgressBar creatureAgression;
+	@FXML
+	private ProgressBar creatureReactiveness;
+	@FXML
+	private ProgressBar creatureEvolution;
 	
 	
 	public void setSimulator(Simulator simulator) {
@@ -100,7 +128,17 @@ public class SimulatorController {
 	
 	public void updateSidePane() {
 		
-		if (inGeneralView()) {
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		
+		boolean forceGeneralView = false;
+		if (mapState.focusedCreature == null && inCreatureView()) {
+			forceGeneralView = true;
+			showGeneralView();
+		}
+		
+		
+		if (inGeneralView() || forceGeneralView) {
 			
 			updateOverview();
 			
@@ -108,8 +146,6 @@ public class SimulatorController {
 			
 			
 		} else {
-			
-			MapStateSingleton mapState = MapStateSingleton.getInstance();
 			
 			boolean focusIsDead = false;
 			for (long i : mapState.deadCreaturesToRemoveIds) {
@@ -147,6 +183,32 @@ public class SimulatorController {
 
 		creatureSpecies.setText(creature.species.name);
 		creatureSpeciesNumber.setText(String.valueOf(creature.numberInSpecies));
+		
+		creatureDiet.setText(creature.genome.diet.name);
+		
+		creatureLifespan.setProgress(((double)creature.genome.getAgeExpectancy())/10);
+
+		creatureSpeed.setProgress(((double)creature.genome.getSpeed())/10);
+		
+		creatureToughness.setProgress(((double)creature.genome.getToughness())/10);
+
+		creatureAttack.setProgress(((double)creature.genome.getAttackDamage())/10);
+
+		creatureDefense.setProgress(((double)creature.genome.getDefenseDamage())/10);
+
+		creaturePerception.setProgress(((double)creature.genome.getPerception())/10);
+
+		creatureStealth.setProgress(((double)creature.genome.getStealth())/10);
+
+		creatureFertility.setProgress(((double)creature.genome.getFertility())/10);
+
+		creatureClutchSize.setProgress(((double)creature.genome.getClutchSize())/10);
+
+		creatureAgression.setProgress(((double)creature.genome.getAgression())/10);
+
+		creatureReactiveness.setProgress(((double)creature.genome.getReactiveness())/10);
+
+		creatureEvolution.setProgress(((double)creature.genome.getUsedEvoPoints())/creature.genome.getMaxEvoPoints());
 	}
 	
 	
@@ -154,8 +216,10 @@ public class SimulatorController {
 		
     	try {
     		
-			foodBar.setProgress(((double)creature.food)/creature.feedingStrategy.getMaximumFoodStorage());
-			ageBar.setProgress(((double)creature.age)/creature.genome.ageExpectancy);
+			foodBar.setProgress(((double)creature.food)/creature.getMaximumFoodStorage());
+			ageBar.setProgress(((double)creature.age)/creature.genome.getMaxAge());
+			healthBar.setProgress(((double)creature.health)/creature.genome.getMaxHealth());
+			
 			
 		} catch (IllegalStateException e) {
 			//Will throw an exception if creature is already dead.
@@ -171,9 +235,9 @@ public class SimulatorController {
 		ProgressBar percentage = new ProgressBar(((double)originalSpecies.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
 		name.setId("name"+originalSpecies.id);
 		percentage.setId("percentage"+originalSpecies.id);
-		percentage.setPrefHeight(16);
+		percentage.setPrefHeight(12);
 		percentage.setPrefWidth(202);
-		percentage.setPadding(new Insets(3, 0, -1, 0));
+//		percentage.setPadding(new Insets(3, 0, -1, 0));
 		overviewSpeciesName.getChildren().add(name);
 		overviewSpeciesPercentage.getChildren().add(percentage);
 	}

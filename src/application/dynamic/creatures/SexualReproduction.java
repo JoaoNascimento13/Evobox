@@ -1,9 +1,10 @@
-package application.dynamic;
+package application.dynamic.creatures;
 
 import java.awt.Point;
 import java.util.ArrayList;
 
 import application.core.RandomizerSingleton;
+import application.dynamic.factories.SexualReproductionCreatureFactory;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 
@@ -110,7 +111,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 
 	public ArrayList<Point> getSpawnPoints(Direction partnerDir, RandomizerSingleton randomizer) {
 		
-		int childrenToSpawn = Math.max(1, creature.genome.clutchSize + randomizer.nextInt(3) - 1);
+		int childrenToSpawn = Math.max(1, creature.genome.getChildrenPerBirth() + randomizer.nextInt(3) - 1);
 		
 
 		ArrayList<Direction> RandomDirs = Direction.randomArrayList(randomizer);
@@ -158,9 +159,9 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	public void startReproductionCooldown() {
 		
-		int expectedReproductionEvents = creature.genome.fertility / creature.genome.clutchSize;
+		int expectedReproductionEvents = creature.genome.getTotalChildren() / creature.genome.getChildrenPerBirth();
 		
-		reproductionCooldown = creature.genome.ageExpectancy / expectedReproductionEvents;
+		reproductionCooldown = creature.genome.getMaxAge() / expectedReproductionEvents;
 	}
 	
 	

@@ -24,8 +24,12 @@ public enum Direction {
     public static final Direction[] ALL_DIRS = {UP, DOWN, LEFT, RIGHT, UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT};
     
     public int x;
-    
     public int y;
+
+    private Direction(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
     
     static public Direction getDirection(int x, int y) {
         if (x < 0) {
@@ -292,10 +296,6 @@ public enum Direction {
         }
     }
     
-    private Direction(int x, int y) {
-        this.x = x;
-        this.y = y;
-    }
 
 	public String getDescription() {
         switch (this) {

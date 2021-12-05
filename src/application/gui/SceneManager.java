@@ -71,6 +71,7 @@ public class SceneManager {
 		simulationScene = new Scene(root,windowWidth,windowHeight);
 		
 		
+		
 		int canvasWidth = 640;
 		int canvasHeight = 640;
 		

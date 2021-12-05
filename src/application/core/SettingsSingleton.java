@@ -1,7 +1,8 @@
 package application.core;
 
-import application.dynamic.Diet;
-import application.dynamic.Genome;
+import application.dynamic.creatures.Diet;
+import application.dynamic.creatures.Genome;
+import application.dynamic.creatures.Size;
 
 public class SettingsSingleton {
 	
@@ -36,8 +37,12 @@ public class SettingsSingleton {
 
 		genome.setDiet(Diet.PHOTOSYNTHESIS);
 		
+		genome.setSize(Size.SMALL);
+		
 		genome.setSpeed(0);
+		
 		genome.setPerception(0);
+		
 		genome.setStealth(0);
 		genome.setAgression(0);
 		genome.setReactiveness(0);
@@ -46,9 +51,17 @@ public class SettingsSingleton {
 		genome.setDefenseDamage(0);
 		genome.setToughness(1);
 		
-		genome.setAgeExpectancy(1000);
-		genome.setFertility(8);
+		
+		genome.setAgeExpectancy(2);
+		//maxAge = *500 -> 500 - 5000
+		
+		genome.setFertility(4);
+		//children = *2+1 -> 3 - 21
+		
 		genome.setClutchSize(2);
+		
+		genome.calculateAvailableEvoPoints();
+		
 		
 		return genome;
     }

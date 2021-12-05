@@ -1,7 +1,7 @@
 package application.gui;
 
 import application.core.MapStateSingleton;
-import application.dynamic.Creature;
+import application.dynamic.creatures.Creature;
 import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.geometry.Pos;

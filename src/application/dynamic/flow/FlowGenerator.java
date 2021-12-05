@@ -1,4 +1,4 @@
-package application.dynamic;
+package application.dynamic.flow;
 
 import java.util.ArrayList;
 import java.util.Random;

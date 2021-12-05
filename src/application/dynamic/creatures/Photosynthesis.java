@@ -1,4 +1,4 @@
-package application.dynamic;
+package application.dynamic.creatures;
 
 import application.core.Direction;
 import application.core.MapStateSingleton;

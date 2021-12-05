@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
-import application.dynamic.Creature;
-import application.dynamic.FlowGenerator;
-import application.dynamic.PreexistingCreatureFactory;
-import application.dynamic.PulsePointFlowGenerator;
-import application.dynamic.Species;
+import application.dynamic.creatures.Creature;
+import application.dynamic.creatures.Species;
+import application.dynamic.factories.PreexistingCreatureFactory;
+import application.dynamic.flow.FlowGenerator;
+import application.dynamic.flow.PulsePointFlowGenerator;
 import application.gui.SimulatorController;
 
 import java.awt.Point;

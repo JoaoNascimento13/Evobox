@@ -1,10 +1,12 @@
-package application.dynamic;
+package application.dynamic.factories;
 
 import java.awt.Point;
 
 import application.core.MapStateSingleton;
 import application.core.RandomizerSingleton;
 import application.core.SettingsSingleton;
+import application.dynamic.creatures.Creature;
+import application.dynamic.creatures.Species;
 
 public class PreexistingCreatureFactory implements CreatureFactory {
 
@@ -46,6 +48,7 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		creature.setFood(
 				((randomizer.nextInt(100)+50) * creature.feedingStrategy.getStartingFoodStorage())/100
 				);
+		creature.setFullHealth();
 		creature.setFertility(false);
 		
 		return creature;

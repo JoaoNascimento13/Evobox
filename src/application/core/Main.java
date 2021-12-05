@@ -19,6 +19,8 @@ public class Main extends Application {
 			
 			stage.setOnCloseRequest(e -> sceneManager.exitCleanup());
 			
+			setUserAgentStylesheet(STYLESHEET_CASPIAN);
+			
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

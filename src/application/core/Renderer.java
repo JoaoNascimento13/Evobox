@@ -3,7 +3,7 @@ package application.core;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
-import application.dynamic.Creature;
+import application.dynamic.creatures.Creature;
 import application.gui.MapScrollPane;
 import javafx.application.Platform;
 import javafx.event.Event;
@@ -133,6 +133,7 @@ public class Renderer {
         PixelWriter p = gc.getPixelWriter();
         p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
 		
+        
 		
 		GridPane container = ((GridPane)activeMapScrollPane.getParent());
 		
