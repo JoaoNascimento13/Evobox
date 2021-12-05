@@ -32,6 +32,8 @@ public class Creature implements Serializable  {
 	public long id;
 	public long numberInSpecies;
 	
+	public boolean mutated = false;
+	
 	public Creature (int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -46,7 +48,7 @@ public class Creature implements Serializable  {
 	
 	
 	
-	public void actOrPostpone(long currentTick) {
+	public void exposeToActivation(long currentTick) {
 		if (this.nextActivation == currentTick) {
 			act(currentTick);
 			nextActivation = currentTick + ticksPerTurn();
@@ -62,7 +64,7 @@ public class Creature implements Serializable  {
 		age();
 		useFood();
 		
-		if(dieOrContinue()) {
+		if(exposeToDeath()) {
 			return;
 		}
 		
@@ -89,18 +91,18 @@ public class Creature implements Serializable  {
 	}
 
 
-	public boolean dieOrContinue() {
-		if (dieFromOldAgeOrContinue()) {
+	public boolean exposeToDeath() {
+		if (exposeToOldAgeDeath()) {
 			return true;
 		}
-		if (dieFromStarvationOrContinue()) {
+		if (exposeToStarvationDeath()) {
 			return true;
 		}
 		return false;
 	}
 	
 	
-	public boolean dieFromOldAgeOrContinue() {
+	public boolean exposeToOldAgeDeath() {
 
 		int chanceOfDeath = 0;
 		
@@ -129,7 +131,7 @@ public class Creature implements Serializable  {
 	}
 	
 
-	public boolean dieFromStarvationOrContinue() {
+	public boolean exposeToStarvationDeath() {
 		
 		if (food <= 0) {
 //			System.out.println("- 1 starved");
@@ -149,6 +151,10 @@ public class Creature implements Serializable  {
 		MapStateSingleton.getInstance().queueCreatureUnregister(this);
 		
 		this.species.currentMembers--;
+		
+		if (mutated) {
+			this.species.currentMutatedMembers--;
+		}
 	}
 	
 	
@@ -163,7 +169,7 @@ public class Creature implements Serializable  {
 
 	public void feed() {
 		
-		this.feedingStrategy.feed();
+		this.feedingStrategy.exposeToFeeding();
 		
 	}
 
@@ -171,7 +177,7 @@ public class Creature implements Serializable  {
 
 	public void reproduce(long tick) {
 		
-		this.reproductionStrategy.reproduce(tick);
+		this.reproductionStrategy.exposeToReproduction(tick);
 		
 	}
 
@@ -334,13 +340,18 @@ public class Creature implements Serializable  {
 	
 
 	public int getMaximumFoodStorage() {
-		return this.feedingStrategy.getMaximumFoodStorage();
+		return feedingStrategy.getMaximumFoodStorage();
 	}
 	
 	
 	
 	public void setStrategiesFromGenome() {
-		this.genome.setStrategiesFromGenome(this);
+		genome.setStrategiesFromGenome(this);
+	}
+
+
+	public void calculateAvailableEvoPoints() {
+		genome.calculateAvailableEvoPoints();
 	}
 
 

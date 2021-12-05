@@ -31,8 +31,9 @@ public class MapStateSingleton {
 	
 	private static final MapStateSingleton mapState = new MapStateSingleton();
 
-	public Creature focusedCreature;
 	
+	public Creature focusedCreature;
+	transient public boolean refreshFocusedCreature;
 	
 	private MapStateSingleton() {}
 	
@@ -86,6 +87,14 @@ public class MapStateSingleton {
     	creature.species.currentMembers++;
     	creature.species.totalMembers++;
     	creature.numberInSpecies = creature.species.totalMembers;
+    	
+    	if (creature.mutated) {
+//    		mapState.focusedCreature = creature;
+//    		mapState.refreshFocusedCreature = true;
+    		
+        	creature.species.currentMutatedMembers++;
+    	}
+		
     }
     
 

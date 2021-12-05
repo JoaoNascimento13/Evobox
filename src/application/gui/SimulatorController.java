@@ -12,12 +12,14 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class SimulatorController {
 	
@@ -50,6 +52,7 @@ public class SimulatorController {
 	private Label creatureSpecies;
 	@FXML
 	private Label creatureSpeciesNumber;
+	
 	@FXML
 	private ProgressBar healthBar;
 	@FXML
@@ -80,11 +83,41 @@ public class SimulatorController {
 	@FXML
 	private ProgressBar creatureClutchSize;
 	@FXML
-	private ProgressBar creatureAgression;
+	private ProgressBar creatureAggression;
 	@FXML
 	private ProgressBar creatureReactiveness;
+
+	@FXML
+	private Label creatureDietLabel;
+	@FXML
+	private Label creatureSizeLabel;
+	@FXML
+	private Label creatureLifespanLabel;
+	@FXML
+	private Label creatureSpeedLabel;
+	@FXML
+	private Label creatureToughnessLabel;
+	@FXML
+	private Label creatureAttackLabel;
+	@FXML
+	private Label creatureDefenseLabel;
+	@FXML
+	private Label creaturePerceptionLabel;
+	@FXML
+	private Label creatureStealthLabel;
+	@FXML
+	private Label creatureFertilityLabel;
+	@FXML
+	private Label creatureClutchSizeLabel;
+	@FXML
+	private Label creatureAggressionLabel;
+	@FXML
+	private Label creatureReactivenessLabel;
+	
 	@FXML
 	private ProgressBar creatureEvolution;
+	@FXML
+	private Label creatureEvolutionLabel;
 	
 	
 	public void setSimulator(Simulator simulator) {
@@ -155,7 +188,12 @@ public class SimulatorController {
 				}
 			}
 			if (!focusIsDead) {
-				fillDynamicCreatureDetails(mapState.focusedCreature);
+				if (mapState.refreshFocusedCreature) {
+					fillCreatureDetails(mapState.focusedCreature);
+					mapState.refreshFocusedCreature = false;
+				} else {
+					fillDynamicCreatureDetails(mapState.focusedCreature);
+				}
 			} else {
 				mapState.focusedCreature = null;
 				showGeneralView();
@@ -181,50 +219,96 @@ public class SimulatorController {
 
 	public void fillStaticCreatureDetails(Creature creature) {
 
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+		    	
+		    	fillGenomeDetails(creature);
+		    	
+		    	fillGenomeLabelDetails(creature);
+		    }
+		});
+		
+		
+	}
+	
+
+	public void fillGenomeDetails(Creature creature) {
+
 		creatureSpecies.setText(creature.species.name);
 		creatureSpeciesNumber.setText(String.valueOf(creature.numberInSpecies));
 		
 		creatureDiet.setText(creature.genome.diet.name);
 		
 		creatureLifespan.setProgress(((double)creature.genome.getAgeExpectancy())/10);
-
 		creatureSpeed.setProgress(((double)creature.genome.getSpeed())/10);
-		
 		creatureToughness.setProgress(((double)creature.genome.getToughness())/10);
-
 		creatureAttack.setProgress(((double)creature.genome.getAttackDamage())/10);
-
 		creatureDefense.setProgress(((double)creature.genome.getDefenseDamage())/10);
-
 		creaturePerception.setProgress(((double)creature.genome.getPerception())/10);
-
 		creatureStealth.setProgress(((double)creature.genome.getStealth())/10);
-
 		creatureFertility.setProgress(((double)creature.genome.getFertility())/10);
-
 		creatureClutchSize.setProgress(((double)creature.genome.getClutchSize())/10);
-
-		creatureAgression.setProgress(((double)creature.genome.getAgression())/10);
-
+		creatureAggression.setProgress(((double)creature.genome.getAgression())/10);
 		creatureReactiveness.setProgress(((double)creature.genome.getReactiveness())/10);
-
 		creatureEvolution.setProgress(((double)creature.genome.getUsedEvoPoints())/creature.genome.getMaxEvoPoints());
+	}
+
+	public void fillGenomeLabelDetails(Creature creature) {
+		
+		if (creature.genome.diet == creature.species.baseGenome.diet) {
+			creatureDietLabel.setTextFill(Color.BLACK);
+		} else {
+			creatureDietLabel.setTextFill(Color.RED);
+		}
+		
+		changeGenomeLabelColor(creatureLifespanLabel, creature.genome.getAgeExpectancy(), creature.species.baseGenome.getAgeExpectancy());
+		changeGenomeLabelColor(creatureSpeedLabel, creature.genome.getSpeed(), creature.species.baseGenome.getSpeed());
+		changeGenomeLabelColor(creatureToughnessLabel, creature.genome.getToughness(), creature.species.baseGenome.getToughness());
+		changeGenomeLabelColor(creatureAttackLabel, creature.genome.getAttackDamage(), creature.species.baseGenome.getAttackDamage());
+		changeGenomeLabelColor(creatureDefenseLabel, creature.genome.getDefenseDamage(), creature.species.baseGenome.getDefenseDamage());
+		changeGenomeLabelColor(creaturePerceptionLabel, creature.genome.getPerception(), creature.species.baseGenome.getPerception());
+		changeGenomeLabelColor(creatureStealthLabel, creature.genome.getStealth(), creature.species.baseGenome.getStealth());
+		changeGenomeLabelColor(creatureFertilityLabel, creature.genome.getFertility(), creature.species.baseGenome.getFertility());
+		changeGenomeLabelColor(creatureClutchSizeLabel, creature.genome.getClutchSize(), creature.species.baseGenome.getClutchSize());
+		changeGenomeLabelColor(creatureAggressionLabel, creature.genome.getAgression(), creature.species.baseGenome.getAgression());
+		changeGenomeLabelColor(creatureReactivenessLabel, creature.genome.getReactiveness(), creature.species.baseGenome.getReactiveness());
+		
+	}
+
+	public void changeGenomeLabelColor(Label label, int creatureValue, int speciesValue) {
+		if (creatureValue == speciesValue) {
+			label.setTextFill(Color.BLACK);
+		} else {
+			if (creatureValue > speciesValue) {
+				label.setTextFill(Color.GREEN);
+			} else {
+				label.setTextFill(Color.RED);
+			}
+		}
 	}
 	
 	
 	public void fillDynamicCreatureDetails(Creature creature) {
+
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+
+		    	try {
+		    		
+					foodBar.setProgress(((double)creature.food)/creature.getMaximumFoodStorage());
+					ageBar.setProgress(((double)creature.age)/creature.genome.getMaxAge());
+					healthBar.setProgress(((double)creature.health)/creature.genome.getMaxHealth());
+					
+					
+				} catch (IllegalStateException e) {
+					//Will throw an exception if creature is already dead.
+					//Can be ignored, the focus will be cleared afterwards.
+				}
+		    }
+		});
 		
-    	try {
-    		
-			foodBar.setProgress(((double)creature.food)/creature.getMaximumFoodStorage());
-			ageBar.setProgress(((double)creature.age)/creature.genome.getMaxAge());
-			healthBar.setProgress(((double)creature.health)/creature.genome.getMaxHealth());
-			
-			
-		} catch (IllegalStateException e) {
-			//Will throw an exception if creature is already dead.
-			//Can be ignored, the focus will be cleared afterwards.
-		}
 	}
 	
 	

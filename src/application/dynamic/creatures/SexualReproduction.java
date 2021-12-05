@@ -23,23 +23,9 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	
 	@Override
-	public void reproduce(long tick) {
+	public void exposeToReproduction(long tick) {
 		
-		if (reproductionCooldown > 0) {
-			reproductionCooldown -= creature.ticksPerTurn();
-		}
-		
-		if (!creature.isFertile) {
-			
-			if (reproductionCooldown <= 0 &&
-				creature.food > (2*creature.feedingStrategy.getMaximumFoodStorage())/3) {
-				
-				creature.isFertile = true;
-
-//				System.out.println("Creature is now fertile!");
-				
-			}
-		}
+		updateFertility();
 		
 		if (creature.isFertile) {
 
@@ -49,48 +35,60 @@ public class SexualReproduction extends ReproductionStrategy  {
 			
 			if (partnerDir != null) {
 
-
-//				System.out.println("Found a partner!");
-				
 				ArrayList<Point> spawnPoints = getSpawnPoints(partnerDir, randomizer);
 				
-				
 				if (spawnPoints.size() > 0) {
-					
+
 					Creature partner = MapStateSingleton.getInstance().getCreature(creature.x+partnerDir.x, creature.y+partnerDir.y);
 					
-					SexualReproductionCreatureFactory factory = new SexualReproductionCreatureFactory();
-					
-					factory.setParents(creature, partner);
-
-//					System.out.println("+ " + spawnPoints.size() + " spawns");
-					
-					for (Point p : spawnPoints) {
-
-						factory.setSpawnPoint(p);
-						
-						Creature spawn = factory.createCreature(tick);
-						
-						MapStateSingleton.getInstance().queueCreatureRegister(spawn);
-						
-						MapStateSingleton.getInstance().setCreatureInPoint(spawn);
-						
-					}
-					
-					creature.isFertile = false;
-					creature.food -= creature.feedingStrategy.getMaximumFoodStorage()/3;
-					startReproductionCooldown();
-
-					partner.isFertile = false;
-					partner.food -= partner.feedingStrategy.getMaximumFoodStorage()/3;
-					partner.reproductionStrategy.startReproductionCooldown();
+					reproduce(tick, partner, spawnPoints);
 				}
-				
 			}
 		}
 	}
 	
 
+	public void updateFertility () {
+		if (reproductionCooldown > 0) {
+			reproductionCooldown -= creature.ticksPerTurn();
+		}
+		if (!creature.isFertile) {
+			if (reproductionCooldown <= 0 &&
+				creature.food > (2*creature.feedingStrategy.getMaximumFoodStorage())/3) {
+				creature.isFertile = true;
+			}
+		}
+	}
+	
+	public void reproduce (long tick, Creature partner, ArrayList<Point> spawnPoints) {
+		
+		SexualReproductionCreatureFactory factory = new SexualReproductionCreatureFactory();
+		
+		factory.setParents(creature, partner);
+		
+		for (Point p : spawnPoints) {
+
+			factory.setSpawnPoint(p);
+			
+			Creature spawn = factory.createCreature(tick);
+			
+			MapStateSingleton.getInstance().queueCreatureRegister(spawn);
+			
+			MapStateSingleton.getInstance().setCreatureInPoint(spawn);
+			
+		}
+		
+		creature.isFertile = false;
+		creature.food -= creature.feedingStrategy.getMaximumFoodStorage()/3;
+		startReproductionCooldown();
+
+		partner.isFertile = false;
+		partner.food -= partner.feedingStrategy.getMaximumFoodStorage()/3;
+		partner.reproductionStrategy.startReproductionCooldown();
+	}
+	
+	
+	
 	public Direction getReproductionDirection(RandomizerSingleton randomizer) {
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();

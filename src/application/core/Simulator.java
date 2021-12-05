@@ -65,9 +65,10 @@ public class Simulator {
 		
 
 		settings.setMapSize(320, 320);
-	   
 		settings.setPeriodicRecordings(0);
-	   
+	    settings.setBirthsPerMutation(1000);
+	    settings.setMutationsPerDietChange(10);
+	    settings.setMutationsPerSizeChange(40);
 
 		MapStateSingleton.getInstance().initialize();
 		
@@ -174,7 +175,13 @@ public class Simulator {
 			
 			int creatureNumber = mapState.activeCreatures.size();
 			
-			System.out.println(creatureNumber + " creatures");
+//			System.out.println(creatureNumber + " creatures");
+			
+			for (Species s : mapState.activeSpecies) {
+				System.out.println("Species " + s.name + ": " + (100*((double)s.currentMutatedMembers)/s.currentMembers));
+			}
+			
+			
 			
 			if (creatureNumber == 0) {
 				paused = true;
@@ -471,7 +478,7 @@ public class Simulator {
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		for (Creature c : mapState.activeCreatures) {
-			c.actOrPostpone(tick);
+			c.exposeToActivation(tick);
 		}
 		
 		

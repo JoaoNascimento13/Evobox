@@ -41,6 +41,7 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 		creature.setSpecies(species);
 		creature.setGenome(species.getGenomeFromBase());
 		
+		creature.calculateAvailableEvoPoints();
 		creature.setStrategiesFromGenome();
 		
 		

@@ -16,11 +16,11 @@ public enum Diet {
 	public int getEvoPointsGranted() {
     	switch(this) {
 		case PHOTOSYNTHESIS:
-			return 10;
+			return 20;
 		case HERBIVOROUS:
-			return  20;
+			return  50;
 		case CARNIVOROUS:
-			return  30;
+			return  70;
 		default:
 			return 0;
     	}

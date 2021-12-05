@@ -272,7 +272,14 @@ public class Renderer {
 
 		
         PixelWriter p = gc.getPixelWriter();
-        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+        
+        try {
+			p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+			
+		} catch (NullPointerException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         
         
 //        try {

@@ -4,7 +4,7 @@ public abstract class FeedingStrategy extends CreatureStrategy {
 	private static final long serialVersionUID = 1L;
 	
 
-	abstract void feed();
+	abstract void exposeToFeeding();
 
 	abstract int getfoodUsedPerTick();
 	

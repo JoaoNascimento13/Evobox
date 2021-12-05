@@ -9,6 +9,9 @@ public class SettingsSingleton {
 	public int periodicRecordings;
 	public int mapCellsX;
 	public int mapCellsY;
+	public int birthsPerMutation;
+	public int mutationsPerDietChange;
+	public int mutationsPerSizeChange;
 
 	static private SettingsSingleton settings = new SettingsSingleton();
 	
@@ -27,12 +30,23 @@ public class SettingsSingleton {
     public void setPeriodicRecordings(int periodicRecordings) {
 		this.periodicRecordings = periodicRecordings;
     }
-   
+    
+    public void setBirthsPerMutation(int birthsPerMutation) {
+		this.birthsPerMutation = birthsPerMutation;
+    }
+
+    public void setMutationsPerDietChange(int mutationsPerDietChange) {
+		this.mutationsPerDietChange = mutationsPerDietChange;
+    }
+    public void setMutationsPerSizeChange(int mutationsPerSizeChange) {
+		this.mutationsPerSizeChange = mutationsPerSizeChange;
+    }
+    
+    
     
     
     public Genome getStarterGenome() {
 
-		
 		Genome genome = new Genome();
 
 		genome.setDiet(Diet.PHOTOSYNTHESIS);
@@ -40,17 +54,13 @@ public class SettingsSingleton {
 		genome.setSize(Size.SMALL);
 		
 		genome.setSpeed(0);
-		
 		genome.setPerception(0);
-		
 		genome.setStealth(0);
 		genome.setAgression(0);
 		genome.setReactiveness(0);
-
 		genome.setAttackDamage(0);
 		genome.setDefenseDamage(0);
 		genome.setToughness(1);
-		
 		
 		genome.setAgeExpectancy(2);
 		//maxAge = *500 -> 500 - 5000
@@ -61,7 +71,6 @@ public class SettingsSingleton {
 		genome.setClutchSize(2);
 		
 		genome.calculateAvailableEvoPoints();
-		
 		
 		return genome;
     }

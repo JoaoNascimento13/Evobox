@@ -13,17 +13,20 @@ public class Species implements Serializable {
 	
 	public int id;
 	public int currentMembers;
+	public int currentMutatedMembers;
 	public long totalMembers;
 	
 	public Species(Creature founderCreature) {
 		setName();
 		setBaseGenome(founderCreature);
 		currentMembers = 0;
+		currentMutatedMembers = 0;
 	}
 	public Species(Genome founderGenome) {
 		setName();
 		setBaseGenome(founderGenome);
 		currentMembers = 0;
+		currentMutatedMembers = 0;
 	}
 	
 	

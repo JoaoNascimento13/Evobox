@@ -2,6 +2,7 @@ package application.dynamic.factories;
 
 import java.awt.Point;
 
+import application.core.MapStateSingleton;
 import application.dynamic.creatures.Creature;
 import application.dynamic.creatures.Genome;
 
@@ -25,10 +26,20 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		
 		
 		Genome genome = parentA.genome.recombineWith(parentB.genome);
+		
+//		genome.exposeToMutation();
+		
+		if (genome.exposeToMutation()) {
+			
+			creature.mutated = true;
+			
+		}
 
-
+				
 		creature.setSpecies(parentA.species);
+		
 		creature.setGenome(genome);
+		
 		
 		creature.setStrategiesFromGenome();
 		
@@ -40,7 +51,7 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		creature.setFullHealth();
 		
 		creature.setFertility(false);
-				
+		
 		
 		return creature;
 	}
