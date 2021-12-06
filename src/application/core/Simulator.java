@@ -66,7 +66,7 @@ public class Simulator {
 
 		settings.setMapSize(320, 320);
 		settings.setPeriodicRecordings(0);
-	    settings.setBirthsPerMutation(1000);
+	    settings.setBirthsPerMutation(10);
 	    settings.setMutationsPerDietChange(10);
 	    settings.setMutationsPerSizeChange(40);
 

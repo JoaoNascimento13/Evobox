@@ -239,7 +239,8 @@ public class SimulatorController {
 		creatureSpeciesNumber.setText(String.valueOf(creature.numberInSpecies));
 		
 		creatureDiet.setText(creature.genome.diet.name);
-		
+
+		creatureSize.setProgress(((double)creature.genome.getSize())/10);
 		creatureLifespan.setProgress(((double)creature.genome.getAgeExpectancy())/10);
 		creatureSpeed.setProgress(((double)creature.genome.getSpeed())/10);
 		creatureToughness.setProgress(((double)creature.genome.getToughness())/10);
@@ -261,7 +262,7 @@ public class SimulatorController {
 		} else {
 			creatureDietLabel.setTextFill(Color.RED);
 		}
-		
+		changeGenomeLabelColor(creatureSizeLabel, creature.genome.getSize(), creature.species.baseGenome.getSize());
 		changeGenomeLabelColor(creatureLifespanLabel, creature.genome.getAgeExpectancy(), creature.species.baseGenome.getAgeExpectancy());
 		changeGenomeLabelColor(creatureSpeedLabel, creature.genome.getSpeed(), creature.species.baseGenome.getSpeed());
 		changeGenomeLabelColor(creatureToughnessLabel, creature.genome.getToughness(), creature.species.baseGenome.getToughness());

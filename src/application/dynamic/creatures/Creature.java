@@ -87,7 +87,9 @@ public class Creature implements Serializable  {
 		this.age += ticksPerTurn();
 	}
 	public void useFood() {
-		this.food -= ticksPerTurn()*feedingStrategy.getfoodUsedPerTick();
+		this.food -= ticksPerTurn() * 
+					 genome.getFoodNeededPerTick() * 
+					 feedingStrategy.getFoodNeededPerTickModifier();
 	}
 
 

@@ -11,9 +11,7 @@ public class Genome implements Serializable {
 	public Diet diet;
 	public Species specificDiet;
 	
-	 Size size;
-	
-
+	private int size;
 	private int speed;
 	private int attackDamage;
 	private int defenseDamage;
@@ -30,6 +28,7 @@ public class Genome implements Serializable {
 	private int maxEvoPoints;
 
 	private transient int valueToAvoidChanging;
+	private transient boolean valueChanged;
 	
 	public void setDiet(Diet diet) {
 		this.diet = diet;
@@ -37,7 +36,7 @@ public class Genome implements Serializable {
 	public void setSpecificDiet(Species specificDiet) {
 		this.specificDiet = specificDiet;
 	}
-	public void setSize(Size size) {
+	public void setSize(int size) {
 		this.size = size;
 	}
 	public void setSpeed(int speed) {
@@ -76,22 +75,6 @@ public class Genome implements Serializable {
 	
 	
 	
-
-	public int getActivationSpeed() {
-		return this.speed;
-	}
-	public int getMaxHealth() {
-		return this.toughness;
-	}
-	public int getMaxAge() {
-		return (this.ageExpectancy*500);
-	}
-	public int getTotalChildren() {
-		return ((this.fertility*2)+1);
-	}
-	public int getChildrenPerBirth() {
-		return this.clutchSize;
-	}
 	
 	
 	
@@ -152,16 +135,17 @@ public class Genome implements Serializable {
 		Genome newGenome = new Genome();
 		newGenome.setNonNumericalsFromParents(this, partnerGenome);
 		newGenome.averageNumericalsFromParents(this, partnerGenome);
+		newGenome.calculateAvailableEvoPoints();
 		return newGenome;
 	}
 	
 	public void setNonNumericalsFromParents(Genome genomeA, Genome genomeB) {
 		this.diet = genomeA.diet;
 		this.specificDiet = genomeA.specificDiet;
-		this.size = genomeA.size;
 	}
 	
 	public void averageNumericalsFromParents(Genome genomeA, Genome genomeB) {
+		this.size = randomlyAverageValue(genomeA.size, genomeB.size);
 		this.speed = randomlyAverageValue(genomeA.speed, genomeB.speed);
 		this.attackDamage = randomlyAverageValue(genomeA.attackDamage, genomeB.attackDamage);
 		this.defenseDamage = randomlyAverageValue(genomeA.defenseDamage, genomeB.defenseDamage);
@@ -195,9 +179,12 @@ public class Genome implements Serializable {
 	}
 	
 	
-	public boolean checkForNewSpecies(Species originalSpecies) {
-		int maxInnateDeviationRate = 1;
+	public boolean checkForMutationAndNewSpecies(Creature creature, Species originalSpecies) {
+		int maxInnateDeviationRate = 1000; //TODO
 		int innateDeviationRate = getDeviationRate(originalSpecies.baseGenome);
+		if (innateDeviationRate > 0) {
+			creature.mutated = true;
+		}
 		return (innateDeviationRate > maxInnateDeviationRate);
 	}
 	
@@ -206,11 +193,15 @@ public class Genome implements Serializable {
 		if (this.diet != baseGenome.diet) {
 			deviationRate += 99;
 		}
-		if (this.specificDiet.id != baseGenome.specificDiet.id) {
-			deviationRate += 50;
+		if (this.specificDiet != null || baseGenome.specificDiet != null) {
+			if (this.specificDiet == null || baseGenome.specificDiet == null) {
+				deviationRate += 50;
+			} else if (this.specificDiet.id != baseGenome.specificDiet.id) {
+				deviationRate += 50;
+			}
 		}
 		if (this.size != baseGenome.size) {
-			deviationRate += 50;
+			deviationRate += 10;
 		}
 		int maxStatDeviation = 0;
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.speed - baseGenome.speed));
@@ -281,13 +272,27 @@ public class Genome implements Serializable {
 	
 
 	public void mutateSize() {
-		if (size == Size.SMALL || size == Size.LARGE) {
-			size = Size.MEDIUM;
+		if (RandomizerSingleton.getInstance().nextBoolean()) {
+			
+			valueChanged = false;
+			size = addToValueIfPossible(size, 1);
+			if (valueChanged) {
+				toughness++;
+			}
 		} else {
-			if (RandomizerSingleton.getInstance().nextBoolean()) {
-				size = Size.SMALL;
-			} else {
-				size = Size.LARGE;
+			valueChanged = false;
+			size = addToValueIfPossible(size, -1);
+			if (valueChanged) {
+				if (toughness > 1) {
+					toughness--;
+				}
+				if (attackDamage > 1) {
+					attackDamage--;
+				}
+				if (defenseDamage > 1) {
+					defenseDamage--;
+				}
+				reduceStatsInNeeded();
 			}
 		}
 	}
@@ -311,53 +316,72 @@ public class Genome implements Serializable {
 		}
 		
 		int valueToIncrease = RandomizerSingleton.getInstance().nextInt(maxStatPosition);
-		while (valueToAvoidChanging == valueToIncrease) {
-			valueToIncrease = RandomizerSingleton.getInstance().nextInt(maxStatPosition);
+		valueChanged = false;
+		
+		while (valueChanged == false) {
+			
+			while (valueToAvoidChanging == valueToIncrease) {
+				valueToIncrease = RandomizerSingleton.getInstance().nextInt(maxStatPosition);
+			}
+			
+			switch (valueToIncrease) {
+			case 0:
+				defenseDamage = addToValueIfPossible(defenseDamage, amountToChange);
+				break;
+			case 1:
+				toughness = addToValueIfPossible(toughness, amountToChange);
+				break;
+			case 2:
+				stealth = addToValueIfPossible(stealth, amountToChange);
+				break;
+			case 3:
+				ageExpectancy = addToValueIfPossible(ageExpectancy, amountToChange);
+				break;
+			case 4:
+				fertility = addToValueIfPossible(fertility, amountToChange);
+				break;
+			case 5:
+				clutchSize = addToValueIfPossible(clutchSize, amountToChange);
+				break;
+			case 6:
+				speed = addToValueIfPossible(speed, amountToChange);
+				break;
+			case 7:
+				perception = addToValueIfPossible(perception, amountToChange);
+				break;
+			case 8:
+				attackDamage = addToValueIfPossible(attackDamage, amountToChange);
+				break;
+			case 9:
+				agression = addToValueIfPossible(agression, amountToChange);
+				break;
+			case 10:
+				reactiveness = addToValueIfPossible(reactiveness, amountToChange);
+				break;
+			default:
+				break;
+			}
 		}
-		switch (valueToIncrease) {
-		case 0:
-			defenseDamage += amountToChange;
-			break;
-		case 1:
-			toughness += amountToChange;
-			break;
-		case 2:
-			stealth += amountToChange;
-			break;
-		case 3:
-			ageExpectancy += amountToChange;
-			break;
-		case 4:
-			fertility += amountToChange;
-			break;
-		case 5:
-			clutchSize += amountToChange;
-			break;
-		case 6:
-			speed += amountToChange;
-			break;
-		case 7:
-			perception += amountToChange;
-			break;
-		case 8:
-			attackDamage += amountToChange;
-			break;
-		case 9:
-			agression += amountToChange;
-			break;
-		case 10:
-			reactiveness += amountToChange;
-			break;
-		default:
-			break;
-		}
+		
 		return valueToIncrease;
+	}
+	
+	
+
+	public int addToValueIfPossible(int originalValue, int amountToChange) {
+		if (originalValue + amountToChange > 0 && originalValue + amountToChange < 11) {
+			valueChanged = true;
+			return (originalValue + amountToChange);
+		}
+		return originalValue;
 	}
 	
 	
 	public void calculateAvailableEvoPoints() {
 		
-		int maxEvoPoints = diet.getEvoPointsGranted() + size.getEvoPointsGranted();
+		int pointsPerSizeLevel = 5;
+		
+		int maxEvoPoints = diet.getEvoPointsGranted() + (size * pointsPerSizeLevel);
 		if (specificDiet != null) {
 			maxEvoPoints += 10;
 		}
@@ -382,6 +406,28 @@ public class Genome implements Serializable {
 	
 	
 	
+	
+
+
+	public int getFoodNeededPerTick() {
+		return this.size;
+	}
+	public int getActivationSpeed() {
+		return this.speed;
+	}
+	public int getMaxHealth() {
+		return this.toughness;
+	}
+	public int getMaxAge() {
+		return (this.ageExpectancy*500);
+	}
+	public int getTotalChildren() {
+		return ((this.fertility*2)+1);
+	}
+	public int getChildrenPerBirth() {
+		return this.clutchSize;
+	}
+	
 
 	public Diet getDiet() {
 		return diet;
@@ -389,7 +435,7 @@ public class Genome implements Serializable {
 	public Species getSpecificDiet() {
 		return specificDiet;
 	}
-	public Size getSize() {
+	public int getSize() {
 		return size;
 	}
 	public int getSpeed() {

@@ -47,8 +47,8 @@ public class Photosynthesis extends FeedingStrategy  {
 	
 
 	@Override
-	public int getfoodUsedPerTick() {
-		return 2;
+	public int getFoodNeededPerTickModifier() {
+		return 1;
 	}
 
 	@Override

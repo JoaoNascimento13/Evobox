@@ -6,7 +6,7 @@ public abstract class FeedingStrategy extends CreatureStrategy {
 
 	abstract void exposeToFeeding();
 
-	abstract int getfoodUsedPerTick();
+	abstract int getFoodNeededPerTickModifier();
 	
 	public abstract int getStartingFoodStorage();
 	

@@ -5,6 +5,7 @@ import java.awt.Point;
 import application.core.MapStateSingleton;
 import application.dynamic.creatures.Creature;
 import application.dynamic.creatures.Genome;
+import application.dynamic.creatures.Species;
 
 public class SexualReproductionCreatureFactory implements CreatureFactory {
 
@@ -27,16 +28,26 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		
 		Genome genome = parentA.genome.recombineWith(parentB.genome);
 		
-//		genome.exposeToMutation();
+
+		//TODO
+		if (genome.checkForMutationAndNewSpecies(creature, parentA.species)) {
+			
+			//TODO
+			
+			//New species occur when the BASE genome (before mutations) differs enough from the original species genome.
+		}
+		
 		
 		if (genome.exposeToMutation()) {
 			
-			creature.mutated = true;
+			//Genome mutated from parents.
+			
+			//Note that even if this returns false, the creature could still have mutated from the base species.
 			
 		}
 
 				
-		creature.setSpecies(parentA.species);
+		creature.setSpecies(parentA.species); //TODO
 		
 		creature.setGenome(genome);
 		

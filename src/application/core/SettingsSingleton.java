@@ -2,7 +2,6 @@ package application.core;
 
 import application.dynamic.creatures.Diet;
 import application.dynamic.creatures.Genome;
-import application.dynamic.creatures.Size;
 
 public class SettingsSingleton {
 	
@@ -51,8 +50,7 @@ public class SettingsSingleton {
 
 		genome.setDiet(Diet.PHOTOSYNTHESIS);
 		
-		genome.setSize(Size.SMALL);
-		
+		genome.setSize(2);
 		genome.setSpeed(0);
 		genome.setPerception(0);
 		genome.setStealth(0);
