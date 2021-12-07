@@ -141,33 +141,27 @@ public class Simulator {
 
 			waitForRenderingIfNeeded();
 
-			running = true;
+			synchronized (Lock.ACTIVESPECIES_LOCK) {
+				
+				running = true;
+				
+				performTickSimulations();
+				
+				simulatorController.updateSidePane(); 
+				//Needs to be done BEFORE unregisterDeadCreatures(), otherwise the selected point won't get cleared.
+				
+				mapState.unregisterDeadCreatures();
+				
+				mapState.registerBornCreatures();
+				
+				int creatureNumber = mapState.activeCreatures.size();
+				
+				if (creatureNumber == 0) {
+					paused = true;
+				}
+	
+				running = false;
 			
-			performTickSimulations();
-			
-			simulatorController.updateSidePane(); 
-			//Needs to be done BEFORE unregisterDeadCreatures(), otherwise the selected point won't get cleared.
-			
-			mapState.unregisterDeadCreatures();
-			
-			mapState.registerBornCreatures();
-			
-
-			running = false;
-			
-			
-			int creatureNumber = mapState.activeCreatures.size();
-			
-//			System.out.println(creatureNumber + " creatures");
-			
-//			for (Species s : mapState.activeSpecies) {
-//				System.out.println("Species " + s.name + ": " + (100*((double)s.currentMutatedMembers)/s.currentMembers));
-//			}
-			
-			
-			
-			if (creatureNumber == 0) {
-				paused = true;
 			}
 			
 			tick++;
@@ -460,6 +454,7 @@ public class Simulator {
 		OutdatedPositionsSingleton.getInstance().clearPositions();
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
 		for (Creature c : mapState.activeCreatures) {
 			c.exposeToActivation(tick);
 		}

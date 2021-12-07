@@ -2,6 +2,7 @@ package application.gui;
 
 import java.util.ArrayList;
 
+import application.core.Lock;
 import application.core.MapStateSingleton;
 import application.core.Renderer;
 import application.core.Simulator;
@@ -344,57 +345,34 @@ public class SimulatorController {
 		speciesHbox.getChildren().add(percentage);
 		
 		Platform.runLater(new Runnable() {
-			
 		    @Override
 		    public void run() {addSpeciesToOverviewSynch(speciesHbox);}
 		});
 	}
-	public synchronized void addSpeciesToOverviewSynch(HBox speciesHbox) {
-		
-//		percentage.setOpaqueInsets(new Insets(1, 0, 0, 0));
-//		overviewSpeciesName.getChildren().add(name);
-//		overviewSpeciesPercentage.getChildren().add(percentage);
-//		
-//		overviewSpeciesName.layout();
-//		overviewSpeciesPercentage.layout();
-		
-		overviewSpeciesContainer.getChildren().add(speciesHbox);
-		overviewSpeciesContainer.layout();
-		
+	public void addSpeciesToOverviewSynch(HBox speciesHbox) {
+		synchronized (Lock.ACTIVESPECIES_LOCK) {
+			overviewSpeciesContainer.getChildren().add(speciesHbox);
+			overviewSpeciesContainer.layout();
+		}
 	}
 
+	
 	public void removeSpeciesFromOverview(Species extinctSpecies) {
-
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {removeSpeciesFromOverviewSynch(extinctSpecies);}
 		});
 	}
-	public synchronized void removeSpeciesFromOverviewSynch(Species extinctSpecies) {
-		
-	ObservableList<Node> speciesNodes = overviewSpeciesContainer.getChildren();
-	for (int i = 0; i < speciesNodes.size(); i++) {
-		if (speciesNodes.get(i).getId().equals("species" + extinctSpecies.id)) {
-			speciesNodes.remove(i);
-			break;
+	public void removeSpeciesFromOverviewSynch(Species extinctSpecies) {
+		synchronized (Lock.ACTIVESPECIES_LOCK) {
+			ObservableList<Node> speciesNodes = overviewSpeciesContainer.getChildren();
+			for (int i = 0; i < speciesNodes.size(); i++) {
+				if (speciesNodes.get(i).getId().equals("species" + extinctSpecies.id)) {
+					speciesNodes.remove(i);
+					break;
+				}
+			}
 		}
-	}
-	
-	
-//		ObservableList<Node> nameNodes = overviewSpeciesName.getChildren();
-//		for (int i = 0; i < nameNodes.size(); i++) {
-//			if (nameNodes.get(i).getId().equals("name"+extinctSpecies.id)) {
-//				nameNodes.remove(i);
-//				break;
-//			}
-//		}
-//		ObservableList<Node> percentageNodes = overviewSpeciesPercentage.getChildren();
-//		for (int i = 0; i < percentageNodes.size(); i++) {
-//			if (percentageNodes.get(i).getId().equals("percentage"+extinctSpecies.id)) {
-//				percentageNodes.remove(i);
-//				break;
-//			}
-//		}
 	}
 	
 	
@@ -405,27 +383,31 @@ public class SimulatorController {
 			});
 	}
 	
-	public synchronized void updateOverviewSynch() {
+	public void updateOverviewSynch() {
 		
-		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+		synchronized (Lock.ACTIVESPECIES_LOCK) {
 
-		ObservableList<Node> species = overviewSpeciesContainer.getChildren();
-		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
-		for (Species s : activeSpecies) {
-			for (Node n : species) {
-				if (((HBox) n).getId().equals("species" + s.id)) {
-					
-					((ProgressBar)((HBox) n).getChildren().get(1)).setProgress(
-							
-							Math.max(
-							((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies,
-							0.05)
-							
-							);
-					break;
+			int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+
+			ObservableList<Node> species = overviewSpeciesContainer.getChildren();
+			ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
+			for (Species s : activeSpecies) {
+				for (Node n : species) {
+					if (((HBox) n).getId().equals("species" + s.id)) {
+						
+						((ProgressBar)((HBox) n).getChildren().get(1)).setProgress(
+								
+								Math.max(
+								((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies,
+								0.05)
+								
+								);
+						break;
+					}
 				}
 			}
 		}
+		
 		
 //		ObservableList<Node> percentage = overviewSpeciesPercentage.getChildren();
 //		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
