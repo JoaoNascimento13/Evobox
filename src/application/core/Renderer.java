@@ -156,149 +156,130 @@ public class Renderer {
 	}
 
 	
-	public synchronized void changeVisibleMapScrollPaneSynch(GridPane container) {
+	public void changeVisibleMapScrollPaneSynch(GridPane container) {
 
+		synchronized(Lock.ACTIVESPECIES_LOCK) {
 
-		container.getChildren().remove(activeMapScrollPane);
-		
-		container.getChildren().add(activeMapScrollPane.backup);
-		
+			container.getChildren().remove(activeMapScrollPane);
 			
-//		root.getChildren().remove(activeMapScrollPane);
-//		
-//		root.add(activeMapScrollPane.backup, 1, 1);
-		
-		container.layout();
-		
-		activeMapScrollPane = activeMapScrollPane.backup;
+			container.getChildren().add(activeMapScrollPane.backup);
+			
+				
+//			root.getChildren().remove(activeMapScrollPane);
+//			
+//			root.add(activeMapScrollPane.backup, 1, 1);
+			
+			container.layout();
+			
+			activeMapScrollPane = activeMapScrollPane.backup;
 
-		activeCanvas = (Canvas) activeMapScrollPane.getTarget();
-		
+			activeCanvas = (Canvas) activeMapScrollPane.getTarget();
+			
 
-		((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D().
-			clearRect(0, 0, activeCanvas.getWidth(), activeCanvas.getHeight());
+			((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D().
+				clearRect(0, 0, activeCanvas.getWidth(), activeCanvas.getHeight());
+		}
+		
 	}
 	
 	
-	public synchronized void render() {
-		
-		int creaturePixels = 2;
+	public void render() {
 
-		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		
-		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
-		ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
-		ArrayList<Integer> oldCreaturePositionsY = outdatedPositions.getOutdatedCreaturesY();
-		
-		
-		for (int i = 0; i < oldCreaturePositionsX.size(); i++) {
-			int x = oldCreaturePositionsX.get(i);
-			int y = oldCreaturePositionsY.get(i);
+		synchronized(Lock.ACTIVESPECIES_LOCK) {
+
+			int creaturePixels = 2;
+
+			MapStateSingleton mapState = MapStateSingleton.getInstance();
+			OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
+			ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
+			ArrayList<Integer> oldCreaturePositionsY = outdatedPositions.getOutdatedCreaturesY();
 			
-            for (int dx = 0; dx < creaturePixels; dx++) {
-                for (int dy = 0 ; dy < creaturePixels; dy++) {
-                	
-                	buffer[x*creaturePixels + dx + canvasWidth * (y*creaturePixels + dy)] = backgroundColor;
-    			}
-			}
-		}
-		
-		
-		
-		
-		
-//		for (int i = 0; i < flowMap.length; i++) {
-//			for (int j = 0; j < flowMap[0].length; j++) {
-//				
-//				
-//				if (
-//					Math.abs(flowMap[i][j].x) 
-//					+
-//					Math.abs(flowMap[i][j].y) 
-//					
-//					> 0) {
-//
-//		            for (int dx = 0; dx < creatureSize; dx++) {
-//		                for (int dy = 0 ; dy < creatureSize; dy++) {
-//		                	
-//		                	buffer[i*creatureSize + dx + canvasWidth * (j*creatureSize + dy)] = 
-//
-//		                			debugColorA
-//		                			
-//		                			//toInt(new Color((flowMap[i][j].y)/100, 0.2, 0.8, 1))
-//		                			
-//		                			
-//		                			
-//		                			//toInt(new Color((100+flowMap[i][j].x)/200, (100+flowMap[i][j].y)/200, 0.5, 1))
-//		                			;
-//		                }
-//		            }
-//				}
-//				
-//	            
-//			}
-//		}
-		
-
-//		for (Creature c : mapState.creatures) {
-//			for (Creature d : mapState.creatures) {
-//				if (c.x == d.x && c.y == d.y && !(c == d)) {
-//					System.out.println("ERROR");
-//					System.out.println("c.id: " + c.id);
-//					System.out.println("d.id: " + d.id);
-//					System.out.println("coords: " + c.x + ", " + c.y);
-//					int crash = 1/0;
-//				}
-//			}
-//		}
-		
-		
-		for (Creature c : mapState.activeCreatures) {
-
-            for (int dx = 0; dx < creaturePixels; dx++) {
-                for (int dy = 0 ; dy < creaturePixels; dy++) {
-                	
-                	buffer[c.x*creaturePixels + dx + canvasWidth * (c.y*creaturePixels + dy)] = plantColor;
-    			}
-			}
-		}
-		
-
-		if (mapState.focusedCreature != null) {
-	        for (int dx = 0; dx < creaturePixels; dx++) {
-	            for (int dy = 0 ; dy < creaturePixels; dy++) {
-	            	
-	            	buffer[mapState.focusedCreature.x*creaturePixels + dx + canvasWidth * (mapState.focusedCreature.y*creaturePixels + dy)] = focusColor;
+			
+			for (int i = 0; i < oldCreaturePositionsX.size(); i++) {
+				int x = oldCreaturePositionsX.get(i);
+				int y = oldCreaturePositionsY.get(i);
+				
+	            for (int dx = 0; dx < creaturePixels; dx++) {
+	                for (int dy = 0 ; dy < creaturePixels; dy++) {
+	                	
+	                	buffer[x*creaturePixels + dx + canvasWidth * (y*creaturePixels + dy)] = backgroundColor;
+	    			}
 				}
 			}
-		}
-		
-
-
-		GraphicsContext gc = activeCanvas.getGraphicsContext2D();
-
-		
-        PixelWriter p = gc.getPixelWriter();
-        
-        try {
-			p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
 			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			
+			for (Creature c : mapState.activeCreatures) {
+
+	            for (int dx = 0; dx < creaturePixels; dx++) {
+	                for (int dy = 0 ; dy < creaturePixels; dy++) {
+	                	
+	                	buffer[c.x*creaturePixels + dx + canvasWidth * (c.y*creaturePixels + dy)] = plantColor;
+	    			}
+				}
+			}
+
+			if (mapState.focusedCreature != null) {
+		        for (int dx = 0; dx < creaturePixels; dx++) {
+		            for (int dy = 0 ; dy < creaturePixels; dy++) {
+		            	
+		            	buffer[mapState.focusedCreature.x*creaturePixels + dx + canvasWidth * (mapState.focusedCreature.y*creaturePixels + dy)] = focusColor;
+					}
+				}
+			}
+
+			GraphicsContext gc = activeCanvas.getGraphicsContext2D();
+
+			
+	        PixelWriter p = gc.getPixelWriter();
+	        
+	        try {
+				p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-        
+		
         
 //        try {
 //			Thread.sleep(10);
 //		} catch (InterruptedException e) {
-//			// TODO Auto-generated catch block
 //			e.printStackTrace();
 //		}
         
 	}
 	
-	
+
+//	for (int i = 0; i < flowMap.length; i++) {
+//		for (int j = 0; j < flowMap[0].length; j++) {
+//			
+//			
+//			if (
+//				Math.abs(flowMap[i][j].x) 
+//				+
+//				Math.abs(flowMap[i][j].y) 
+//				
+//				> 0) {
+//
+//	            for (int dx = 0; dx < creatureSize; dx++) {
+//	                for (int dy = 0 ; dy < creatureSize; dy++) {
+//	                	
+//	                	buffer[i*creatureSize + dx + canvasWidth * (j*creatureSize + dy)] = 
+//
+//	                			debugColorA
+//	                			
+//	                			//toInt(new Color((flowMap[i][j].y)/100, 0.2, 0.8, 1))
+//	                			
+//	                			
+//	                			
+//	                			//toInt(new Color((100+flowMap[i][j].x)/200, (100+flowMap[i][j].y)/200, 0.5, 1))
+//	                			;
+//	                }
+//	            }
+//			}
+//		}
+//	}
 	
 	
 	public void zoomIn() {

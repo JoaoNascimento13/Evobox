@@ -65,9 +65,9 @@ public class Simulator {
 		
 		settings.setMapSize(320, 320);
 		settings.setPeriodicRecordings(0);
-	    settings.setBirthsPerMutation(200);
+	    settings.setBirthsPerMutation(100);
 	    settings.setMutationsPerDietChange(200);
-	    settings.setMutationsPerSizeChange(200);
+	    settings.setMutationsPerSizeChange(5);
 
 		MapStateSingleton.getInstance().initialize();
 	}

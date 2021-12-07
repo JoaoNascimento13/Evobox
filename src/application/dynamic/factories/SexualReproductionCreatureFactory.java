@@ -33,7 +33,7 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 
 		if (parentA.species.id == parentB.species.id) {
 			
-			genome = parentA.genome.recombineWith(parentB.genome);
+			genome = parentA.genome.recombineWith(parentB.genome, parentA.species.baseGenome);
 			creature.setSpecies(parentA.species);
 			
 		} else {
@@ -51,7 +51,8 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		
 		if (genome.checkForMutationAndNewSpecies(creature) && 
 			parentA.species.id == parentB.species.id) {
-			
+
+
 			//New species occur when the BASE genome (after recombination, but before mutations)
 			//differs enough from the original species genome.
 
@@ -64,15 +65,68 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 			//      without recombination, originating a new species that shouldn't exist.
 			
 			
-			creature.setSpecies(new Species(genome));
+			boolean speciesAlreadyExists = false;
+			for (Species s : MapStateSingleton.getInstance().activeSpecies) {
+
+				//Note: If a new species spawns from 2 parents, any further "new species" spawned from either of these parents
+				//		should be considered part of the first new species.
+				//		Otherwise, a strongly-mutated member could reproduce with non-mutated members
+				//		and produce a lot of "new species", all equal to each other.
+				
+				if (s.originalParentIdA == parentA.id || s.originalParentIdA == parentB.id || 
+					s.originalParentIdB == parentA.id || s.originalParentIdB == parentB.id) {
+					
+					creature.setSpecies(s);
+					speciesAlreadyExists = true;
+					break;
+				}
+				
+				//Note: Aditionally to the above, if this new species descends from the same parent species 
+				//		and has the exact same genome as a different species, then this creature is also considered
+				//		to be part of that first new species, and not a different one.
+				
+				if (s.parent.id ==  parentA.species.id && s.baseGenome.sameAs(genome)) {
+
+					creature.setSpecies(s);
+					speciesAlreadyExists = true;
+					break;
+				}
+			}
+				
 			
-			//If species A and B are the same, it doesn't matter which one we pick.
+
 			
-			creature.species.parent = parentA.species;
+			if (!speciesAlreadyExists) {
+				
+				creature.setSpecies(new Species(genome));
+				
+				//If species A and B must be the same, it doesn't matter which one we pick.
+				
+				creature.species.parent = parentA.species;
+				
+				creature.species.parent.children.add(creature.species);
+				
+				creature.species.originalParentIdA = parentA.id;
+				creature.species.originalParentIdB = parentB.id;
+				
+				
+				System.out.println("New species: " + creature.species.name);
+				System.out.println("Parent species: " + creature.species.parent.name);
+				
+				System.out.println("Parent species genomes: ");
+				System.out.println(creature.species.parent.baseGenome.toString());
+				System.out.println("Parent A: " + parentA);
+				System.out.println("Parent A genome: ");
+				System.out.println(parentA.genome.toString());
+				System.out.println("Parent B: " + parentB);
+				System.out.println("Parent B genome: ");
+				System.out.println(parentB.genome.toString());
+				System.out.println("This genome: ");
+				System.out.println(creature.species.baseGenome.toString());
+				System.out.println();
+				
+			}
 			
-			creature.species.parent.children.add(creature.species);
-			
-			System.out.println("New species: " + creature.species.name);
 			
 		} else {
 			

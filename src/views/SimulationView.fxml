@@ -389,9 +389,9 @@
                   </VBox>
                   <VBox fx:id="generalView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                      <children>
-                        <ScrollPane maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
+                        <ScrollPane hbarPolicy="NEVER" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                            <content>
-                              <VBox fx:id="overviewSpeciesContainer" maxWidth="340.0" minHeight="640.0" minWidth="340.0" prefWidth="340.0" spacing="10.0">
+                              <VBox fx:id="overviewSpeciesContainer" maxWidth="325.0" minHeight="640.0" minWidth="325.0" prefWidth="325.0" spacing="10.0">
                                  <padding>
                                     <Insets left="20.0" top="10.0" />
                                  </padding>

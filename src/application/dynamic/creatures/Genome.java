@@ -13,8 +13,8 @@ public class Genome implements Serializable {
 	
 	private int size;
 	private int speed;
-	private int attackDamage;
-	private int defenseDamage;
+	private int attack;
+	private int defense;
 	private int toughness;
 	private int perception;
 	private int stealth;
@@ -43,10 +43,10 @@ public class Genome implements Serializable {
 		this.speed = speed;
 	}
 	public void setAttackDamage(int attackDamage) {
-		this.attackDamage = attackDamage;
+		this.attack = attackDamage;
 	}
 	public void setDefenseDamage(int defenseDamage) {
-		this.defenseDamage = defenseDamage;
+		this.defense = defenseDamage;
 	}
 	public void setToughness(int toughness) {
 		this.toughness = toughness;
@@ -89,8 +89,8 @@ public class Genome implements Serializable {
 		this.specificDiet = genome.specificDiet;
 		this.size = genome.size;
 		this.speed = genome.speed;
-		this.attackDamage = genome.attackDamage;
-		this.defenseDamage = genome.defenseDamage;
+		this.attack = genome.attack;
+		this.defense = genome.defense;
 		this.toughness = genome.toughness;
 		this.perception = genome.perception;
 		this.stealth = genome.stealth;
@@ -131,9 +131,14 @@ public class Genome implements Serializable {
 	
 	
 
-	public Genome recombineWith(Genome partnerGenome) {
+	public Genome recombineWith(Genome partnerGenome, Genome baseGenome) {
+		
+		//Note: Genome recombination only occurs when both creatures belong to the same species.
+		//Creatures from different (parent/children) species, when reproducing, get the genome of either of them.
+		
 		Genome newGenome = new Genome();
 		newGenome.setNonNumericalsFromParents(this, partnerGenome);
+		newGenome.setSizeFromParents(this, partnerGenome, baseGenome);
 		newGenome.averageNumericalsFromParents(this, partnerGenome);
 		newGenome.calculateAvailableEvoPoints();
 		return newGenome;
@@ -144,11 +149,26 @@ public class Genome implements Serializable {
 		this.specificDiet = genomeA.specificDiet;
 	}
 	
+	public void setSizeFromParents(Genome genomeA, Genome genomeB, Genome baseGenome) {
+		
+		//Note: Size is handled differently than onther numerical values.
+		//Because a single innate Size deviation is enough to create a new species,
+		//we impose that the children of a size-mutated and a non-size-mutated creature of the same species
+		//is always non-size-mutated.
+		
+		if (genomeA.size == genomeB.size) {
+			this.size = genomeA.size;
+		} else if (genomeA.size == baseGenome.size || genomeB.size == baseGenome.size) {
+			this.size = baseGenome.size;
+		} else {
+			this.size = randomlyAverageValue(genomeA.size, genomeB.size);
+		}
+	}
+	
 	public void averageNumericalsFromParents(Genome genomeA, Genome genomeB) {
-		this.size = randomlyAverageValue(genomeA.size, genomeB.size);
 		this.speed = randomlyAverageValue(genomeA.speed, genomeB.speed);
-		this.attackDamage = randomlyAverageValue(genomeA.attackDamage, genomeB.attackDamage);
-		this.defenseDamage = randomlyAverageValue(genomeA.defenseDamage, genomeB.defenseDamage);
+		this.attack = randomlyAverageValue(genomeA.attack, genomeB.attack);
+		this.defense = randomlyAverageValue(genomeA.defense, genomeB.defense);
 		this.toughness = randomlyAverageValue(genomeA.toughness, genomeB.toughness);
 		this.perception = randomlyAverageValue(genomeA.perception, genomeB.perception);
 		this.stealth = randomlyAverageValue(genomeA.stealth, genomeB.stealth);
@@ -205,8 +225,8 @@ public class Genome implements Serializable {
 		}
 		int maxStatDeviation = 0;
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.speed - baseGenome.speed));
-		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.attackDamage - baseGenome.attackDamage));
-		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.defenseDamage - baseGenome.defenseDamage));
+		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.attack - baseGenome.attack));
+		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.defense - baseGenome.defense));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.toughness - baseGenome.toughness));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.perception - baseGenome.perception));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.stealth - baseGenome.stealth));
@@ -282,11 +302,11 @@ public class Genome implements Serializable {
 				if (toughness > 1) {
 					toughness--;
 				}
-				if (attackDamage > 1) {
-					attackDamage--;
+				if (attack > 1) {
+					attack--;
 				}
-				if (defenseDamage > 1) {
-					defenseDamage--;
+				if (defense > 1) {
+					defense--;
 				}
 				reduceStatsInNeeded();
 			}
@@ -322,7 +342,7 @@ public class Genome implements Serializable {
 			
 			switch (valueToIncrease) {
 			case 0:
-				defenseDamage = addToValueIfPossible(defenseDamage, amountToChange);
+				defense = addToValueIfPossible(defense, amountToChange);
 				break;
 			case 1:
 				toughness = addToValueIfPossible(toughness, amountToChange);
@@ -346,7 +366,7 @@ public class Genome implements Serializable {
 				perception = addToValueIfPossible(perception, amountToChange);
 				break;
 			case 8:
-				attackDamage = addToValueIfPossible(attackDamage, amountToChange);
+				attack = addToValueIfPossible(attack, amountToChange);
 				break;
 			case 9:
 				agression = addToValueIfPossible(agression, amountToChange);
@@ -386,8 +406,8 @@ public class Genome implements Serializable {
 		int freeEvoPoints = maxEvoPoints;
 		
 		freeEvoPoints -= speed;
-		freeEvoPoints -= attackDamage;
-		freeEvoPoints -= defenseDamage;
+		freeEvoPoints -= attack;
+		freeEvoPoints -= defense;
 		freeEvoPoints -= toughness;
 		freeEvoPoints -= perception;
 		freeEvoPoints -= stealth;
@@ -437,11 +457,11 @@ public class Genome implements Serializable {
 	public int getSpeed() {
 		return speed;
 	}
-	public int getAttackDamage() {
-		return attackDamage;
+	public int getAttack() {
+		return attack;
 	}
-	public int getDefenseDamage() {
-		return defenseDamage;
+	public int getDefense() {
+		return defense;
 	}
 	public int getToughness() {
 		return toughness;
@@ -475,6 +495,48 @@ public class Genome implements Serializable {
 	}
 	public int getUsedEvoPoints() {
 		return (maxEvoPoints-freeEvoPoints);
+	}
+	
+	@Override
+	public String toString() {
+		return (
+				"Diet " + diet + 
+				"; Size " + size + 
+				"; Speed " + speed + 
+				"; Toughness " + toughness + 
+				"; Attack " + attack + 
+				"; Defense " + defense + 
+				"; Perception " + perception + 
+				"; Stealth " + stealth + 
+				"; Age Expectancy " + ageExpectancy + 
+				"; Fertility " + fertility + 
+				"; Clutch Size " + clutchSize + 
+				"; Agression " + agression + 
+				"; Reactiveness " + reactiveness);
+	}
+	
+	public boolean sameAs(Genome otherGenome) {
+		if (
+			size == otherGenome.size &&
+			speed == otherGenome.speed &&
+			attack == otherGenome.attack &&
+			defense == otherGenome.defense &&
+			toughness == otherGenome.toughness &&
+			perception == otherGenome.perception &&
+			stealth == otherGenome.stealth &&
+			ageExpectancy == otherGenome.ageExpectancy &&
+			fertility == otherGenome.fertility &&
+			clutchSize == otherGenome.clutchSize &&
+			agression == otherGenome.agression &&
+			reactiveness == otherGenome.reactiveness &&
+			diet == otherGenome.diet &&
+			((specificDiet == null && otherGenome.specificDiet == null) || 
+			(specificDiet != null && otherGenome.specificDiet != null && specificDiet.id == otherGenome.specificDiet.id))
+			) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 

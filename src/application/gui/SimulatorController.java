@@ -252,8 +252,8 @@ public class SimulatorController {
 		creatureLifespan.setProgress(((double)creature.genome.getAgeExpectancy())/10);
 		creatureSpeed.setProgress(((double)creature.genome.getSpeed())/10);
 		creatureToughness.setProgress(((double)creature.genome.getToughness())/10);
-		creatureAttack.setProgress(((double)creature.genome.getAttackDamage())/10);
-		creatureDefense.setProgress(((double)creature.genome.getDefenseDamage())/10);
+		creatureAttack.setProgress(((double)creature.genome.getAttack())/10);
+		creatureDefense.setProgress(((double)creature.genome.getDefense())/10);
 		creaturePerception.setProgress(((double)creature.genome.getPerception())/10);
 		creatureStealth.setProgress(((double)creature.genome.getStealth())/10);
 		creatureFertility.setProgress(((double)creature.genome.getFertility())/10);
@@ -274,8 +274,8 @@ public class SimulatorController {
 		changeGenomeLabelColor(creatureLifespanLabel, creature.genome.getAgeExpectancy(), creature.species.baseGenome.getAgeExpectancy());
 		changeGenomeLabelColor(creatureSpeedLabel, creature.genome.getSpeed(), creature.species.baseGenome.getSpeed());
 		changeGenomeLabelColor(creatureToughnessLabel, creature.genome.getToughness(), creature.species.baseGenome.getToughness());
-		changeGenomeLabelColor(creatureAttackLabel, creature.genome.getAttackDamage(), creature.species.baseGenome.getAttackDamage());
-		changeGenomeLabelColor(creatureDefenseLabel, creature.genome.getDefenseDamage(), creature.species.baseGenome.getDefenseDamage());
+		changeGenomeLabelColor(creatureAttackLabel, creature.genome.getAttack(), creature.species.baseGenome.getAttack());
+		changeGenomeLabelColor(creatureDefenseLabel, creature.genome.getDefense(), creature.species.baseGenome.getDefense());
 		changeGenomeLabelColor(creaturePerceptionLabel, creature.genome.getPerception(), creature.species.baseGenome.getPerception());
 		changeGenomeLabelColor(creatureStealthLabel, creature.genome.getStealth(), creature.species.baseGenome.getStealth());
 		changeGenomeLabelColor(creatureFertilityLabel, creature.genome.getFertility(), creature.species.baseGenome.getFertility());
@@ -337,7 +337,7 @@ public class SimulatorController {
 		name.setMaxWidth(80);
 //		percentage.setId("percentage"+originalSpecies.id);
 		percentage.setPrefHeight(12);
-		percentage.setPrefWidth(202);
+		percentage.setPrefWidth(210);
 		
 		HBox speciesHbox = new HBox();
 		speciesHbox.setId("species" + originalSpecies.id);

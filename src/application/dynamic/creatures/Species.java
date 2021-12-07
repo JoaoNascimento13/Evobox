@@ -20,6 +20,11 @@ public class Species implements Serializable {
 	public int currentMutatedMembers;
 	public long totalMembers;
 	
+
+	public long originalParentIdA;
+	public long originalParentIdB;
+	
+	
 	public Species parent;
 	public ArrayList<Species> children;
 	
