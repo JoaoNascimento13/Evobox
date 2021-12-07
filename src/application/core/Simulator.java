@@ -43,12 +43,15 @@ public class Simulator {
 	
 	//private Point[][] flowMap;
 	
-	public Simulator(Renderer renderer) {
+	public Simulator() {
+
+		
+	}
+
+
+	public void setupSimulator(Renderer renderer) {
 
 		this.renderer = renderer;
-
-//		settings = new SettingsSingleton(0, 320, 320);
-		
 		
 		tick = 0;
 		
@@ -56,33 +59,19 @@ public class Simulator {
 		recording = false;
 		rendering = false;
 		
-		
-		
-		
 		randomizer = RandomizerSingleton.getInstance();
 		
 		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
-
 		settings.setMapSize(320, 320);
 		settings.setPeriodicRecordings(0);
-	    settings.setBirthsPerMutation(10);
-	    settings.setMutationsPerDietChange(10);
-	    settings.setMutationsPerSizeChange(40);
+	    settings.setBirthsPerMutation(200);
+	    settings.setMutationsPerDietChange(200);
+	    settings.setMutationsPerSizeChange(200);
 
 		MapStateSingleton.getInstance().initialize();
-		
-		
-//		try {
-//			
-//			simulationFile = new FileOutputStream("simulations/simul");
-//			
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//			System.exit(0);
-//		}
 	}
-
+	
 	
 	
 	public void populateWorld() {
@@ -91,27 +80,21 @@ public class Simulator {
 		
 		PreexistingCreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
 		
-		Species originalSpecies = new Species(settings.getStarterGenome());
 		
-		MapStateSingleton.getInstance().registerSpecies(originalSpecies);
-
-		simulatorController.addSpeciesToOverview(originalSpecies);
+		Species originalSpecies = new Species(settings.getStarterGenome());
+		originalSpecies.parent = originalSpecies;
 		
 		preexistingCreatureFactory.setStarterSpecies(originalSpecies);
-		
 		for (int i = 0; i < 15000; i++) {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 
 		Species originalSpeciesB = new Species(settings.getStarterGenome());
+		originalSpeciesB.parent = originalSpeciesB;
 		
-		MapStateSingleton.getInstance().registerSpecies(originalSpeciesB);
-
-		simulatorController.addSpeciesToOverview(originalSpeciesB);
 		
 		preexistingCreatureFactory.setStarterSpecies(originalSpeciesB);
-		
-		for (int i = 0; i < 5000; i++) {
+		for (int i = 0; i < 10; i++) {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 		
@@ -177,9 +160,9 @@ public class Simulator {
 			
 //			System.out.println(creatureNumber + " creatures");
 			
-			for (Species s : mapState.activeSpecies) {
-				System.out.println("Species " + s.name + ": " + (100*((double)s.currentMutatedMembers)/s.currentMembers));
-			}
+//			for (Species s : mapState.activeSpecies) {
+//				System.out.println("Species " + s.name + ": " + (100*((double)s.currentMutatedMembers)/s.currentMembers));
+//			}
 			
 			
 			

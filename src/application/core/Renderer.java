@@ -137,6 +137,10 @@ public class Renderer {
 		
 		GridPane container = ((GridPane)activeMapScrollPane.getParent());
 		
+
+		activeMapScrollPane.backup.setHvalue(activeMapScrollPane.getHvalue());
+		activeMapScrollPane.backup.setVvalue(activeMapScrollPane.getVvalue());
+		
 		
 //        Pane container = ((Pane)activeMapScrollPane.getParent());
         
@@ -145,35 +149,38 @@ public class Renderer {
 		    @Override
 		    public void run() {
 
-				activeMapScrollPane.backup.setHvalue(activeMapScrollPane.getHvalue());
-				activeMapScrollPane.backup.setVvalue(activeMapScrollPane.getVvalue());
-				
-
-				container.getChildren().remove(activeMapScrollPane);
-				
-				container.getChildren().add(activeMapScrollPane.backup);
-				
-					
-//				root.getChildren().remove(activeMapScrollPane);
-//				
-//				root.add(activeMapScrollPane.backup, 1, 1);
-				
-				container.layout();
-				
-				activeMapScrollPane = activeMapScrollPane.backup;
-
-				activeCanvas = (Canvas) activeMapScrollPane.getTarget();
-				
-
-				((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D().
-					clearRect(0, 0, activeCanvas.getWidth(), activeCanvas.getHeight());
+		    	changeVisibleMapScrollPaneSynch(container);
 		    }
 		});
 		
 	}
+
+	
+	public synchronized void changeVisibleMapScrollPaneSynch(GridPane container) {
+
+
+		container.getChildren().remove(activeMapScrollPane);
+		
+		container.getChildren().add(activeMapScrollPane.backup);
+		
+			
+//		root.getChildren().remove(activeMapScrollPane);
+//		
+//		root.add(activeMapScrollPane.backup, 1, 1);
+		
+		container.layout();
+		
+		activeMapScrollPane = activeMapScrollPane.backup;
+
+		activeCanvas = (Canvas) activeMapScrollPane.getTarget();
+		
+
+		((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D().
+			clearRect(0, 0, activeCanvas.getWidth(), activeCanvas.getHeight());
+	}
 	
 	
-	public void render() {
+	public synchronized void render() {
 		
 		int creaturePixels = 2;
 
@@ -276,7 +283,7 @@ public class Renderer {
         try {
 			p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
 			
-		} catch (NullPointerException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

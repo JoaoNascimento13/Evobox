@@ -10,16 +10,17 @@ import application.dynamic.creatures.Species;
 import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 
 public class SimulatorController {
 	
@@ -41,12 +42,14 @@ public class SimulatorController {
 	@FXML
 	private GridPane mapContainer;
 	
-	
-	
+
 	@FXML
-	private VBox overviewSpeciesName;
-	@FXML
-	private VBox overviewSpeciesPercentage;
+	private VBox overviewSpeciesContainer;
+	
+//	@FXML
+//	private VBox overviewSpeciesName;
+//	@FXML
+//	private VBox overviewSpeciesPercentage;
 
 	@FXML
 	private Label creatureSpecies;
@@ -120,6 +123,9 @@ public class SimulatorController {
 	private Label creatureEvolutionLabel;
 	
 	
+	public boolean modifyingOverview = false;
+
+	
 	public void setSimulator(Simulator simulator) {
 		this.simulator = simulator;
 	}
@@ -173,6 +179,7 @@ public class SimulatorController {
 		
 		if (inGeneralView() || forceGeneralView) {
 			
+
 			updateOverview();
 			
 		} else if (inSpeciesView()) {
@@ -315,33 +322,122 @@ public class SimulatorController {
 	
 
 	public void addSpeciesToOverview(Species originalSpecies) {
+
+//		System.out.println("Set true addSpeciesToOverview");
+		
 		Label name = new Label(originalSpecies.name);
 		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
 		ProgressBar percentage = new ProgressBar(((double)originalSpecies.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
-		name.setId("name"+originalSpecies.id);
-		percentage.setId("percentage"+originalSpecies.id);
+//		name.setId("name"+originalSpecies.id);
+		name.setPrefHeight(12);
+		name.setFont(Font.font("Calibri", FontWeight.BOLD, 12));
+		name.setMinWidth(80);
+		name.setPrefWidth(80);
+		name.setMaxWidth(80);
+//		percentage.setId("percentage"+originalSpecies.id);
 		percentage.setPrefHeight(12);
 		percentage.setPrefWidth(202);
-//		percentage.setPadding(new Insets(3, 0, -1, 0));
-		overviewSpeciesName.getChildren().add(name);
-		overviewSpeciesPercentage.getChildren().add(percentage);
+		
+		HBox speciesHbox = new HBox();
+		speciesHbox.setId("species" + originalSpecies.id);
+		speciesHbox.getChildren().add(name);
+		speciesHbox.getChildren().add(percentage);
+		
+		Platform.runLater(new Runnable() {
+			
+		    @Override
+		    public void run() {addSpeciesToOverviewSynch(speciesHbox);}
+		});
+	}
+	public synchronized void addSpeciesToOverviewSynch(HBox speciesHbox) {
+		
+//		percentage.setOpaqueInsets(new Insets(1, 0, 0, 0));
+//		overviewSpeciesName.getChildren().add(name);
+//		overviewSpeciesPercentage.getChildren().add(percentage);
+//		
+//		overviewSpeciesName.layout();
+//		overviewSpeciesPercentage.layout();
+		
+		overviewSpeciesContainer.getChildren().add(speciesHbox);
+		overviewSpeciesContainer.layout();
+		
 	}
 
-	
-	public void updateOverview() {
+	public void removeSpeciesFromOverview(Species extinctSpecies) {
+
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {removeSpeciesFromOverviewSynch(extinctSpecies);}
+		});
+	}
+	public synchronized void removeSpeciesFromOverviewSynch(Species extinctSpecies) {
 		
-		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
-		ObservableList<Node> percentage = overviewSpeciesPercentage.getChildren();
-		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
-		for (Species s : activeSpecies) {
-			for (Node n : percentage) {
-				if (n.getId().equals("percentage"+s.id)) {
-					((ProgressBar)n).setProgress(((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
-				}
-			}
+	ObservableList<Node> speciesNodes = overviewSpeciesContainer.getChildren();
+	for (int i = 0; i < speciesNodes.size(); i++) {
+		if (speciesNodes.get(i).getId().equals("species" + extinctSpecies.id)) {
+			speciesNodes.remove(i);
+			break;
 		}
 	}
 	
+	
+//		ObservableList<Node> nameNodes = overviewSpeciesName.getChildren();
+//		for (int i = 0; i < nameNodes.size(); i++) {
+//			if (nameNodes.get(i).getId().equals("name"+extinctSpecies.id)) {
+//				nameNodes.remove(i);
+//				break;
+//			}
+//		}
+//		ObservableList<Node> percentageNodes = overviewSpeciesPercentage.getChildren();
+//		for (int i = 0; i < percentageNodes.size(); i++) {
+//			if (percentageNodes.get(i).getId().equals("percentage"+extinctSpecies.id)) {
+//				percentageNodes.remove(i);
+//				break;
+//			}
+//		}
+	}
+	
+	
+	public void updateOverview() {
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {updateOverviewSynch();}
+			});
+	}
+	
+	public synchronized void updateOverviewSynch() {
+		
+		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+
+		ObservableList<Node> species = overviewSpeciesContainer.getChildren();
+		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
+		for (Species s : activeSpecies) {
+			for (Node n : species) {
+				if (((HBox) n).getId().equals("species" + s.id)) {
+					
+					((ProgressBar)((HBox) n).getChildren().get(1)).setProgress(
+							
+							Math.max(
+							((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies,
+							0.05)
+							
+							);
+					break;
+				}
+			}
+		}
+		
+//		ObservableList<Node> percentage = overviewSpeciesPercentage.getChildren();
+//		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
+//		for (Species s : activeSpecies) {
+//			for (Node n : percentage) {
+//				if (n.getId().equals("percentage"+s.id)) {
+//					((ProgressBar)n).setProgress(((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
+//				}
+//			}
+//		}
+		
+	}
 	
 	public void showGeneralView() {
 		

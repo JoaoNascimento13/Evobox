@@ -15,7 +15,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.stage.Stage;
 
-public class SceneManager {
+public class SceneManagerSingleton {
 
 	
 	
@@ -27,9 +27,17 @@ public class SceneManager {
 	private FXMLLoader simulationLoader;
 	private Renderer renderer;
 	public Simulator simulator;
+	public SimulatorController simulatorController;
 	
+	private static final SceneManagerSingleton sceneManager = new SceneManagerSingleton();
 	
-	public void setMainMenuScene(Stage stage, SceneManager sceneManager) throws IOException {
+	private SceneManagerSingleton() {}
+	
+	public static SceneManagerSingleton getInstance() {
+		return sceneManager;
+	}
+	
+	public void setMainMenuScene(Stage stage, SceneManagerSingleton sceneManager) throws IOException {
 
 		URL mainMenuViewURL = getClass().getResource("/views/MainMenuView.fxml");
 		
@@ -64,9 +72,9 @@ public class SceneManager {
 		simulationLoader = new FXMLLoader(viewURL);
 		
 		Parent root = simulationLoader.load();
-		
 
-		SimulatorController simulatorController = (SimulatorController) simulationLoader.getController();
+
+		simulatorController = (SimulatorController) simulationLoader.getController();
 		
 		simulationScene = new Scene(root,windowWidth,windowHeight);
 		
@@ -116,8 +124,8 @@ public class SceneManager {
 	
 	public void setNewSimulation() {
 		
-		simulator = new Simulator(renderer);
-		
+		simulator = new Simulator();
+		simulator.setupSimulator(renderer);
 		simulator.setSimNumber();
 		
 	}
@@ -161,8 +169,9 @@ public class SceneManager {
 		}
 		
 
-		simulator = new Simulator(renderer);
+		simulator = new Simulator();
 		
+		simulator.setupSimulator(renderer);
 		
 		simulator.loadSimulation(simulationToLoad);
 		
@@ -173,14 +182,10 @@ public class SceneManager {
 	
 	
 	public void setSimulationController() {
-
-		SimulatorController controller = simulationLoader.getController();
+		simulatorController.setSimulator(simulator);
+		simulatorController.setRenderer(renderer);
 		
-		controller.setSimulator(simulator);
-		controller.setRenderer(renderer);
-		
-		simulator.setController(controller);
-		
+		simulator.setController(simulatorController);
 	}
 	
 	

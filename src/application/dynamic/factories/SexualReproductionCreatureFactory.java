@@ -3,6 +3,7 @@ package application.dynamic.factories;
 import java.awt.Point;
 
 import application.core.MapStateSingleton;
+import application.core.RandomizerSingleton;
 import application.dynamic.creatures.Creature;
 import application.dynamic.creatures.Genome;
 import application.dynamic.creatures.Species;
@@ -26,28 +27,66 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 		creature.setNextActivation(currentTick+1);
 		
 		
-		Genome genome = parentA.genome.recombineWith(parentB.genome);
+		Genome genome = null;
+		
 		
 
-		//TODO
-		if (genome.checkForMutationAndNewSpecies(creature, parentA.species)) {
+		if (parentA.species.id == parentB.species.id) {
 			
-			//TODO
+			genome = parentA.genome.recombineWith(parentB.genome);
+			creature.setSpecies(parentA.species);
 			
-			//New species occur when the BASE genome (before mutations) differs enough from the original species genome.
+		} else {
+
+			if (RandomizerSingleton.getInstance().nextBoolean()) {
+				genome = parentA.genome.getCopyOfGenome();
+				creature.setSpecies(parentA.species);
+			} else {
+				genome = parentB.genome.getCopyOfGenome();
+				creature.setSpecies(parentB.species);
+			}
+			
 		}
 		
 		
-		if (genome.exposeToMutation()) {
+		if (genome.checkForMutationAndNewSpecies(creature) && 
+			parentA.species.id == parentB.species.id) {
 			
-			//Genome mutated from parents.
-			
-			//Note that even if this returns false, the creature could still have mutated from the base species.
-			
-		}
+			//New species occur when the BASE genome (after recombination, but before mutations)
+			//differs enough from the original species genome.
 
+			//Note: We decided to not allow the children of creatures from different species 
+			//      to become the first ones of that species.
+			//      This is because these creatures get a complete copy of one of the parents
+			//      (in order to allow newly-formed species to mate with their parent species
+			//		and still maintain their genetic traits).
+			//		However that could also cause a mutation to pass directly to the offspring
+			//      without recombination, originating a new species that shouldn't exist.
+			
+			
+			creature.setSpecies(new Species(genome));
+			
+			//If species A and B are the same, it doesn't matter which one we pick.
+			
+			creature.species.parent = parentA.species;
+			
+			creature.species.parent.children.add(creature.species);
+			
+			System.out.println("New species: " + creature.species.name);
+			
+		} else {
+			
+			genome.exposeToMutation();
 				
-		creature.setSpecies(parentA.species); //TODO
+				//Genome has a chance to mutate from parents.
+				//This can only happen if this isn't the first creature of the species.
+				//That means, the first creature of the species always has the same genome as the base genome for the species.
+				//Note that even if it doesn't mutate, the creature could still have mutations from the base species
+				//(inherited from its parents).
+		}
+		
+		
+				
 		
 		creature.setGenome(genome);
 		

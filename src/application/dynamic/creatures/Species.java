@@ -1,8 +1,12 @@
 package application.dynamic.creatures;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
+import application.core.MapStateSingleton;
 import application.core.RandomizerSingleton;
+import application.gui.SceneManagerSingleton;
+import application.gui.SimulatorController;
 
 public class Species implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -16,6 +20,9 @@ public class Species implements Serializable {
 	public int currentMutatedMembers;
 	public long totalMembers;
 	
+	public Species parent;
+	public ArrayList<Species> children;
+	
 	public Species(Creature founderCreature) {
 		setName();
 		setBaseGenome(founderCreature);
@@ -23,10 +30,15 @@ public class Species implements Serializable {
 		currentMutatedMembers = 0;
 	}
 	public Species(Genome founderGenome) {
+		
 		setName();
 		setBaseGenome(founderGenome);
 		currentMembers = 0;
 		currentMutatedMembers = 0;
+		children = new ArrayList<Species>();
+		
+		MapStateSingleton.getInstance().registerSpecies(this);
+		SceneManagerSingleton.getInstance().simulatorController.addSpeciesToOverview(this);
 	}
 	
 	
@@ -138,12 +150,20 @@ public class Species implements Serializable {
 	}
 	
 	public void setBaseGenome(Creature founderCreature) {
-		this.baseGenome = founderCreature.genome.getBaseGenome();
+		this.baseGenome = founderCreature.genome.getCopyOfGenome();
 	}
 	public void setBaseGenome(Genome founderGenome) {
-		this.baseGenome = founderGenome.getBaseGenome();
+		this.baseGenome = founderGenome.getCopyOfGenome();
 	}
 	public Genome getGenomeFromBase() {
-		return this.baseGenome.getBaseGenome();
+		return this.baseGenome.getCopyOfGenome();
+	}
+	
+	public boolean isDirectRelative(Species otherSpecies) {
+		if (this.id == otherSpecies.parent.id || this.parent.id == otherSpecies.id) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }

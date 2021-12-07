@@ -8,10 +8,10 @@ import javafx.scene.Node;
 
 public class MainMenuController {
 	
-	private SceneManager sceneManager;
+	private SceneManagerSingleton sceneManager;
 	
 	
-	public void setSceneManager(SceneManager sceneManager) {
+	public void setSceneManager(SceneManagerSingleton sceneManager) {
 		this.sceneManager = sceneManager;
 	}
 	

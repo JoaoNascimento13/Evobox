@@ -29,11 +29,12 @@ public class MapStateSingleton {
 	public int nextSpeciesId;
 
 	
-	private static final MapStateSingleton mapState = new MapStateSingleton();
-
-	
 	public Creature focusedCreature;
 	transient public boolean refreshFocusedCreature;
+	
+	
+	private static final MapStateSingleton mapState = new MapStateSingleton();
+
 	
 	private MapStateSingleton() {}
 	
@@ -102,6 +103,9 @@ public class MapStateSingleton {
     	species.id = nextSpeciesId;
     	nextSpeciesId++;
     	activeSpecies.add(species);
+    }
+    public void unregisterSpecies(Species species) {
+    	activeSpecies.remove(species);
     }
 
 	public int getMaxNumberOfCreaturesOfSameSpecies() {

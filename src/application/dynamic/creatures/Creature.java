@@ -8,6 +8,7 @@ import application.core.MapStateSingleton;
 import application.core.OutdatedPositionsSingleton;
 import application.core.SettingsSingleton;
 import application.core.Simulator;
+import application.gui.SceneManagerSingleton;
 
 public class Creature implements Serializable  {
 	
@@ -153,6 +154,12 @@ public class Creature implements Serializable  {
 		MapStateSingleton.getInstance().queueCreatureUnregister(this);
 		
 		this.species.currentMembers--;
+		if (this.species.currentMembers <= 0) {
+			
+			System.out.println(species.name + " went extinct!");
+			MapStateSingleton.getInstance().unregisterSpecies(species);
+			SceneManagerSingleton.getInstance().simulatorController.removeSpeciesFromOverview(species);
+		}
 		
 		if (mutated) {
 			this.species.currentMutatedMembers--;

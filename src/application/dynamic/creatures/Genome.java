@@ -78,7 +78,7 @@ public class Genome implements Serializable {
 	
 	
 	
-	public Genome getBaseGenome() {
+	public Genome getCopyOfGenome() {
 		Genome baseGenome = new Genome();
 		baseGenome.copyFrom(this);
 		return baseGenome;
@@ -179,9 +179,9 @@ public class Genome implements Serializable {
 	}
 	
 	
-	public boolean checkForMutationAndNewSpecies(Creature creature, Species originalSpecies) {
-		int maxInnateDeviationRate = 1000; //TODO
-		int innateDeviationRate = getDeviationRate(originalSpecies.baseGenome);
+	public boolean checkForMutationAndNewSpecies(Creature creature) {
+		int maxInnateDeviationRate = 1;
+		int innateDeviationRate = getDeviationRate(creature.species.baseGenome);
 		if (innateDeviationRate > 0) {
 			creature.mutated = true;
 		}
@@ -220,14 +220,10 @@ public class Genome implements Serializable {
 	}
 	
 	
-	public boolean exposeToMutation() {
-		
-		boolean mutated = exposeToStatAdjustment();
-		if (mutated) {
+	public void exposeToMutation() {
+		if (exposeToStatAdjustment()) {
 			reduceStatsInNeeded();
 		}
-		
-		return mutated;
 	}
 
 	

@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -25,33 +26,6 @@
          <children>
             <StackPane fx:id="overviewPane" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0">
                <children>
-                  <VBox fx:id="speciesView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
-                     <children>
-                        <Label alignment="CENTER" prefHeight="341.0" prefWidth="318.0" text="SPECIES">
-                           <font>
-                              <Font name="System Bold" size="58.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </VBox>
-                  <VBox fx:id="generalView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
-                     <children>
-                        <HBox maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0">
-                           <children>
-                              <VBox fx:id="overviewSpeciesName" maxHeight="642.0" maxWidth="120.0" minHeight="642.0" minWidth="120.0" prefHeight="642.0" prefWidth="120.0" spacing="10.0">
-                                 <padding>
-                                    <Insets left="20.0" top="10.0" />
-                                 </padding>
-                              </VBox>
-                              <VBox fx:id="overviewSpeciesPercentage" maxHeight="642.0" maxWidth="222.0" minHeight="642.0" minWidth="222.0" prefHeight="642.0" prefWidth="222.0" spacing="10.0">
-                                 <padding>
-                                    <Insets top="10.0" />
-                                 </padding>
-                              </VBox>
-                           </children>
-                        </HBox>
-                     </children>
-                  </VBox>
                   <VBox fx:id="creatureView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
                      <children>
                         <HBox prefHeight="35.0" prefWidth="320.0">
@@ -403,6 +377,28 @@
                      <StackPane.margin>
                         <Insets />
                      </StackPane.margin>
+                  </VBox>
+                  <VBox fx:id="speciesView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
+                     <children>
+                        <Label alignment="CENTER" prefHeight="341.0" prefWidth="318.0" text="SPECIES">
+                           <font>
+                              <Font name="System Bold" size="58.0" />
+                           </font>
+                        </Label>
+                     </children>
+                  </VBox>
+                  <VBox fx:id="generalView" maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
+                     <children>
+                        <ScrollPane maxHeight="642.0" maxWidth="342.0" minHeight="642.0" minWidth="342.0" prefHeight="642.0" prefWidth="342.0" style="-fx-background-color: #ECE6D5;">
+                           <content>
+                              <VBox fx:id="overviewSpeciesContainer" maxWidth="340.0" minHeight="640.0" minWidth="340.0" prefWidth="340.0" spacing="10.0">
+                                 <padding>
+                                    <Insets left="20.0" top="10.0" />
+                                 </padding>
+                              </VBox>
+                           </content>
+                        </ScrollPane>
+                     </children>
                   </VBox>
                </children>
             </StackPane>

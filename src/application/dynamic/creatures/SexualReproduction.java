@@ -94,10 +94,14 @@ public class SexualReproduction extends ReproductionStrategy  {
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		ArrayList<Direction> RandomDirs = Direction.randomArrayList(randomizer);
 		Direction reproductionDir = null;
+		Creature partner = null;
 		for (Direction d : RandomDirs) {
-			if (mapState.hasPlant(creature.x+d.x, creature.y+d.y) && 
-					// TODO : can only reproduce with creatures of the same species, or child/parent species
-				mapState.getCreature(creature.x+d.x, creature.y+d.y).isFertile) {
+			
+			 partner = mapState.getCreature(creature.x+d.x, creature.y+d.y);
+			
+			if (partner != null &&
+				partner.isFertile && 
+				creature.species.isDirectRelative(partner.species)) {
 				
 				reproductionDir = d;
 				break;

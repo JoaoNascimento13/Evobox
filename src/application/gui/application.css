@@ -21,18 +21,20 @@
 	-fx-border-width: 4;
 }
 
+/* 
 .pixelated {
   image-rendering: pixelated;
 }
+*/
 
 .progress-bar .bar { 
-    -fx-background-radius: 7; 
+    -fx-background-radius: 6; 
 }
 .progress-bar .track { 
-    -fx-background-radius: 7; 
+    -fx-background-radius: 6; 
 }
 .progress-bar {
-    -fx-background-radius: 7;     
+    -fx-background-radius: 6;     
 }
 
 /* 

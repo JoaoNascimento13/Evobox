@@ -1,6 +1,6 @@
 package application.core;
 	
-import application.gui.SceneManager;
+import application.gui.SceneManagerSingleton;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -13,7 +13,7 @@ public class Main extends Application {
 			
 			configureMainStage(stage);
 			
-			SceneManager sceneManager = new SceneManager();
+			SceneManagerSingleton sceneManager = SceneManagerSingleton.getInstance();
 			
 			sceneManager.setMainMenuScene(stage, sceneManager);
 			
