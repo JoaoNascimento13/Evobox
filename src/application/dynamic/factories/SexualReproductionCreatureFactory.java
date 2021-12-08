@@ -98,16 +98,19 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 			
 			if (!speciesAlreadyExists) {
 				
-				creature.setSpecies(new Species(genome));
+				
+				
+				creature.setSpecies(new SpeciesFactory().createSpecies(genome, parentA.species, parentA.id, parentB.id));
 				
 				//If species A and B must be the same, it doesn't matter which one we pick.
 				
-				creature.species.parent = parentA.species;
 				
-				creature.species.parent.children.add(creature.species);
-				
-				creature.species.originalParentIdA = parentA.id;
-				creature.species.originalParentIdB = parentB.id;
+//				creature.species.parent = parentA.species;
+//				
+//				creature.species.parent.children.add(creature.species);
+//				
+//				creature.species.originalParentIdA = parentA.id;
+//				creature.species.originalParentIdB = parentB.id;
 				
 				
 				System.out.println("New species: " + creature.species.name);

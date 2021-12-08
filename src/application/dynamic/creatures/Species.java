@@ -7,6 +7,7 @@ import application.core.MapStateSingleton;
 import application.core.RandomizerSingleton;
 import application.gui.SceneManagerSingleton;
 import application.gui.SimulatorController;
+import javafx.scene.paint.Color;
 
 public class Species implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -23,28 +24,75 @@ public class Species implements Serializable {
 
 	public long originalParentIdA;
 	public long originalParentIdB;
-	
+
+	private int colorInt;
 	
 	public Species parent;
 	public ArrayList<Species> children;
 	
-	public Species(Creature founderCreature) {
-		setName();
-		setBaseGenome(founderCreature);
-		currentMembers = 0;
-		currentMutatedMembers = 0;
-	}
+	
+	
 	public Species(Genome founderGenome) {
-		
-		setName();
-		setBaseGenome(founderGenome);
 		currentMembers = 0;
 		currentMutatedMembers = 0;
 		children = new ArrayList<Species>();
-		
-		MapStateSingleton.getInstance().registerSpecies(this);
-		SceneManagerSingleton.getInstance().simulatorController.addSpeciesToOverview(this);
 	}
+	
+	
+	public void addChildren(Species children) {
+		this.children.add(children);
+	}
+	
+	
+
+	public void setColor() {
+		int red = 0;
+		int green = 0;
+		int blue = 0;
+		int available;
+		switch (baseGenome.diet) {
+		case PHOTOSYNTHESIS:
+			
+			green = 120 + RandomizerSingleton.getInstance().nextInt(115);
+			available = 80 + RandomizerSingleton.getInstance().nextInt(21);
+			red = RandomizerSingleton.getInstance().nextInt(available);
+			blue = available - red;
+			break;
+			
+		case HERBIVOROUS:
+
+			blue = 120 + RandomizerSingleton.getInstance().nextInt(115);
+			available = 80 + RandomizerSingleton.getInstance().nextInt(21);
+			red = RandomizerSingleton.getInstance().nextInt(available);
+			green = available - red;
+			break;
+			
+		case CARNIVOROUS:
+			
+			red = 120 + RandomizerSingleton.getInstance().nextInt(115);
+			available = 80 + RandomizerSingleton.getInstance().nextInt(21);
+			green = RandomizerSingleton.getInstance().nextInt(available);
+			blue = available - green;
+			break;
+			
+		default:
+			break;
+		}
+		this.colorInt = calculateColorInt(Color.rgb(red, green, blue));
+	}
+	
+	public int getColor() {
+		return colorInt;
+	}
+	
+	public int calculateColorInt(Color color) {
+        return
+                (                      255  << 24) |
+                ((int) (color.getRed()   * 255) << 16) |
+                ((int) (color.getGreen() * 255) << 8)  |
+                ((int) (color.getBlue()  * 255));
+    }
+	
 	
 	
 	

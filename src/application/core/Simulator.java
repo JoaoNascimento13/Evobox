@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import application.dynamic.creatures.Creature;
 import application.dynamic.creatures.Species;
 import application.dynamic.factories.PreexistingCreatureFactory;
+import application.dynamic.factories.SpeciesFactory;
 import application.dynamic.flow.FlowGenerator;
 import application.dynamic.flow.PulsePointFlowGenerator;
 import application.gui.SimulatorController;
@@ -44,8 +45,6 @@ public class Simulator {
 	//private Point[][] flowMap;
 	
 	public Simulator() {
-
-		
 	}
 
 
@@ -81,20 +80,25 @@ public class Simulator {
 		PreexistingCreatureFactory preexistingCreatureFactory = new PreexistingCreatureFactory();
 		
 		
-		Species originalSpecies = new Species(settings.getStarterGenome());
+		Species originalSpecies = new SpeciesFactory().createSpecies(settings.getStarterGenome(), null, -1, -1);
 		originalSpecies.parent = originalSpecies;
-		
 		preexistingCreatureFactory.setStarterSpecies(originalSpecies);
-		for (int i = 0; i < 15000; i++) {
+		
+		for (int i = 0; i < 10000; i++) {
+
+//			Species originalSpecies = new SpeciesFactory().createSpecies(settings.getStarterGenome(), null, -1, -1);
+//			originalSpecies.parent = originalSpecies;
+//			preexistingCreatureFactory.setStarterSpecies(originalSpecies);
+			
+			
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 
-		Species originalSpeciesB = new Species(settings.getStarterGenome());
+		Species originalSpeciesB = new SpeciesFactory().createSpecies(settings.getStarterGenome(), null, -1, -1);
 		originalSpeciesB.parent = originalSpeciesB;
-		
-		
 		preexistingCreatureFactory.setStarterSpecies(originalSpeciesB);
-		for (int i = 0; i < 10; i++) {
+		
+		for (int i = 0; i < 10000; i++) {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
 		

@@ -45,8 +45,10 @@ public class Renderer {
 	
 	private int numberOfCanvasSwapsDelayed;
 	
+
+	private int backgroundColor = toInt(Color.web("#c4eeec"));
 	
-	private int backgroundColor = toInt(Color.web("#BBFAF7"));
+//	private int backgroundColor = toInt(Color.web("#BBFAF7"));
 //	private int backgroundColor = toInt(Color.web("#95E1D3"));
 	
 	
@@ -207,13 +209,11 @@ public class Renderer {
 				}
 			}
 			
-			
+			int creatureColor;
 			for (Creature c : mapState.activeCreatures) {
-
 	            for (int dx = 0; dx < creaturePixels; dx++) {
 	                for (int dy = 0 ; dy < creaturePixels; dy++) {
-	                	
-	                	buffer[c.x*creaturePixels + dx + canvasWidth * (c.y*creaturePixels + dy)] = plantColor;
+	                	buffer[c.x*creaturePixels + dx + canvasWidth * (c.y*creaturePixels + dy)] = c.species.getColor();
 	    			}
 				}
 			}
