@@ -99,6 +99,8 @@ public class Genome implements Serializable {
 		this.ageExpectancy = genome.ageExpectancy;
 		this.fertility = genome.fertility;
 		this.clutchSize = genome.clutchSize;
+		this.freeEvoPoints = genome.freeEvoPoints;
+		this.maxEvoPoints = genome.maxEvoPoints;
 	}
 	
 	
@@ -496,6 +498,22 @@ public class Genome implements Serializable {
 	public int getUsedEvoPoints() {
 		return (maxEvoPoints-freeEvoPoints);
 	}
+	
+
+	public String getSizeDescription() {
+		if (size < 3) {
+			return "Tiny ";
+		} else if (size < 5) {
+			return "Small ";
+		} else if (size < 7) {
+			return "Medium ";
+		} else if (size < 9) {
+			return "Large ";
+		} else {
+			return "Gigantic ";
+		}
+	}
+	
 	
 	@Override
 	public String toString() {

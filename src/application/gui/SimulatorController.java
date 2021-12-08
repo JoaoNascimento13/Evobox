@@ -1,6 +1,7 @@
 package application.gui;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import application.core.Lock;
 import application.core.MapStateSingleton;
@@ -13,8 +14,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -45,12 +48,86 @@ public class SimulatorController {
 	
 
 	@FXML
+	private Label turnLabel;
+	@FXML
 	private VBox overviewSpeciesContainer;
+
+	@FXML
+	private CheckBox speciesHighlight;
+	@FXML
+	private Button speciesViewRandom;
 	
-//	@FXML
-//	private VBox overviewSpeciesName;
-//	@FXML
-//	private VBox overviewSpeciesPercentage;
+	
+	@FXML
+	private Label speciesName;
+	@FXML
+	private Label speciesDescription;
+	
+	@FXML
+	private Label speciesMembersAlive;
+	@FXML
+	private Label speciesMembersTotal;
+	
+	@FXML
+	private Label speciesDiet;
+	@FXML
+	private ProgressBar speciesSize;
+	@FXML
+	private ProgressBar speciesLifespan;
+	@FXML
+	private ProgressBar speciesSpeed;
+	@FXML
+	private ProgressBar speciesToughness;
+	@FXML
+	private ProgressBar speciesAttack;
+	@FXML
+	private ProgressBar speciesDefense;
+	@FXML
+	private ProgressBar speciesPerception;
+	@FXML
+	private ProgressBar speciesStealth;
+	@FXML
+	private ProgressBar speciesFertility;
+	@FXML
+	private ProgressBar speciesClutchSize;
+	@FXML
+	private ProgressBar speciesAggression;
+	@FXML
+	private ProgressBar speciesReactiveness;
+
+	@FXML
+	private Label speciesDietLabel;
+	@FXML
+	private Label speciesSizeLabel;
+	@FXML
+	private Label speciesLifespanLabel;
+	@FXML
+	private Label speciesSpeedLabel;
+	@FXML
+	private Label speciesToughnessLabel;
+	@FXML
+	private Label speciesAttackLabel;
+	@FXML
+	private Label speciesDefenseLabel;
+	@FXML
+	private Label speciesPerceptionLabel;
+	@FXML
+	private Label speciesStealthLabel;
+	@FXML
+	private Label speciesFertilityLabel;
+	@FXML
+	private Label speciesClutchSizeLabel;
+	@FXML
+	private Label speciesAggressionLabel;
+	@FXML
+	private Label speciesReactivenessLabel;
+	
+	@FXML
+	private ProgressBar speciesEvolution;
+	@FXML
+	private Label speciesEvolutionLabel;
+	
+	
 
 	@FXML
 	private Label creatureSpecies;
@@ -63,6 +140,8 @@ public class SimulatorController {
 	private ProgressBar foodBar;
 	@FXML
 	private ProgressBar ageBar;
+	
+	
 	
 	@FXML
 	private Label creatureDiet;
@@ -124,6 +203,8 @@ public class SimulatorController {
 	private Label creatureEvolutionLabel;
 	
 	
+	
+	
 	public boolean modifyingOverview = false;
 
 	
@@ -164,15 +245,65 @@ public class SimulatorController {
 	}
 	
 	
+	public void viewRandomMemberOfSpecies() {
+		
+		synchronized(Lock.MAINLOCK) {
+
+			ArrayList<Creature> creatures = MapStateSingleton.getInstance().activeCreatures;
+			int creaturesSize = creatures.size();
+			int startFrom = new Random().nextInt(creaturesSize);
+			int i = startFrom;
+			long targetSpeciesId = MapStateSingleton.getInstance().getFocusedSpecies().id;
+			Creature c;
+			Creature chosenCreature = null;
+			while (true) {
+				c = creatures.get(i);
+				if (c.species.id == targetSpeciesId) {
+					chosenCreature = c;
+					break;
+				}
+				i++;
+				if (i == creaturesSize) {
+					i = 0;
+				}
+				if (i == startFrom) {
+					break;
+				}
+			}
+			if (chosenCreature != null) {
+				if (speciesHighlight.isSelected()) {
+					toggleSpeciesHighlight();
+				}
+				selectAndViewCreature(chosenCreature);
+			}
+		}
+		
+	}
+	
+	public void toggleSpeciesHighlight() {
+		speciesHighlight.setSelected(MapStateSingleton.getInstance().toggleSpeciesHighlight());
+		renderer.render();
+	}
+	
+	
+	
 	
 	
 	public void updateSidePane() {
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
-		
 		boolean forceGeneralView = false;
-		if (mapState.focusedCreature == null && inCreatureView()) {
+		boolean forceSpeciesView = false;
+		if (mapState.getFocusedCreature() == null && inCreatureView()) {
+			if (mapState.getFocusedSpecies() == null) {
+				forceGeneralView = true;
+				showGeneralView();
+			} else {
+				forceSpeciesView = true;
+				showSpeciesView();
+			}
+		} else if (mapState.getFocusedSpecies() == null && inSpeciesView()) {
 			forceGeneralView = true;
 			showGeneralView();
 		}
@@ -180,39 +311,40 @@ public class SimulatorController {
 		
 		if (inGeneralView() || forceGeneralView) {
 			
-
 			updateOverview();
 			
-		} else if (inSpeciesView()) {
+		} else if (inSpeciesView() || forceSpeciesView) {
 			
+			fillSpeciesDynamicDetails(mapState.getFocusedSpecies());
 			
 		} else {
 			
 			boolean focusIsDead = false;
 			for (long i : mapState.deadCreaturesToRemoveIds) {
-				if (mapState.focusedCreature.id == i) {
+				if (mapState.getFocusedCreature().id == i) {
 					focusIsDead = true;
 					break;
 				}
 			}
 			if (!focusIsDead) {
 				if (mapState.refreshFocusedCreature) {
-					fillCreatureDetails(mapState.focusedCreature);
+					selectAndViewCreature(mapState.getFocusedCreature());
 					mapState.refreshFocusedCreature = false;
 				} else {
-					fillDynamicCreatureDetails(mapState.focusedCreature);
+					fillDynamicCreatureDetails(mapState.getFocusedCreature());
 				}
 			} else {
-				mapState.focusedCreature = null;
-				showGeneralView();
+				mapState.setFocusedSpecies(mapState.getFocusedCreature().species);
+						
+				mapState.clearFocusedCreature();;
+				
+				showSpeciesView();
 			}
 		}
 	}
 	
 	
-	public void fillCreatureDetails(Creature creature) {
-		
-    	System.out.println("Clicked on creature: " + creature + " on " + creature.x + ", " + creature.y);
+	public void selectAndViewCreature(Creature creature) {
     	
     	fillStaticCreatureDetails(creature);
     	fillDynamicCreatureDetails(creature);
@@ -231,17 +363,16 @@ public class SimulatorController {
 		    @Override
 		    public void run() {
 		    	
-		    	fillGenomeDetails(creature);
+		    	fillCreatureGenomeDetails(creature);
 		    	
-		    	fillGenomeLabelDetails(creature);
+		    	fillCreatureGenomeLabelDetails(creature);
 		    }
 		});
-		
 		
 	}
 	
 
-	public void fillGenomeDetails(Creature creature) {
+	public void fillCreatureGenomeDetails(Creature creature) {
 
 		creatureSpecies.setText(creature.species.name);
 		creatureSpeciesNumber.setText(String.valueOf(creature.numberInSpecies));
@@ -263,7 +394,7 @@ public class SimulatorController {
 		creatureEvolution.setProgress(((double)creature.genome.getUsedEvoPoints())/creature.genome.getMaxEvoPoints());
 	}
 
-	public void fillGenomeLabelDetails(Creature creature) {
+	public void fillCreatureGenomeLabelDetails(Creature creature) {
 		
 		if (creature.genome.diet == creature.species.baseGenome.diet) {
 			creatureDietLabel.setTextFill(Color.BLACK);
@@ -282,7 +413,6 @@ public class SimulatorController {
 		changeGenomeLabelColor(creatureClutchSizeLabel, creature.genome.getClutchSize(), creature.species.baseGenome.getClutchSize());
 		changeGenomeLabelColor(creatureAggressionLabel, creature.genome.getAgression(), creature.species.baseGenome.getAgression());
 		changeGenomeLabelColor(creatureReactivenessLabel, creature.genome.getReactiveness(), creature.species.baseGenome.getReactiveness());
-		
 	}
 
 	public void changeGenomeLabelColor(Label label, int creatureValue, int speciesValue) {
@@ -322,6 +452,54 @@ public class SimulatorController {
 	
 	
 
+	public void fillSpeciesPane() {
+		Species species = MapStateSingleton.getInstance().getFocusedSpecies();
+		fillSpeciesStaticDetails(species);
+		fillSpeciesDynamicDetails(species);
+		
+    	showSpeciesView();
+    	
+//    	MapStateSingleton.getInstance().setFocusedSpecies(species);
+    	
+//    	simulator.render();
+	}
+
+	public void fillSpeciesDynamicDetails(Species species) {
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+				speciesMembersAlive.setText(String.valueOf(species.currentMembers));
+				speciesMembersTotal.setText(String.valueOf(species.totalMembers));
+		    }
+		});
+	}
+
+	public void fillSpeciesStaticDetails(Species species) {
+		
+		speciesName.setText(species.name);
+		speciesDescription.setText(species.baseGenome.getSizeDescription() + species.baseGenome.diet.name.toLowerCase() + " species"); 
+		
+		speciesDiet.setText(species.baseGenome.diet.name);
+
+		speciesSize.setProgress(((double)species.baseGenome.getSize())/10);
+		speciesLifespan.setProgress(((double)species.baseGenome.getAgeExpectancy())/10);
+		speciesSpeed.setProgress(((double)species.baseGenome.getSpeed())/10);
+		speciesToughness.setProgress(((double)species.baseGenome.getToughness())/10);
+		speciesAttack.setProgress(((double)species.baseGenome.getAttack())/10);
+		speciesDefense.setProgress(((double)species.baseGenome.getDefense())/10);
+		speciesPerception.setProgress(((double)species.baseGenome.getPerception())/10);
+		speciesStealth.setProgress(((double)species.baseGenome.getStealth())/10);
+		speciesFertility.setProgress(((double)species.baseGenome.getFertility())/10);
+		speciesClutchSize.setProgress(((double)species.baseGenome.getClutchSize())/10);
+		speciesAggression.setProgress(((double)species.baseGenome.getAgression())/10);
+		speciesReactiveness.setProgress(((double)species.baseGenome.getReactiveness())/10);
+		speciesEvolution.setProgress(((double)species.baseGenome.getUsedEvoPoints())/species.baseGenome.getMaxEvoPoints());
+	}
+	
+	
+	
+	
+
 	public void addSpeciesToOverview(Species originalSpecies) {
 
 //		System.out.println("Set true addSpeciesToOverview");
@@ -344,13 +522,55 @@ public class SimulatorController {
 		speciesHbox.getChildren().add(name);
 		speciesHbox.getChildren().add(percentage);
 		
+		name.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.PRIMARY) {
+	            e.consume();
+	            viewSpeciesFromOverview(originalSpecies);
+//	            System.out.println("Clicked on species: " + originalSpecies.name);
+//	            MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
+//	            fillSpeciesPane();
+			}
+        });
+		percentage.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.PRIMARY) {
+	            e.consume();
+	            viewSpeciesFromOverview(originalSpecies);
+			}
+        });
+		
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {addSpeciesToOverviewSynch(speciesHbox);}
 		});
 	}
+	
+	
+
+	
+	public void viewSpeciesFromOverview(Species originalSpecies) {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		if (speciesHighlight.isSelected() && 
+			mapState.getFocusedSpecies() != null && 
+			mapState.getFocusedSpecies().id != originalSpecies.id
+			) {
+			
+			speciesHighlight.setSelected(mapState.toggleSpeciesHighlight());
+			if (mapState.getFocusedCreature() != null && mapState.getFocusedCreature() .species.id != originalSpecies.id) {
+				mapState.clearFocusedCreature();
+			}
+			renderer.render();
+		}
+        MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
+        fillSpeciesPane();
+	}
+	
+	
+	
+	
 	public void addSpeciesToOverviewSynch(HBox speciesHbox) {
-		synchronized (Lock.ACTIVESPECIES_LOCK) {
+		synchronized (Lock.MAINLOCK) {
 			overviewSpeciesContainer.getChildren().add(speciesHbox);
 			overviewSpeciesContainer.layout();
 		}
@@ -364,7 +584,7 @@ public class SimulatorController {
 		});
 	}
 	public void removeSpeciesFromOverviewSynch(Species extinctSpecies) {
-		synchronized (Lock.ACTIVESPECIES_LOCK) {
+		synchronized (Lock.MAINLOCK) {
 			ObservableList<Node> speciesNodes = overviewSpeciesContainer.getChildren();
 			for (int i = 0; i < speciesNodes.size(); i++) {
 				if (speciesNodes.get(i).getId().equals("species" + extinctSpecies.id)) {
@@ -385,9 +605,11 @@ public class SimulatorController {
 	
 	public void updateOverviewSynch() {
 		
-		synchronized (Lock.ACTIVESPECIES_LOCK) {
+		synchronized (Lock.MAINLOCK) {
 
 			int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+
+			turnLabel.setText(String.valueOf(simulator.tick));
 
 			ObservableList<Node> species = overviewSpeciesContainer.getChildren();
 			ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
@@ -407,22 +629,41 @@ public class SimulatorController {
 				}
 			}
 		}
-		
-		
-//		ObservableList<Node> percentage = overviewSpeciesPercentage.getChildren();
-//		ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
-//		for (Species s : activeSpecies) {
-//			for (Node n : percentage) {
-//				if (n.getId().equals("percentage"+s.id)) {
-//					((ProgressBar)n).setProgress(((double)s.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
-//				}
-//			}
-//		}
-		
 	}
 	
+	
+	
+	public void setGeneralMouseListeners() {
+
+		speciesView.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.SECONDARY) {
+				synchronized(Lock.MAINLOCK) {
+		            e.consume();
+		            System.out.println("Back to overview");
+		            updateOverview();
+		            showGeneralView();	
+				}		
+			}
+		});
+
+		creatureView.setOnMouseClicked(e -> {
+			if (e.getButton() == MouseButton.SECONDARY) {
+
+				synchronized(Lock.MAINLOCK) {
+		            e.consume();
+		            System.out.println("Back to species view");
+		            MapStateSingleton.getInstance().setFocusedSpecies(MapStateSingleton.getInstance().getFocusedCreature().species);
+		        	fillSpeciesPane();
+		        	showSpeciesView();	
+				}		
+			}
+		});
+	}
+	
+	
+	
+	
 	public void showGeneralView() {
-		
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
@@ -470,7 +711,6 @@ public class SimulatorController {
 	}
 	public void setMapScrollPane(MapScrollPane mapScrollPane) {
 		this.mapContainer.add(mapScrollPane, 0, 0);
-//		this.mapContainer.getChildren().add(mapScrollPane);
 	}
 	public void removeMapScrollPane() {
 		this.mapContainer.getChildren().clear();

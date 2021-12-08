@@ -121,6 +121,9 @@ public class Simulator {
 			f.addFlow();
 		}
 		
+		simulatorController.updateOverview();
+		simulatorController.showGeneralView();
+		
 		simulatorController.updateSidePane();
 	}
 	
@@ -145,7 +148,7 @@ public class Simulator {
 
 			waitForRenderingIfNeeded();
 
-			synchronized (Lock.ACTIVESPECIES_LOCK) {
+			synchronized (Lock.MAINLOCK) {
 				
 				running = true;
 				
@@ -182,7 +185,6 @@ public class Simulator {
 			if (settings.periodicRecordings > 0 && tick % settings.periodicRecordings == 0) {
 					
 					try {
-						
 						record();
 						
 					} catch (IOException e) {
@@ -283,7 +285,7 @@ public class Simulator {
 	
 
 	public void render() {
-
+		
 		rendering = true;
 		
 		Thread thread = new Thread(new Runnable() {
@@ -463,16 +465,6 @@ public class Simulator {
 			c.exposeToActivation(tick);
 		}
 		
-		
-		Creature focusedCreature = MapStateSingleton.getInstance().focusedCreature;
-		
-		if (focusedCreature != null) {
-			simulatorController.fillDynamicCreatureDetails(focusedCreature);
-		} else {
-			simulatorController.showGeneralView();
-		}
-			
-
 	}
 	
 	

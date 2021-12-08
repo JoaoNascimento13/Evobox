@@ -32,7 +32,7 @@ public class Species implements Serializable {
 	
 	
 	
-	public Species(Genome founderGenome) {
+	public Species() {
 		currentMembers = 0;
 		currentMutatedMembers = 0;
 		children = new ArrayList<Species>();

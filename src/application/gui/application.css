@@ -3,15 +3,12 @@
 
 
 .root{
-	
-	/* -fx-background-color: #95E1D3; */
-	
-	
 	-fx-background-color: #ECE6D5;
 }
 
 .vbox{
 	-fx-background-color: #ECE6D5;
+	-fx-focus-color: transparent;
 }
 
 
@@ -20,6 +17,8 @@
 	-fx-border-color: #000000;
 	-fx-border-width: 4;
 }
+
+
 
 /* 
 .pixelated {
@@ -36,11 +35,3 @@
 .progress-bar {
     -fx-background-radius: 6;     
 }
-
-/* 
-.progress-bar > .track {
-	-fx-pref-height: 10; */
-	/*-fx-background-radius: 2;*/
-	/*-fx-effect: innershadow(gaussian, #e4e4e4, 4, 0, 0, 1);*/
-	/*-fx-background-color: #f5f5f5;
-}*/

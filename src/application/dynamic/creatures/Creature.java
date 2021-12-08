@@ -150,7 +150,7 @@ public class Creature implements Serializable  {
 		OutdatedPositionsSingleton.getInstance().addCreaturePosition(x, y);
 		
 		MapStateSingleton.getInstance().clearCreature(this);
-
+		
 		MapStateSingleton.getInstance().queueCreatureUnregister(this);
 		
 		this.species.currentMembers--;

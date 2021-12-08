@@ -95,28 +95,18 @@ public class SceneManagerSingleton {
 		
 		mapScrollPaneB.backup = mapScrollPaneA;
 		
-//		mapScrollPane.setStyle("-fx-background-color: red");
-		
-//		((GridPane)root).add(mapScrollPaneA, 1, 1);
-		
 		simulatorController.setMapScrollPane(mapScrollPaneA);
 
+		mapScrollPaneA.setStyle("-fx-focus-color: transparent;");
+		mapScrollPaneB.setStyle("-fx-focus-color: transparent;");
 		
-//		GridPane rootTest = ((GridPane)mapScrollPaneA.getParent());
-//		System.out.println("Nodes: ");
-//		for (Node n : rootTest.getChildren()) {
-//			System.out.println(n);
-//		}
-		
-		
-		
-		
-//		canvas.setStyle("-fx-background-color: red");
 		
 		renderer = new Renderer(canvasA, canvasB, mapScrollPaneA, canvasWidth, canvasHeight);
-		
+
+		simulatorController.setGeneralMouseListeners();
 		
 		simulationScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		
 		
 	}
 	

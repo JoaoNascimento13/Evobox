@@ -11,7 +11,7 @@ public class SpeciesFactory {
 	
 	public Species createSpecies(Genome genome, Species parentSpecies, long originalParentIdA, long originalParentIdB) {
 
-		Species species = new Species(genome);
+		Species species = new Species();
 
 		species.setName();
 		species.setBaseGenome(genome);

@@ -31,7 +31,6 @@ public class MainMenuController {
 		
 		sceneManager.showSimulation(stage);
 		
-//		sceneManager.saveFirstSimulatorFrame();
 	}
 	
 	

@@ -1,5 +1,6 @@
 package application.gui;
 
+import application.core.Lock;
 import application.core.MapStateSingleton;
 import application.dynamic.creatures.Creature;
 import javafx.geometry.Bounds;
@@ -7,6 +8,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.VBox;
 
@@ -131,23 +133,14 @@ public class MapScrollPane extends ScrollPane {
     
     
     private void onClick(Point2D mousePoint) {
-    	
 //    	System.out.println("Click on: " + (mousePoint.getX()/(scaleValue))/2 + ", " + (mousePoint.getY()/(scaleValue))/2);
-    	
-//    	int locationX = (int)((mousePoint.getX()/(scaleValue))/2);
-//    	
-//    	int locationY = (int)((mousePoint.getY()/(scaleValue))/2);
-//    			
-//    	MapStateSingleton.getInstance().getCreature(locationX, locationY);
-    			
-    			
     	Creature creature = MapStateSingleton.getInstance().getCreature(
     			(int)((mousePoint.getX()/(scaleValue))/2), 
     			(int)((mousePoint.getY()/(scaleValue))/2));
-    	
-    	
     	if (creature != null) {
-    		simulatorController.fillCreatureDetails(creature);
+    		synchronized(Lock.MAINLOCK) {
+        		simulatorController.selectAndViewCreature(creature);
+    		}
     	}
     }
     
