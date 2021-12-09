@@ -141,7 +141,11 @@ public class SimulatorController {
 	@FXML
 	private ProgressBar ageBar;
 	
-	
+
+	@FXML
+	private CheckBox creatureTrack;
+	@FXML
+	private Button creatureLocate;
 	
 	@FXML
 	private Label creatureDiet;
@@ -237,11 +241,11 @@ public class SimulatorController {
 	
 
 	public void zoomIn() {
-		renderer.zoomIn();
+		renderer.activeMapScrollPane.zoomIn();;
 	}
 	
 	public void zoomOut() {
-		renderer.zoomOut();
+		renderer.activeMapScrollPane.zoomOut();
 	}
 	
 	
@@ -274,6 +278,8 @@ public class SimulatorController {
 				if (speciesHighlight.isSelected()) {
 					toggleSpeciesHighlight();
 				}
+		    	MapStateSingleton.getInstance().setFocusedCreature(chosenCreature);
+				locateCreature();
 				selectAndViewCreature(chosenCreature);
 			}
 		}
@@ -285,8 +291,23 @@ public class SimulatorController {
 		renderer.render();
 	}
 	
-	
-	
+
+	public void toggleCreatureTracking() {
+		creatureTrack.setSelected(MapStateSingleton.getInstance().toggleCreatureTracking());
+		if (creatureTrack.isSelected()) {
+			Creature c = MapStateSingleton.getInstance().getFocusedCreature();
+			SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.centerIn(c.x, c.y);
+		}
+		
+	}
+
+	public void locateCreature() {
+		Creature c = MapStateSingleton.getInstance().getFocusedCreature();
+		for (int i = 0; i < 13; i++) {
+			renderer.activeMapScrollPane.zoomIn();
+		}
+		renderer.activeMapScrollPane.centerIn(c.x, c.y);
+	}
 	
 	
 	public void updateSidePane() {
@@ -296,6 +317,7 @@ public class SimulatorController {
 		boolean forceGeneralView = false;
 		boolean forceSpeciesView = false;
 		if (mapState.getFocusedCreature() == null && inCreatureView()) {
+			
 			if (mapState.getFocusedSpecies() == null) {
 				forceGeneralView = true;
 				showGeneralView();
@@ -310,11 +332,9 @@ public class SimulatorController {
 		
 		
 		if (inGeneralView() || forceGeneralView) {
-			
 			updateOverview();
 			
 		} else if (inSpeciesView() || forceSpeciesView) {
-			
 			fillSpeciesDynamicDetails(mapState.getFocusedSpecies());
 			
 		} else {
@@ -335,9 +355,8 @@ public class SimulatorController {
 				}
 			} else {
 				mapState.setFocusedSpecies(mapState.getFocusedCreature().species);
-						
 				mapState.clearFocusedCreature();;
-				
+				fillSpeciesPane();
 				showSpeciesView();
 			}
 		}
@@ -348,7 +367,7 @@ public class SimulatorController {
     	
     	fillStaticCreatureDetails(creature);
     	fillDynamicCreatureDetails(creature);
-
+    	updateCreatureTrackingStatus(creature);
     	showCreatureView();
     	
     	MapStateSingleton.getInstance().setFocusedCreature(creature);
@@ -356,6 +375,13 @@ public class SimulatorController {
     	simulator.render();
 	}
 	
+	public void updateCreatureTrackingStatus(Creature creature) {
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		if (mapState.getCreatureTracking() && mapState.getFocusedCreatureId() != creature.id) {
+			mapState.toggleCreatureTracking();
+			creatureTrack.setSelected(false);
+		}
+	}
 
 	public void fillStaticCreatureDetails(Creature creature) {
 
@@ -475,25 +501,32 @@ public class SimulatorController {
 	}
 
 	public void fillSpeciesStaticDetails(Species species) {
-		
-		speciesName.setText(species.name);
-		speciesDescription.setText(species.baseGenome.getSizeDescription() + species.baseGenome.diet.name.toLowerCase() + " species"); 
-		
-		speciesDiet.setText(species.baseGenome.diet.name);
 
-		speciesSize.setProgress(((double)species.baseGenome.getSize())/10);
-		speciesLifespan.setProgress(((double)species.baseGenome.getAgeExpectancy())/10);
-		speciesSpeed.setProgress(((double)species.baseGenome.getSpeed())/10);
-		speciesToughness.setProgress(((double)species.baseGenome.getToughness())/10);
-		speciesAttack.setProgress(((double)species.baseGenome.getAttack())/10);
-		speciesDefense.setProgress(((double)species.baseGenome.getDefense())/10);
-		speciesPerception.setProgress(((double)species.baseGenome.getPerception())/10);
-		speciesStealth.setProgress(((double)species.baseGenome.getStealth())/10);
-		speciesFertility.setProgress(((double)species.baseGenome.getFertility())/10);
-		speciesClutchSize.setProgress(((double)species.baseGenome.getClutchSize())/10);
-		speciesAggression.setProgress(((double)species.baseGenome.getAgression())/10);
-		speciesReactiveness.setProgress(((double)species.baseGenome.getReactiveness())/10);
-		speciesEvolution.setProgress(((double)species.baseGenome.getUsedEvoPoints())/species.baseGenome.getMaxEvoPoints());
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+
+				speciesName.setText(species.name);
+				speciesDescription.setText(species.baseGenome.getSizeDescription() + species.baseGenome.diet.name.toLowerCase() + " species"); 
+				
+				speciesDiet.setText(species.baseGenome.diet.name);
+
+				speciesSize.setProgress(((double)species.baseGenome.getSize())/10);
+				speciesLifespan.setProgress(((double)species.baseGenome.getAgeExpectancy())/10);
+				speciesSpeed.setProgress(((double)species.baseGenome.getSpeed())/10);
+				speciesToughness.setProgress(((double)species.baseGenome.getToughness())/10);
+				speciesAttack.setProgress(((double)species.baseGenome.getAttack())/10);
+				speciesDefense.setProgress(((double)species.baseGenome.getDefense())/10);
+				speciesPerception.setProgress(((double)species.baseGenome.getPerception())/10);
+				speciesStealth.setProgress(((double)species.baseGenome.getStealth())/10);
+				speciesFertility.setProgress(((double)species.baseGenome.getFertility())/10);
+				speciesClutchSize.setProgress(((double)species.baseGenome.getClutchSize())/10);
+				speciesAggression.setProgress(((double)species.baseGenome.getAgression())/10);
+				speciesReactiveness.setProgress(((double)species.baseGenome.getReactiveness())/10);
+				speciesEvolution.setProgress(((double)species.baseGenome.getUsedEvoPoints())/species.baseGenome.getMaxEvoPoints());
+		    }
+		});
+		
 	}
 	
 	
@@ -639,7 +672,6 @@ public class SimulatorController {
 			if (e.getButton() == MouseButton.SECONDARY) {
 				synchronized(Lock.MAINLOCK) {
 		            e.consume();
-		            System.out.println("Back to overview");
 		            updateOverview();
 		            showGeneralView();	
 				}		
@@ -651,7 +683,6 @@ public class SimulatorController {
 
 				synchronized(Lock.MAINLOCK) {
 		            e.consume();
-		            System.out.println("Back to species view");
 		            MapStateSingleton.getInstance().setFocusedSpecies(MapStateSingleton.getInstance().getFocusedCreature().species);
 		        	fillSpeciesPane();
 		        	showSpeciesView();	

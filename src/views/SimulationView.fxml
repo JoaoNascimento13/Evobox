@@ -374,6 +374,26 @@
                               <Insets bottom="10.0" left="10.0" right="10.0" top="15.0" />
                            </VBox.margin>
                         </GridPane>
+                        <HBox maxHeight="18.0" minHeight="18.0" minWidth="312.0" prefHeight="18.0" prefWidth="312.0" spacing="80.0">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <children>
+                              <CheckBox fx:id="creatureTrack" maxHeight="18.0" maxWidth="130.0" minHeight="18.0" minWidth="130.0" mnemonicParsing="false" onAction="#toggleCreatureTracking" prefHeight="18.0" prefWidth="130.0" text="Track Creature">
+                                 <font>
+                                    <Font name="Calibri" size="13.0" />
+                                 </font>
+                              </CheckBox>
+                              <Button fx:id="creatureLocate" alignment="CENTER" contentDisplay="CENTER" maxHeight="18.0" maxWidth="96.0" minHeight="18.0" minWidth="96.0" mnemonicParsing="false" onAction="#locateCreature" prefHeight="18.0" prefWidth="96.0" text="Locate">
+                                 <font>
+                                    <Font name="Calibri" size="13.0" />
+                                 </font>
+                              </Button>
+                           </children>
+                           <VBox.margin>
+                              <Insets bottom="10.0" left="15.0" right="15.0" top="20.0" />
+                           </VBox.margin>
+                        </HBox>
                      </children>
                      <StackPane.margin>
                         <Insets />
@@ -726,12 +746,12 @@
                               <Insets bottom="10.0" left="15.0" right="15.0" top="20.0" />
                            </VBox.margin>
                            <children>
-                              <CheckBox fx:id="speciesHighlight" minHeight="15.0" minWidth="15.0" mnemonicParsing="false" onAction="#toggleSpeciesHighlight" prefHeight="18.0" text="Highlight Memebers">
+                              <CheckBox fx:id="speciesHighlight" maxHeight="18.0" maxWidth="130.0" minHeight="15.0" minWidth="130.0" mnemonicParsing="false" onAction="#toggleSpeciesHighlight" prefHeight="18.0" prefWidth="130.0" text="Highlight Memebers">
                                  <font>
                                     <Font name="Calibri" size="13.0" />
                                  </font>
                               </CheckBox>
-                              <Button fx:id="speciesViewRandom" alignment="CENTER" contentDisplay="CENTER" maxHeight="18.0" minHeight="18.0" mnemonicParsing="false" onAction="#viewRandomMemberOfSpecies" prefHeight="18.0" text="View Random">
+                              <Button fx:id="speciesViewRandom" alignment="CENTER" contentDisplay="CENTER" maxHeight="18.0" maxWidth="96.0" minHeight="18.0" minWidth="96.0" mnemonicParsing="false" onAction="#viewRandomMemberOfSpecies" prefHeight="18.0" prefWidth="96.0" text="View Random">
                                  <font>
                                     <Font name="Calibri" size="13.0" />
                                  </font>

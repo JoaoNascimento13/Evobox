@@ -1,5 +1,6 @@
 package application.gui;
 
+import application.core.Direction;
 import application.core.Lock;
 import application.core.MapStateSingleton;
 import application.dynamic.creatures.Creature;
@@ -119,8 +120,56 @@ public class MapScrollPane extends ScrollPane {
     public void zoomOut() {
     	zoomToCenterOfViewArea(-1*buttonZoomIntensity);
     }
-    
 
+
+	public void moveInDir(Direction movementDir) {
+
+		int tileSize = 2;
+
+        Bounds innerBounds = zoomNode.getLayoutBounds();
+        Bounds viewportBounds = getViewportBounds();
+        
+		this.setHvalue(this.getHvalue() + ((double)movementDir.x*tileSize*scaleValue)/
+											(innerBounds.getWidth() - viewportBounds.getWidth()));
+		
+		this.setVvalue(this.getVvalue() + ((double)movementDir.y*tileSize*scaleValue)/
+											(innerBounds.getHeight() - viewportBounds.getHeight()));
+		
+		backup.setHvalue(this.getHvalue());
+		backup.setVvalue(this.getVvalue());
+	}
+
+
+	public void centerIn(int x, int y) {
+
+		int tileSize = 2;
+		
+        Bounds innerBounds = zoomNode.getLayoutBounds();
+        Bounds viewportBounds = getViewportBounds();
+        
+        double screenStartX = this.getHvalue() * ((innerBounds.getWidth() - viewportBounds.getWidth()) / (tileSize * scaleValue));
+        double screenStartY = this.getVvalue() * ((innerBounds.getHeight() - viewportBounds.getHeight()) / (tileSize *scaleValue));
+
+        
+        double screenCenterX = screenStartX + viewportBounds.getWidth()/(2*tileSize*scaleValue);
+        double screenCenterY = screenStartY + viewportBounds.getHeight()/(2*tileSize*scaleValue);
+		
+        
+        
+//    	System.out.println("start of screen: " + screenStartX + ", " + screenStartY);
+//
+//    	System.out.println("center of screen: " + screenCenterX + ", " + screenCenterY);
+        
+		this.setHvalue(this.getHvalue() + ((double)tileSize*scaleValue*(x-screenCenterX))/
+											(innerBounds.getWidth() - viewportBounds.getWidth()));
+		
+		this.setVvalue(this.getVvalue() + ((double)tileSize*scaleValue*(y-screenCenterY))/
+											(innerBounds.getHeight() - viewportBounds.getHeight()));
+		
+		backup.setHvalue(this.getHvalue());
+		backup.setVvalue(this.getVvalue());
+	}
+	
     private void onMousePressed() {
     	mouseBeingPressed = true;
     	backup.mouseBeingPressed = true;
@@ -133,7 +182,13 @@ public class MapScrollPane extends ScrollPane {
     
     
     private void onClick(Point2D mousePoint) {
-//    	System.out.println("Click on: " + (mousePoint.getX()/(scaleValue))/2 + ", " + (mousePoint.getY()/(scaleValue))/2);
+    	System.out.println("Click on: " + (mousePoint.getX()/(scaleValue))/2 + ", " + (mousePoint.getY()/(scaleValue))/2);
+    	
+
+        Bounds innerBounds = zoomNode.getLayoutBounds();
+        Bounds viewportBounds = getViewportBounds();
+    	
+    	
     	Creature creature = MapStateSingleton.getInstance().getCreature(
     			(int)((mousePoint.getX()/(scaleValue))/2), 
     			(int)((mousePoint.getY()/(scaleValue))/2));
@@ -218,7 +273,8 @@ public class MapScrollPane extends ScrollPane {
         this.setHvalue((valX + adjustment.getX()) / (updatedInnerBounds.getWidth() - viewportBounds.getWidth()));
         this.setVvalue((valY + adjustment.getY()) / (updatedInnerBounds.getHeight() - viewportBounds.getHeight()));
 
-        backup.setHvalue((valX + adjustment.getX()) / (updatedInnerBounds.getWidth() - viewportBounds.getWidth()));
-        backup.setVvalue((valY + adjustment.getY()) / (updatedInnerBounds.getHeight() - viewportBounds.getHeight()));
+		backup.setHvalue(this.getHvalue());
+		backup.setVvalue(this.getVvalue());
     }
+
 }

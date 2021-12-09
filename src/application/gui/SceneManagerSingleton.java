@@ -25,7 +25,7 @@ public class SceneManagerSingleton {
 	
 	private Scene simulationScene;
 	private FXMLLoader simulationLoader;
-	private Renderer renderer;
+	public Renderer renderer;
 	public Simulator simulator;
 	public SimulatorController simulatorController;
 	

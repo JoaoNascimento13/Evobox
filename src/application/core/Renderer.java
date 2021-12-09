@@ -28,7 +28,7 @@ public class Renderer {
 
 	private Canvas activeCanvas;
 	
-	private MapScrollPane activeMapScrollPane;
+	public MapScrollPane activeMapScrollPane;
 	
 	//private GraphicsContext gc;
 	private int[] buffer;
@@ -288,16 +288,6 @@ public class Renderer {
 //			}
 //		}
 //	}
-	
-	
-	public void zoomIn() {
-		activeMapScrollPane.zoomIn();
-	}
-	
-
-	public void zoomOut() {
-		activeMapScrollPane.zoomOut();
-	}
 	
 	
 	

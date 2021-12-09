@@ -301,6 +301,16 @@ public class Creature implements Serializable  {
 			
 			mapState.setCreatureInPoint(this);
 			
+			if (mapState.getCreatureTracking() && mapState.getFocusedCreatureId() == this.id) {
+				
+//				if (this.x < 17 || this.x > SettingsSingleton.getInstance().mapCellsX - 17 || 
+//					this.y < 17 || this.y > SettingsSingleton.getInstance().mapCellsY - 17) {
+//					SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.centerIn(this.x, this.y);
+//				} else {
+					SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.moveInDir(movementDir);
+//				}
+			}
+			
 		}
 	}
 	

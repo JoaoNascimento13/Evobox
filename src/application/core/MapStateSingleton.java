@@ -31,7 +31,9 @@ public class MapStateSingleton {
 	
 	private Creature focusedCreature;
 	private Species focusedSpecies;
+	
 	transient private boolean highlightSpecies;
+	transient private boolean trackFocusedCreature;
 	
 	transient public boolean refreshFocusedCreature;
 	
@@ -232,6 +234,12 @@ public class MapStateSingleton {
 	public Creature getFocusedCreature() {
 		return this.focusedCreature;
 	}
+	public long getFocusedCreatureId() {
+		if (focusedCreature == null) {
+			return -1;
+		}
+		return this.focusedCreature.id;
+	}
 
 	public Species getFocusedSpecies() {
 		return this.focusedSpecies;
@@ -263,5 +271,13 @@ public class MapStateSingleton {
 	public boolean getSpeciesHighlight() {
 		return highlightSpecies;
 	}
+	
 
+	public boolean toggleCreatureTracking() {
+		trackFocusedCreature = !trackFocusedCreature;
+		return trackFocusedCreature;
+	}
+	public boolean getCreatureTracking() {
+		return trackFocusedCreature;
+	}
 }
