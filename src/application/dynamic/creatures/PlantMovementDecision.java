@@ -5,12 +5,12 @@ import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 
-public class FloaterMovementDecision extends MovementDecisionStrategy  {
+public class PlantMovementDecision extends MovementDecisionStrategy  {
 	private static final long serialVersionUID = 1L;
 	
 	private Creature creature;
 	
-	public FloaterMovementDecision (Creature creature) {
+	public PlantMovementDecision (Creature creature) {
 		this.creature = creature;
 	}
 	

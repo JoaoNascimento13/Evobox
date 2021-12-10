@@ -114,7 +114,7 @@ public class Genome implements Serializable {
 	
 	public void setMovementStrategyFromGenome(Creature creature) {
 		if (this.diet == Diet.PHOTOSYNTHESIS) {
-			creature.setMovementDecisionStrategy(new FloaterMovementDecision(creature));
+			creature.setMovementDecisionStrategy(new PlantMovementDecision(creature));
 		}
 		//TODO: ELSE: other strategies.
 	}
@@ -474,7 +474,7 @@ public class Genome implements Serializable {
 	public int getStealth() {
 		return stealth;
 	}
-	public int getAgression() {
+	public int getAggression() {
 		return agression;
 	}
 	public int getReactiveness() {

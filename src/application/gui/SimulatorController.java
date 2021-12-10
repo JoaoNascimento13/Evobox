@@ -415,7 +415,7 @@ public class SimulatorController {
 		creatureStealth.setProgress(((double)creature.genome.getStealth())/10);
 		creatureFertility.setProgress(((double)creature.genome.getFertility())/10);
 		creatureClutchSize.setProgress(((double)creature.genome.getClutchSize())/10);
-		creatureAggression.setProgress(((double)creature.genome.getAgression())/10);
+		creatureAggression.setProgress(((double)creature.genome.getAggression())/10);
 		creatureReactiveness.setProgress(((double)creature.genome.getReactiveness())/10);
 		creatureEvolution.setProgress(((double)creature.genome.getUsedEvoPoints())/creature.genome.getMaxEvoPoints());
 	}
@@ -437,7 +437,7 @@ public class SimulatorController {
 		changeGenomeLabelColor(creatureStealthLabel, creature.genome.getStealth(), creature.species.baseGenome.getStealth());
 		changeGenomeLabelColor(creatureFertilityLabel, creature.genome.getFertility(), creature.species.baseGenome.getFertility());
 		changeGenomeLabelColor(creatureClutchSizeLabel, creature.genome.getClutchSize(), creature.species.baseGenome.getClutchSize());
-		changeGenomeLabelColor(creatureAggressionLabel, creature.genome.getAgression(), creature.species.baseGenome.getAgression());
+		changeGenomeLabelColor(creatureAggressionLabel, creature.genome.getAggression(), creature.species.baseGenome.getAggression());
 		changeGenomeLabelColor(creatureReactivenessLabel, creature.genome.getReactiveness(), creature.species.baseGenome.getReactiveness());
 	}
 
@@ -521,7 +521,7 @@ public class SimulatorController {
 				speciesStealth.setProgress(((double)species.baseGenome.getStealth())/10);
 				speciesFertility.setProgress(((double)species.baseGenome.getFertility())/10);
 				speciesClutchSize.setProgress(((double)species.baseGenome.getClutchSize())/10);
-				speciesAggression.setProgress(((double)species.baseGenome.getAgression())/10);
+				speciesAggression.setProgress(((double)species.baseGenome.getAggression())/10);
 				speciesReactiveness.setProgress(((double)species.baseGenome.getReactiveness())/10);
 				speciesEvolution.setProgress(((double)species.baseGenome.getUsedEvoPoints())/species.baseGenome.getMaxEvoPoints());
 		    }
@@ -642,7 +642,7 @@ public class SimulatorController {
 
 			int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
 
-			turnLabel.setText(String.valueOf(simulator.tick));
+			turnLabel.setText(String.valueOf(MapStateSingleton.getInstance().tick));
 
 			ObservableList<Node> species = overviewSpeciesContainer.getChildren();
 			ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;

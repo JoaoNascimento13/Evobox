@@ -58,6 +58,9 @@ public class SexualReproduction extends ReproductionStrategy  {
 				creature.isFertile = true;
 			}
 		}
+		if (creature.food <= creature.feedingStrategy.getMaximumFoodStorage()/3)  {
+			creature.isFertile = false;
+		}
 	}
 	
 	public void reproduce (long tick, Creature partner, ArrayList<Point> spawnPoints) {

@@ -29,13 +29,15 @@ public class Species implements Serializable {
 	
 	public Species parent;
 	public ArrayList<Species> children;
-	
+
+	public transient ArrayList<Creature> members;
 	
 	
 	public Species() {
 		currentMembers = 0;
 		currentMutatedMembers = 0;
 		children = new ArrayList<Species>();
+		members = new ArrayList<Creature>();
 	}
 	
 	

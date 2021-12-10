@@ -36,6 +36,8 @@ public class MapStateSingleton {
 	transient private boolean trackFocusedCreature;
 	
 	transient public boolean refreshFocusedCreature;
+
+	public long tick;
 	
 	
 	private static final MapStateSingleton mapState = new MapStateSingleton();
@@ -58,7 +60,8 @@ public class MapStateSingleton {
     public void initialize() {
     	initializeFlowMap();
     	initializeCreatureMap();
-    	
+
+		tick = 0;
     	nextCreatureId = 1;
     	nextSpeciesId = 1;
 		activeCreatures = new ArrayList<Creature>();
@@ -92,6 +95,8 @@ public class MapStateSingleton {
     	
     	creature.species.currentMembers++;
     	creature.species.totalMembers++;
+    	creature.species.members.add(creature);
+    	
     	creature.numberInSpecies = creature.species.totalMembers;
     	
     	if (creature.mutated) {
@@ -139,11 +144,20 @@ public class MapStateSingleton {
 		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
 		ArrayList<Integer> oldCreaturePositionsX = outdatedPositions.getOutdatedCreaturesX();
 		ArrayList<Integer> oldCreaturePositionsY = outdatedPositions.getOutdatedCreaturesY();
-    	for (long id : deadCreaturesToRemoveIds) {
+		Creature deadCreature;
+    	for (long deadCreatureId : deadCreaturesToRemoveIds) {
     		for (int i = 0; i < activeCreatures.size(); i++) {
-        		if (activeCreatures.get(i).id == id) {
-        			oldCreaturePositionsX.add(activeCreatures.get(i).x);
-        			oldCreaturePositionsY.add(activeCreatures.get(i).y);
+        		if (activeCreatures.get(i).id == deadCreatureId) {
+        			deadCreature = activeCreatures.get(i);
+        			oldCreaturePositionsX.add(deadCreature.x);
+        			oldCreaturePositionsY.add(deadCreature.y);
+
+            		for (int j = 0; j < deadCreature.species.members.size(); j++) {
+            			if (deadCreature.species.members.get(j).id == deadCreatureId) {
+            				deadCreature.species.members.remove(j);
+            				break;
+            			}
+            		}
         			activeCreatures.remove(i);
         			break;
         		}
@@ -199,6 +213,69 @@ public class MapStateSingleton {
     			return false;
     		}
     	}
+    }
+    public boolean hasAccessibleFood(int x, int y, Diet diet, Creature attacker) {
+    	try {
+			Creature target = getCreature(x, y);
+			return isFood(attacker, target);
+		} catch (ArrayIndexOutOfBoundsException e) {
+			return false;
+		}
+    }
+    public boolean isFood(Creature attacker, Creature target) {
+    	if (target == null || 
+			target.species.id == attacker.species.id || 
+			isTargetSpeciesChildOfAttacker(attacker, target)) {
+			return false;
+		} else {
+			if (target.genome.diet == Diet.PHOTOSYNTHESIS) {
+				if (attacker.genome.diet == Diet.HERBIVOROUS && 
+					getCombatBasedTargetPriority(attacker, target) > 0) {
+					return true;
+				}
+			} else {
+				if (attacker.genome.diet == Diet.CARNIVOROUS && 
+					getCombatBasedTargetPriority(attacker, target) > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+    }
+    public boolean isThreat(Creature observer, Creature PossibleThreat) {
+    	if (PossibleThreat == null) {
+    		return false;
+    	}
+    	return isFood(PossibleThreat, observer);
+    }
+
+    public boolean isMate(Creature initiator, Creature target) {
+    	if (target != null &&
+			(target.species.id == initiator.species.id || 
+			target.species.parent.id == initiator.species.id ||
+			target.species.id == initiator.species.parent.id)) {
+			return true;
+		}
+		return false;
+    }
+    
+    
+    public boolean isTargetSpeciesChildOfAttacker(Creature attacker, Creature target) {
+    	for (Species s : attacker.species.children) {
+    		if (s.id == target.species.id) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    public int getCombatBasedTargetPriority(Creature attacker, Creature target) {
+		int maxHitsTakenByAttacker = (target.health / attacker.genome.getAttack()) + 1;
+		int maxDamageExpected = maxHitsTakenByAttacker * target.genome.getDefense();
+		if (attacker.health > maxDamageExpected) {
+			return 100 - maxDamageExpected;
+		} else {
+			return -99;
+		}
     }
     public void clearCreature(Creature creature) {
     	creatureMap[creature.x][creature.y] = null;
@@ -279,5 +356,10 @@ public class MapStateSingleton {
 	}
 	public boolean getCreatureTracking() {
 		return trackFocusedCreature;
+	}
+
+
+	public void increaseTurnCounter() {
+		tick++;
 	}
 }

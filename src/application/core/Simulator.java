@@ -18,8 +18,6 @@ import java.awt.Point;
 
 public class Simulator {
 	
-	public long tick;
-	
 	
 	
 	private Renderer renderer;
@@ -52,7 +50,6 @@ public class Simulator {
 
 		this.renderer = renderer;
 		
-		tick = 0;
 		
 		paused = true;
 		recording = false;
@@ -171,18 +168,16 @@ public class Simulator {
 			
 			}
 			
-			tick++;
-
-
+			mapState.increaseTurnCounter();
 			
-			if (tick % 50 == 0) {
+			if (mapState.tick % 50 == 0) {
 				renderer.changeVisibleMapScrollPane();
 			}
 			
 			render();
 
 			
-			if (settings.periodicRecordings > 0 && tick % settings.periodicRecordings == 0) {
+			if (settings.periodicRecordings > 0 && mapState.tick % settings.periodicRecordings == 0) {
 					
 					try {
 						record();
@@ -320,7 +315,8 @@ public class Simulator {
 
 				try {
 					FileOutputStream simulationFile = new FileOutputStream(
-							"simulations/" + String.format("%04d", simNumber) + "-" + String.format("%09d", tick));
+							"simulations/" + String.format("%04d", simNumber) + "-" + 
+							String.format("%09d", MapStateSingleton.getInstance().tick));
 					ObjectOutputStream out = new ObjectOutputStream(simulationFile);
 					out.writeObject(getStateOnTick());
 					out.close();
@@ -365,7 +361,7 @@ public class Simulator {
 //		CloneableRandom frameRandom = (CloneableRandom) randomizer.clone();
 		
 		SimulationState simulationState = new SimulationState(
-				simNumber, frameResultCreatures, frameResultFlowGenerators, frameRandom, tick);
+				simNumber, frameResultCreatures, frameResultFlowGenerators, frameRandom);
 		
 		return simulationState;
 	}
@@ -401,7 +397,6 @@ public class Simulator {
 		
 		this.simNumber = simulationToLoad.simulationNumber;
 		this.randomizer = simulationToLoad.randomizer;
-		this.tick = simulationToLoad.tick;
 		
 
 		mapState.activeCreatures = simulationToLoad.creatures;
@@ -450,7 +445,7 @@ public class Simulator {
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		for (FlowGenerator g : mapState.flowGenerators) {
-			g.tick(tick, randomizer);
+			g.tick(mapState.tick, randomizer);
 		}
 		
 	}
@@ -462,7 +457,7 @@ public class Simulator {
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		for (Creature c : mapState.activeCreatures) {
-			c.exposeToActivation(tick);
+			c.exposeToActivation(mapState.tick);
 		}
 		
 	}

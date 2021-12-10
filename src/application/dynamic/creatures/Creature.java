@@ -35,6 +35,11 @@ public class Creature implements Serializable  {
 	
 	public boolean mutated = false;
 	
+	
+	public Creature targetCreature;
+	public CreatureGoal goal;
+	public long nextGoalChange;
+	
 	public Creature (int x, int y) {
 		this.x = x;
 		this.y = y;
@@ -147,15 +152,12 @@ public class Creature implements Serializable  {
 	
 
 	public void die() {
+		this.health = 0;
 		OutdatedPositionsSingleton.getInstance().addCreaturePosition(x, y);
-		
 		MapStateSingleton.getInstance().clearCreature(this);
-		
 		MapStateSingleton.getInstance().queueCreatureUnregister(this);
-		
 		this.species.currentMembers--;
 		if (this.species.currentMembers <= 0) {
-			
 			System.out.println(species.name + " went extinct!");
 			MapStateSingleton.getInstance().unregisterSpecies(species);
 			SceneManagerSingleton.getInstance().simulatorController.removeSpeciesFromOverview(species);

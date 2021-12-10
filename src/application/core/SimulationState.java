@@ -11,7 +11,6 @@ public class SimulationState implements Serializable, Cloneable {
 	public ArrayList<Creature> creatures;
 	public ArrayList<FlowGenerator> flowGenerators;
 	public RandomizerSingleton randomizer;
-	public long tick;
 	public int simulationNumber;
 	
 	public Object clone() throws CloneNotSupportedException {
@@ -21,12 +20,11 @@ public class SimulationState implements Serializable, Cloneable {
 	public SimulationState(int simulationNumber, 
 			ArrayList<Creature> creatures, 
 			ArrayList<FlowGenerator> flowGenerators, 
-			RandomizerSingleton randomizer, long tick) {
+			RandomizerSingleton randomizer) {
 		this.simulationNumber = simulationNumber;
 		this.creatures = creatures;
 		this.flowGenerators = flowGenerators;
 		this.randomizer = randomizer;
-		this.tick = tick;
 	}
 	
 }
