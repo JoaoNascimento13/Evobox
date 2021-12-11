@@ -27,7 +27,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 		
 		updateFertility();
 		
-		if (creature.isFertile) {
+		if (creature.isFertile && creature.goal != null && creature.goal.allowsReproduction()) {
 
 			RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 			
@@ -78,6 +78,8 @@ public class SexualReproduction extends ReproductionStrategy  {
 			MapStateSingleton.getInstance().queueCreatureRegister(spawn);
 			
 			MapStateSingleton.getInstance().setCreatureInPoint(spawn);
+			
+			creature.numberOfOffspring++;
 			
 		}
 		
@@ -163,14 +165,16 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	
 	public void startReproductionCooldown() {
-		
-		int expectedReproductionEvents = creature.genome.getTotalChildren() / creature.genome.getChildrenPerBirth();
-		
-		reproductionCooldown = creature.genome.getMaxAge() / expectedReproductionEvents;
+		reproductionCooldown = getReproductionCooldown();
 	}
 	
 	
-	
-	
-	
+	public int getReproductionCooldown() {
+		int expectedReproductionEvents = creature.genome.getTotalChildren() / creature.genome.getChildrenPerBirth();
+		return (creature.genome.getMaxAge() / expectedReproductionEvents);
+	}
+
+	public void setRandomReproductionCooldown() {
+		reproductionCooldown = RandomizerSingleton.getInstance().nextInt(getReproductionCooldown());
+	}
 }

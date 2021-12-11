@@ -4,5 +4,15 @@ public enum CreatureGoal {
 	FEED,
 	MATE,
 	FLEE,
-	WANDER
+	WANDER, 
+	
+	FLOAT;
+
+	boolean allowsReproduction() {
+		if (this == MATE || this == FLOAT) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

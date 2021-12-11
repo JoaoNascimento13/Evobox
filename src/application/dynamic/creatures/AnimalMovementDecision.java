@@ -70,7 +70,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 						mapState.getCombatBasedTargetPriority(adjacentCreature, creature) > 0) {
 						immediateThreat = adjacentCreature;
 					
-				} else if (mapState.isMate(creature, adjacentCreature)) {
+				} else if (mapState.isMate(creature, adjacentCreature, mapState.willAcceptOffSpeciesMating(creature))) {
 						immediateMate = adjacentCreature;
 				}
 			}
@@ -221,7 +221,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	
 	private ArrayList <Pair <Creature, Integer>> locateAvailableFood() {
 		
-		int maxRange = Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 1;
+		int maxRange = 2*Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 2;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -288,7 +288,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 
 	private ArrayList <Pair <Creature, Integer>> locateThreats() {
 		
-		int maxRange = Math.max(creature.genome.getPerception(), creature.genome.getReactiveness()) + 1;
+		int maxRange = 2*Math.max(creature.genome.getPerception(), creature.genome.getReactiveness()) + 2;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -344,10 +344,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	
 
 	private ArrayList <Pair <Creature, Integer>> locateMates() {
-		
-		int maxRange = creature.genome.getPerception() + 3;
+
+		int maxRange = 2*creature.genome.getPerception() + 4;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		boolean willAcceptOffSpeciesMating = mapState.willAcceptOffSpeciesMating(creature);
+		
 		
         ArrayList <Pair <Creature, Integer>> mates = new ArrayList <Pair <Creature, Integer>> ();
         
@@ -356,13 +359,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			for (int x = creature.x - dist; x <= creature.x + dist; x++) {
 				
 				if (
-					mapState.isMate(creature, mapState.getCreature(x, dist))) {
+					mapState.isMate(creature, mapState.getCreature(x, dist), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(x, dist), 
 							getDistanceBasedTargetPriority(dist)
 								));
 				}
-				if (mapState.isMate(creature, mapState.getCreature(x, -dist))) {
+				if (mapState.isMate(creature, mapState.getCreature(x, -dist), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(x, -dist), 
 							getDistanceBasedTargetPriority(dist)
@@ -370,13 +373,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 				}
 			}
 			for (int y = creature.y - dist + 1; y <= creature.y + dist - 1; y++) {
-				if (mapState.isMate(creature, mapState.getCreature(dist, y))) {
+				if (mapState.isMate(creature, mapState.getCreature(dist, y), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(dist, y), 
 							getDistanceBasedTargetPriority(dist)
 								));
 				}
-				if (mapState.isMate(creature, mapState.getCreature(-dist, y))) {
+				if (mapState.isMate(creature, mapState.getCreature(-dist, y), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(-dist, y), 
 							getDistanceBasedTargetPriority(dist)
@@ -390,8 +393,9 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			}
 		}
 		return mates;
-			
 	}
+	
+	
 	
 	
 	public int getDistanceBasedTargetPriority(int distance) {

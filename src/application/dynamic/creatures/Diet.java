@@ -25,4 +25,17 @@ public enum Diet {
 			return 0;
     	}
     }
+	
+	public String getBarColorString() {
+    	switch(this) {
+		case PHOTOSYNTHESIS:
+			return "-fx-accent: green;";
+		case HERBIVOROUS:
+			return  "-fx-accent: blue;";
+		case CARNIVOROUS:
+			return  "-fx-accent: red;";
+		default:
+			return "-fx-accent: black;";
+    	}
+	}
 }

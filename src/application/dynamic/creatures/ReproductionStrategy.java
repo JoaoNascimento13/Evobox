@@ -7,5 +7,6 @@ public abstract class ReproductionStrategy extends CreatureStrategy {
 	
 	abstract void startReproductionCooldown();
 
+	abstract void setRandomReproductionCooldown();
 	
 }

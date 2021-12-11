@@ -17,7 +17,7 @@ public class Photosynthesis extends FeedingStrategy  {
 			return;
 		}
 		
-		int foodGainedperTick = 5;
+		int foodGainedperSizePerTick = 5;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -34,33 +34,31 @@ public class Photosynthesis extends FeedingStrategy  {
 				
 			} else {
 				
-				foodGainedperTick -= 1;
-				if (foodGainedperTick == 0) {
+				foodGainedperSizePerTick -= 1;
+				if (foodGainedperSizePerTick == 0) {
 					break;
 				}
 			}
 		}
 		
-		creature.food += foodGainedperTick * creature.ticksPerTurn();
+		creature.food += foodGainedperSizePerTick * creature.genome.getSize() * creature.ticksPerTurn();
 	}
 
 	
 
 	@Override
 	public int getFoodNeededPerTickModifier() {
-		return 1;
+		return creature.genome.getSize();
 	}
 
 	@Override
 	public int getStartingFoodStorage() {
-		//TODO: should take into account creature size, once implemented;
-		return 250;
+		return 200 * creature.genome.getSize();
 	}
 	
 	@Override
 	public int getMaximumFoodStorage() {
-		//TODO: should take into account creature size, once implemented;
-		return 1000;
+		return 500 * creature.genome.getSize();
 	}
 	
 

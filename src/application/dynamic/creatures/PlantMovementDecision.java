@@ -56,6 +56,8 @@ public class PlantMovementDecision extends MovementDecisionStrategy  {
 			}
 		}
 		
+		creature.goal = CreatureGoal.FLOAT;
+		
 		return Direction.getDirection(dirX, dirY);
 		
 		

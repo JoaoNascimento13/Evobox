@@ -550,6 +550,10 @@ public class SimulatorController {
 		percentage.setPrefHeight(12);
 		percentage.setPrefWidth(210);
 		
+		percentage.setStyle(originalSpecies.baseGenome.diet.getBarColorString());
+		
+		
+		
 		HBox speciesHbox = new HBox();
 		speciesHbox.setId("species" + originalSpecies.id);
 		speciesHbox.getChildren().add(name);

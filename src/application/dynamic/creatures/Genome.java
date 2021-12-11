@@ -18,7 +18,7 @@ public class Genome implements Serializable {
 	private int toughness;
 	private int perception;
 	private int stealth;
-	private int agression;
+	private int aggression;
 	private int reactiveness;
 	private int ageExpectancy;
 	private int fertility;
@@ -57,8 +57,8 @@ public class Genome implements Serializable {
 	public void setStealth(int stealth) {
 		this.stealth = stealth;
 	}
-	public void setAgression(int agression) {
-		this.agression = agression;
+	public void setAggression(int agression) {
+		this.aggression = agression;
 	}
 	public void setReactiveness(int reactiveness) {
 		this.reactiveness = reactiveness;
@@ -94,7 +94,7 @@ public class Genome implements Serializable {
 		this.toughness = genome.toughness;
 		this.perception = genome.perception;
 		this.stealth = genome.stealth;
-		this.agression = genome.agression;
+		this.aggression = genome.aggression;
 		this.reactiveness = genome.reactiveness;
 		this.ageExpectancy = genome.ageExpectancy;
 		this.fertility = genome.fertility;
@@ -115,15 +115,17 @@ public class Genome implements Serializable {
 	public void setMovementStrategyFromGenome(Creature creature) {
 		if (this.diet == Diet.PHOTOSYNTHESIS) {
 			creature.setMovementDecisionStrategy(new PlantMovementDecision(creature));
+		} else {
+			creature.setMovementDecisionStrategy(new AnimalMovementDecision(creature));
 		}
-		//TODO: ELSE: other strategies.
 	}
 
 	public void setFeedingStrategyFromGenome(Creature creature) {
 		if (this.diet == Diet.PHOTOSYNTHESIS) {
 			creature.setFeedingStrategy(new Photosynthesis(creature));
+		} else {
+			creature.setFeedingStrategy(new Heterotrophy(creature));
 		}
-		//TODO: ELSE: other strategies.
 	}
 	
 	public void setReproductionStrategyFromGenome(Creature creature) {
@@ -139,16 +141,19 @@ public class Genome implements Serializable {
 		//Creatures from different (parent/children) species, when reproducing, get the genome of either of them.
 		
 		Genome newGenome = new Genome();
-		newGenome.setNonNumericalsFromParents(this, partnerGenome);
+		newGenome.setDietFromParents(this);
 		newGenome.setSizeFromParents(this, partnerGenome, baseGenome);
 		newGenome.averageNumericalsFromParents(this, partnerGenome);
 		newGenome.calculateAvailableEvoPoints();
 		return newGenome;
 	}
 	
-	public void setNonNumericalsFromParents(Genome genomeA, Genome genomeB) {
-		this.diet = genomeA.diet;
-		this.specificDiet = genomeA.specificDiet;
+	public void setDietFromParents(Genome parentGenome) {
+		
+		//Note: Diet changes always result in a new species, and can never vary within species.
+		
+		this.diet = parentGenome.diet;
+		this.specificDiet = parentGenome.specificDiet;
 	}
 	
 	public void setSizeFromParents(Genome genomeA, Genome genomeB, Genome baseGenome) {
@@ -174,7 +179,7 @@ public class Genome implements Serializable {
 		this.toughness = randomlyAverageValue(genomeA.toughness, genomeB.toughness);
 		this.perception = randomlyAverageValue(genomeA.perception, genomeB.perception);
 		this.stealth = randomlyAverageValue(genomeA.stealth, genomeB.stealth);
-		this.agression = randomlyAverageValue(genomeA.agression, genomeB.agression);
+		this.aggression = randomlyAverageValue(genomeA.aggression, genomeB.aggression);
 		this.reactiveness = randomlyAverageValue(genomeA.reactiveness, genomeB.reactiveness);
 		this.ageExpectancy = randomlyAverageValue(genomeA.ageExpectancy, genomeB.ageExpectancy);
 		this.fertility = randomlyAverageValue(genomeA.fertility, genomeB.fertility);
@@ -194,7 +199,6 @@ public class Genome implements Serializable {
 			if (RandomizerSingleton.getInstance().nextBoolean()) {
 				return (minVal + (delta/2));
 			} else {
-
 				return (minVal + (delta/2) + 1);
 			}
 		}
@@ -232,7 +236,7 @@ public class Genome implements Serializable {
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.toughness - baseGenome.toughness));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.perception - baseGenome.perception));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.stealth - baseGenome.stealth));
-		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.agression - baseGenome.agression));
+		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.aggression - baseGenome.aggression));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.reactiveness - baseGenome.reactiveness));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.ageExpectancy - baseGenome.ageExpectancy));
 		maxStatDeviation = Math.max(maxStatDeviation, Math.abs(this.fertility - baseGenome.fertility));
@@ -242,42 +246,62 @@ public class Genome implements Serializable {
 	}
 	
 	
-	public void exposeToMutation() {
-		if (exposeToStatAdjustment()) {
+
+//	public void exposeToDietMutation() {
+//		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
+//		SettingsSingleton settings = SettingsSingleton.getInstance();
+//		
+//		if (randomizer.nextInt(settings.birthsPerMutation * settings.mutationsPerDietChange) == 0) {
+//			
+//			valueToAvoidChanging = -1;
+//			
+//			mutateDiet();
+//		}
+//	}
+	
+	
+	public void exposeToMutation(boolean canMutateDiet) {
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
+		SettingsSingleton settings = SettingsSingleton.getInstance();
+		
+		int birthsPerMutation;
+		if (diet == Diet.PHOTOSYNTHESIS) {
+			birthsPerMutation = settings.plantBirthsPerMutation;
+		} else {
+			birthsPerMutation = settings.animalBirthsPerMutation;
+		}
+		
+		if (randomizer.nextInt(birthsPerMutation) == 0) {
+			
+			valueToAvoidChanging = -1;
+			increaseRandomStat(canMutateDiet);
+
 			reduceStatsInNeeded();
 		}
 	}
+	
+	
+	public void increaseRandomStat(boolean canMutateDiet) {
 
-	
-	
-	public boolean exposeToStatAdjustment() {
 		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		SettingsSingleton settings = SettingsSingleton.getInstance();
-		
-		if (randomizer.nextInt(settings.birthsPerMutation) == 0) {
-			
-			valueToAvoidChanging = -1;
-			increaseRandomStat();
-			
-			return true;
-			
+
+		int mutationsPerDietChange;
+		int mutationsPerSizeChange;
+		if (diet == Diet.PHOTOSYNTHESIS) {
+			mutationsPerDietChange = settings.plantMutationsPerDietChange;
+			mutationsPerSizeChange = settings.plantMutationsPerSizeChange;
 		} else {
-			return false;
+			mutationsPerDietChange = settings.animalMutationsPerDietChange;
+			mutationsPerSizeChange = settings.animalMutationsPerSizeChange;
 		}
 		
-	}
-	
-	
-	public void increaseRandomStat() {
-
-		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
-		SettingsSingleton settings = SettingsSingleton.getInstance();
 		
-		if (randomizer.nextInt(settings.mutationsPerDietChange) == 0) {
+		if (canMutateDiet && randomizer.nextInt(mutationsPerDietChange) == 0) {
 			
-			//TODO: Diet changes require the proper movement, attack, defense, and feeding methods
+			mutateDiet();
 			
-		} else if (randomizer.nextInt(settings.mutationsPerSizeChange) == 0) {
+		} else if (randomizer.nextInt(mutationsPerSizeChange) == 0) {
 			
 			mutateSize();
 			
@@ -314,7 +338,50 @@ public class Genome implements Serializable {
 			}
 		}
 	}
+	
+	public void mutateDiet() {
+		switch (diet) {
+		case CARNIVOROUS:
+			diet = Diet.HERBIVOROUS;
+			reduceStatsInNeeded();
+			break;
+		case HERBIVOROUS:
+			if (RandomizerSingleton.getInstance().nextBoolean()) {
+				diet = Diet.CARNIVOROUS;
+			} else {
+				diet = Diet.PHOTOSYNTHESIS;
+				convertStatsToPlant();
+				reduceStatsInNeeded();
+			}
+			break;
+		case PHOTOSYNTHESIS:
+			diet = Diet.HERBIVOROUS;
+			convertStatsToAnimal();
+			reduceStatsInNeeded();
+			break;
+		default:
+			break;
+		}
+	}
+	
 
+	public void convertStatsToPlant() {
+		setSpeed(0);
+		setPerception(0);
+		setAggression(0);
+		setReactiveness(0);
+		setAttackDamage(0);
+	}
+	
+	public void convertStatsToAnimal() {
+		setSpeed(Math.max(speed, 1));
+		setPerception(Math.max(perception, 1));
+		setAggression(Math.max(aggression, 1));
+		setReactiveness(Math.max(reactiveness, 1));
+		setAttackDamage(Math.max(attack, 1));
+	}
+	
+	
 	public void reduceStatsInNeeded() {
 		calculateAvailableEvoPoints();
 		while (freeEvoPoints < 0) {
@@ -371,7 +438,7 @@ public class Genome implements Serializable {
 				attack = addToValueIfPossible(attack, amountToChange);
 				break;
 			case 9:
-				agression = addToValueIfPossible(agression, amountToChange);
+				aggression = addToValueIfPossible(aggression, amountToChange);
 				break;
 			case 10:
 				reactiveness = addToValueIfPossible(reactiveness, amountToChange);
@@ -415,7 +482,7 @@ public class Genome implements Serializable {
 		freeEvoPoints -= stealth;
 		freeEvoPoints -= fertility;
 		freeEvoPoints -= clutchSize;
-		freeEvoPoints -= agression;
+		freeEvoPoints -= aggression;
 		freeEvoPoints -= reactiveness;
 		freeEvoPoints -= ageExpectancy;
 		
@@ -437,7 +504,7 @@ public class Genome implements Serializable {
 		return this.toughness;
 	}
 	public int getMaxAge() {
-		return (this.ageExpectancy*500);
+		return (this.ageExpectancy*800);
 	}
 	public int getTotalChildren() {
 		return ((this.fertility*2)+1);
@@ -475,7 +542,7 @@ public class Genome implements Serializable {
 		return stealth;
 	}
 	public int getAggression() {
-		return agression;
+		return aggression;
 	}
 	public int getReactiveness() {
 		return reactiveness;
@@ -529,7 +596,7 @@ public class Genome implements Serializable {
 				"; Age Expectancy " + ageExpectancy + 
 				"; Fertility " + fertility + 
 				"; Clutch Size " + clutchSize + 
-				"; Agression " + agression + 
+				"; Agression " + aggression + 
 				"; Reactiveness " + reactiveness);
 	}
 	
@@ -545,7 +612,7 @@ public class Genome implements Serializable {
 			ageExpectancy == otherGenome.ageExpectancy &&
 			fertility == otherGenome.fertility &&
 			clutchSize == otherGenome.clutchSize &&
-			agression == otherGenome.agression &&
+			aggression == otherGenome.aggression &&
 			reactiveness == otherGenome.reactiveness &&
 			diet == otherGenome.diet &&
 			((specificDiet == null && otherGenome.specificDiet == null) || 

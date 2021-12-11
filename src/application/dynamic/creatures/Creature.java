@@ -29,6 +29,7 @@ public class Creature implements Serializable  {
 	public int food;
 	public int health;
 	public boolean isFertile;
+	public int numberOfOffspring = 0;
 	
 	public long id;
 	public long numberInSpecies;
@@ -159,6 +160,7 @@ public class Creature implements Serializable  {
 		this.species.currentMembers--;
 		if (this.species.currentMembers <= 0) {
 			System.out.println(species.name + " went extinct!");
+			System.out.println();
 			MapStateSingleton.getInstance().unregisterSpecies(species);
 			SceneManagerSingleton.getInstance().simulatorController.removeSpeciesFromOverview(species);
 		}
@@ -354,6 +356,9 @@ public class Creature implements Serializable  {
 	public void setFertility(boolean fertility) {
 		this.isFertile = fertility;
 	}
+	public void setRandomFertilityCooldown() {
+		this.reproductionStrategy.setRandomReproductionCooldown();
+	}
 
 
 	
@@ -373,6 +378,14 @@ public class Creature implements Serializable  {
 
 	public void calculateAvailableEvoPoints() {
 		genome.calculateAvailableEvoPoints();
+	}
+
+
+	public void takeDamage(int damage) {
+		health -= damage;
+		if (health <= 0) {
+			die();
+		}
 	}
 
 

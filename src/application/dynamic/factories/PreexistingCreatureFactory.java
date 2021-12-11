@@ -51,6 +51,7 @@ public class PreexistingCreatureFactory implements CreatureFactory {
 				);
 		creature.setFullHealth();
 		creature.setFertility(false);
+		creature.setRandomFertilityCooldown();
 		
 		return creature;
 	}

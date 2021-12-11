@@ -8,9 +8,13 @@ public class SettingsSingleton {
 	public int periodicRecordings;
 	public int mapCellsX;
 	public int mapCellsY;
-	public int birthsPerMutation;
-	public int mutationsPerDietChange;
-	public int mutationsPerSizeChange;
+	
+	public int plantBirthsPerMutation;
+	public int plantMutationsPerDietChange;
+	public int plantMutationsPerSizeChange;
+	public int animalBirthsPerMutation;
+	public int animalMutationsPerDietChange;
+	public int animalMutationsPerSizeChange;
 
 	static private SettingsSingleton settings = new SettingsSingleton();
 	
@@ -30,15 +34,24 @@ public class SettingsSingleton {
 		this.periodicRecordings = periodicRecordings;
     }
     
-    public void setBirthsPerMutation(int birthsPerMutation) {
-		this.birthsPerMutation = birthsPerMutation;
+    
+    public void setPlantBirthsPerMutation(int plantBirthsPerMutation) {
+		this.plantBirthsPerMutation = plantBirthsPerMutation;
     }
-
-    public void setMutationsPerDietChange(int mutationsPerDietChange) {
-		this.mutationsPerDietChange = mutationsPerDietChange;
+    public void setPlantMutationsPerDietChange(int plantMutationsPerDietChange) {
+		this.plantMutationsPerDietChange = plantMutationsPerDietChange;
     }
-    public void setMutationsPerSizeChange(int mutationsPerSizeChange) {
-		this.mutationsPerSizeChange = mutationsPerSizeChange;
+    public void setPlantMutationsPerSizeChange(int plantMutationsPerSizeChange) {
+		this.plantMutationsPerSizeChange = plantMutationsPerSizeChange;
+    }
+    public void setAnimalBirthsPerMutation(int animalBirthsPerMutation) {
+		this.animalBirthsPerMutation = animalBirthsPerMutation;
+    }
+    public void setAnimalMutationsPerDietChange(int animalMutationsPerDietChange) {
+		this.animalMutationsPerDietChange = animalMutationsPerDietChange;
+    }
+    public void setAnimalMutationsPerSizeChange(int animalMutationsPerSizeChange) {
+		this.animalMutationsPerSizeChange = animalMutationsPerSizeChange;
     }
     
     
@@ -54,7 +67,7 @@ public class SettingsSingleton {
 		genome.setSpeed(0);
 		genome.setPerception(0);
 		genome.setStealth(0);
-		genome.setAgression(0);
+		genome.setAggression(0);
 		genome.setReactiveness(0);
 		genome.setAttackDamage(0);
 		genome.setDefenseDamage(0);

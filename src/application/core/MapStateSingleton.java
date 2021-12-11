@@ -249,16 +249,29 @@ public class MapStateSingleton {
     	return isFood(PossibleThreat, observer);
     }
 
-    public boolean isMate(Creature initiator, Creature target) {
+    public boolean isMate(Creature initiator, Creature target, boolean initiatorAcceptsOffspeciesMating) {
+    	
     	if (target != null &&
-			(target.species.id == initiator.species.id || 
-			target.species.parent.id == initiator.species.id ||
-			target.species.id == initiator.species.parent.id)) {
+    			
+			 (target.species.id == initiator.species.id || 
+			
+			 (initiatorAcceptsOffspeciesMating && 
+			  willAcceptOffSpeciesMating(target) && 
+			 (target.species.parent.id == initiator.species.id ||
+			  target.species.id == initiator.species.parent.id)))) {
+    		
 			return true;
 		}
 		return false;
     }
-    
+	public boolean willAcceptOffSpeciesMating(Creature creature) {
+		if (creature.age > 2*creature.genome.getAgeExpectancy()/3 && 
+			creature.numberOfOffspring < creature.genome.getTotalChildren()/3) {
+			return true;
+		} else {
+			return false;
+		}
+	}
     
     public boolean isTargetSpeciesChildOfAttacker(Creature attacker, Creature target) {
     	for (Species s : attacker.species.children) {
