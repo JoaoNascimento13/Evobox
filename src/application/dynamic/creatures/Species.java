@@ -20,10 +20,11 @@ public class Species implements Serializable {
 	public int currentMembers;
 	public int currentMutatedMembers;
 	public long totalMembers;
-	
 
-	public long originalParentIdA;
-	public long originalParentIdB;
+	public long extinctionTurn;
+
+//	public long originalParentIdA;
+//	public long originalParentIdB;
 
 	private int colorInt;
 	
@@ -36,6 +37,7 @@ public class Species implements Serializable {
 	public Species() {
 		currentMembers = 0;
 		currentMutatedMembers = 0;
+		extinctionTurn = -1;
 		children = new ArrayList<Species>();
 		members = new ArrayList<Creature>();
 	}
@@ -47,6 +49,10 @@ public class Species implements Serializable {
 	
 	
 
+//	darkenNextPlantSpecies = false;
+//	darkenNextHerbivoreSpecies = false;
+//	darkenNextCarnivoreSpecies = false;
+	
 	public void setColor() {
 		int red = 0;
 		int green = 0;
@@ -55,7 +61,14 @@ public class Species implements Serializable {
 		switch (baseGenome.diet) {
 		case PHOTOSYNTHESIS:
 			
-			green = 120 + RandomizerSingleton.getInstance().nextInt(115);
+			if (MapStateSingleton.getInstance().darkenNextPlantSpecies) {
+				green = 180 + RandomizerSingleton.getInstance().nextInt(60);
+			} else {
+				green = 120 + RandomizerSingleton.getInstance().nextInt(60);
+			}
+			MapStateSingleton.getInstance().darkenNextPlantSpecies = !MapStateSingleton.getInstance().darkenNextPlantSpecies;
+			
+//			green = 120 + RandomizerSingleton.getInstance().nextInt(115);
 			available = 80 + RandomizerSingleton.getInstance().nextInt(21);
 			red = RandomizerSingleton.getInstance().nextInt(available);
 			blue = available - red;
@@ -63,16 +76,29 @@ public class Species implements Serializable {
 			
 		case HERBIVOROUS:
 
-			blue = 120 + RandomizerSingleton.getInstance().nextInt(115);
-			available = 80 + RandomizerSingleton.getInstance().nextInt(21);
+			if (MapStateSingleton.getInstance().darkenNextHerbivoreSpecies) {
+				blue = 180 + RandomizerSingleton.getInstance().nextInt(60);
+			} else {
+				blue = 120 + RandomizerSingleton.getInstance().nextInt(60);
+			}
+			MapStateSingleton.getInstance().darkenNextHerbivoreSpecies = !MapStateSingleton.getInstance().darkenNextHerbivoreSpecies;
+			
+			//blue = 120 + RandomizerSingleton.getInstance().nextInt(115);
+			available = 40 + RandomizerSingleton.getInstance().nextInt(21);
 			red = RandomizerSingleton.getInstance().nextInt(available);
 			green = available - red;
 			break;
 			
 		case CARNIVOROUS:
-			
-			red = 120 + RandomizerSingleton.getInstance().nextInt(115);
-			available = 80 + RandomizerSingleton.getInstance().nextInt(21);
+			if (MapStateSingleton.getInstance().darkenNextCarnivoreSpecies) {
+				red = 180 + RandomizerSingleton.getInstance().nextInt(60);
+			} else {
+				red = 120 + RandomizerSingleton.getInstance().nextInt(60);
+			}
+			MapStateSingleton.getInstance().darkenNextCarnivoreSpecies = !MapStateSingleton.getInstance().darkenNextCarnivoreSpecies;
+	
+//			red = 120 + RandomizerSingleton.getInstance().nextInt(115);
+			available = 60 + RandomizerSingleton.getInstance().nextInt(21);
 			green = RandomizerSingleton.getInstance().nextInt(available);
 			blue = available - green;
 			break;
@@ -104,7 +130,7 @@ public class Species implements Serializable {
 		String mid = "";
 		int lengthWithoutMid = start.length() + end.length();
 		if (lengthWithoutMid < 6 ||
-			(lengthWithoutMid < 10 && RandomizerSingleton.getInstance().nextBoolean())) {
+			(lengthWithoutMid < 8 && RandomizerSingleton.getInstance().nextBoolean())) {
 			mid = generateNameMid();
 		}
 		name = start + mid + end;

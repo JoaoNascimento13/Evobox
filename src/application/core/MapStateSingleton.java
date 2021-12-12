@@ -18,6 +18,8 @@ public class MapStateSingleton {
 	
 	public ArrayList<Creature> activeCreatures;
 	public ArrayList<Species> activeSpecies;
+
+	public ArrayList<Species> extinctSpecies;
 	
 	public ArrayList<Long> deadCreaturesToRemoveIds;
 	public ArrayList<Creature> bornCreaturesToAdd;
@@ -28,6 +30,10 @@ public class MapStateSingleton {
 	public long nextCreatureId;
 	public int nextSpeciesId;
 
+	public boolean darkenNextPlantSpecies;
+	public boolean darkenNextHerbivoreSpecies;
+	public boolean darkenNextCarnivoreSpecies;
+	
 	
 	private Creature focusedCreature;
 	private Species focusedSpecies;
@@ -37,7 +43,7 @@ public class MapStateSingleton {
 	
 	transient public boolean refreshFocusedCreature;
 
-	public long tick;
+	public long turn;
 	
 	
 	private static final MapStateSingleton mapState = new MapStateSingleton();
@@ -61,11 +67,17 @@ public class MapStateSingleton {
     	initializeFlowMap();
     	initializeCreatureMap();
 
-		tick = 0;
+		turn = 0;
     	nextCreatureId = 1;
     	nextSpeciesId = 1;
+
+    	darkenNextPlantSpecies = false;
+    	darkenNextHerbivoreSpecies = false;
+    	darkenNextCarnivoreSpecies = false;
+    	
 		activeCreatures = new ArrayList<Creature>();
 		activeSpecies = new ArrayList<Species>();
+		extinctSpecies = new ArrayList<Species>();
 		bornCreaturesToAdd = new ArrayList<Creature>();
 		deadCreaturesToRemoveIds = new ArrayList<Long>();
 		flowGenerators = new ArrayList<FlowGenerator>();
@@ -115,6 +127,8 @@ public class MapStateSingleton {
     	activeSpecies.add(species);
     }
     public void unregisterSpecies(Species species) {
+    	species.extinctionTurn = turn;
+    	extinctSpecies.add(species);
     	activeSpecies.remove(species);
     }
 
@@ -249,24 +263,29 @@ public class MapStateSingleton {
     	return isFood(PossibleThreat, observer);
     }
 
-    public boolean isMate(Creature initiator, Creature target, boolean initiatorAcceptsOffspeciesMating) {
+    public boolean acceptsMating(Creature initiator, Creature target, boolean initiatorAcceptsOffspeciesMating) {
     	
-    	if (target != null &&
+    	if (target != null && target.isFertile && 
     			
-			 (target.species.id == initiator.species.id || 
-			
-			 (initiatorAcceptsOffspeciesMating && 
-			  willAcceptOffSpeciesMating(target) && 
-			 (target.species.parent.id == initiator.species.id ||
-			  target.species.id == initiator.species.parent.id)))) {
+    		(target.species.id == initiator.species.id || 
+    		
+    		(initiatorAcceptsOffspeciesMating && 
+					 
+			(target.species.id == initiator.species.parent.id || 
+			(target.species.parent.id == initiator.species.id && willAcceptOffSpeciesMating(target)))))
+			) {
     		
 			return true;
 		}
 		return false;
     }
 	public boolean willAcceptOffSpeciesMating(Creature creature) {
-		if (creature.age > 2*creature.genome.getAgeExpectancy()/3 && 
-			creature.numberOfOffspring < creature.genome.getTotalChildren()/3) {
+		if (
+			creature.species.currentMembers < 10
+			|| 
+			(creature.age > (2*creature.genome.getMaxAge())/3 && 
+			creature.numberOfOffspring < creature.genome.getTotalChildren()/3)
+			) {
 			return true;
 		} else {
 			return false;
@@ -373,6 +392,6 @@ public class MapStateSingleton {
 
 
 	public void increaseTurnCounter() {
-		tick++;
+		turn++;
 	}
 }

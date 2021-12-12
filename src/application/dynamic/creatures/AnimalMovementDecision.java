@@ -23,19 +23,14 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	@Override
 	public Direction decideMovementDirection() {
 
-//		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
-
-
-//		int lastPixelX = SettingsSingleton.getInstance().mapCellsX-1;
-//		int lastPixelY = SettingsSingleton.getInstance().mapCellsY-1;;
-
+		
 		if (creature.targetCreature != null && creature.targetCreature.health == 0) {
 			creature.targetCreature = null;
 		}
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
-		if (creature.targetCreature == null || mapState.tick >= creature.nextGoalChange) {
+		if (creature.targetCreature == null || mapState.turn >= creature.nextGoalChange) {
 			creature.goal = null;
 			creature.targetCreature = null;
 		}
@@ -65,12 +60,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 					mapState.getCombatBasedTargetPriority(creature, adjacentCreature) > 0) {
 					immediateFood = adjacentCreature;
 					
-				} else if (canReproduce && 
+				} else if (
 						mapState.isFood(adjacentCreature, creature) && 
 						mapState.getCombatBasedTargetPriority(adjacentCreature, creature) > 0) {
 						immediateThreat = adjacentCreature;
 					
-				} else if (mapState.isMate(creature, adjacentCreature, mapState.willAcceptOffSpeciesMating(creature))) {
+				} else if (canReproduce && 
+						mapState.acceptsMating(creature, adjacentCreature, mapState.willAcceptOffSpeciesMating(creature))) {
 						immediateMate = adjacentCreature;
 				}
 			}
@@ -132,12 +128,11 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			
 			if (maxMateRate + maxFoodRate + maxThreatRate > 0) {
 				
-
 				if (2*maxMateRate > maxFoodRate && 2*maxMateRate > maxThreatRate) {
 					
 					creature.goal = CreatureGoal.MATE;
 					creature.targetCreature = mateTargets.get(maxMateRateInd).getKey();
-					creature.nextGoalChange = mapState.tick + (20 * creature.genome.getActivationSpeed());
+					creature.nextGoalChange = mapState.turn + (20 * creature.genome.getActivationSpeed());
 					
 					
 				} else if (maxFoodRate == 0 || 
@@ -148,33 +143,27 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 
 					creature.goal = CreatureGoal.FLEE;
 					creature.targetCreature = threatTargets.get(maxThreatRateInd).getKey();
-					creature.nextGoalChange = mapState.tick + (10 * creature.genome.getActivationSpeed());
+					creature.nextGoalChange = mapState.turn + (10 * creature.genome.getActivationSpeed());
 					
 				} else if (maxFoodRate > 0) {
 
 					creature.goal = CreatureGoal.FEED;
 					creature.targetCreature = foodTargets.get(maxFoodRateInd).getKey();
-					creature.nextGoalChange = mapState.tick + (10 * creature.genome.getActivationSpeed());
+					creature.nextGoalChange = mapState.turn + (10 * creature.genome.getActivationSpeed());
 				}
-				
-			}
-			
-
-			if (creature.targetCreature == null) {
-
-				//No targets of any kind - move at random
-
-				creature.goal = CreatureGoal.WANDER;
-				creature.nextGoalChange = mapState.tick + (5 * creature.genome.getActivationSpeed());
 			}
 		}
 		
 		
 		int dirX = 0;
 		int dirY = 0;
-
 		
 		if (creature.targetCreature == null) {
+
+			//No targets of any kind - move at random
+
+			creature.goal = CreatureGoal.WANDER;
+			creature.nextGoalChange = mapState.turn + (5 * creature.genome.getActivationSpeed());
 			
 			dirX = randomizer.nextInt(3)-1;
 			dirY = randomizer.nextInt(3)-1;
@@ -198,21 +187,44 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			
 		} else {
 			
-			if (creature.targetCreature.x > creature.x) {
+			if (creature.targetCreature.x > creature.x + 1) {
 				dirX = 1;
-			} else if (creature.targetCreature.x < creature.x) {
+			} else if (creature.targetCreature.x < creature.x - 1) {
 				dirX = -1;
 			} else {
 				dirX = 0;
 			}
-			if (creature.targetCreature.y > creature.y) {
+			if (creature.targetCreature.y > creature.y + 1) {
 				dirY = 1;
-			} else if (creature.targetCreature.y < creature.y) {
+			} else if (creature.targetCreature.y < creature.y - 1) {
 				dirY = -1;
 			} else {
 				dirY = 0;
 			}
 		}
+
+//		if (creature.genome.diet == Diet.HERBIVOROUS && creature.goal == CreatureGoal.MATE) {
+//			System.out.println("Animal " + creature + " looking for mate.");
+//			System.out.println("food: " + creature.food);
+//			System.out.println("maxFood: " + creature.getMaximumFoodStorage());
+//			System.out.println("isFertile: " + creature.isFertile);
+//			System.out.println("cooldown: " + creature.getReproductionCooldown());
+//			System.out.println("isFertile: " + creature.isFertile);
+//			System.out.println("willAcceptOffSpeciesMating: " + mapState.willAcceptOffSpeciesMating(creature));
+//			System.out.println("target: " + creature.targetCreature);
+//			System.out.println("target species: " + creature.targetCreature.species.name);
+//			System.out.println();
+//		}
+
+
+		
+//		if (creature.genome.diet == Diet.HERBIVOROUS && 
+//			creature.goal == CreatureGoal.MATE &&	
+//			creature.targetCreature.species.id == creature.species.id) {
+//			System.out.println(creature.species.name + " " + creature.id + 
+//				" is trying to mate with " + creature.targetCreature.species.name + " " + creature.targetCreature.id + "!");
+//			System.out.println();
+//		}
 		
 		return Direction.getDirection(dirX, dirY);
 	}
@@ -221,7 +233,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	
 	private ArrayList <Pair <Creature, Integer>> locateAvailableFood() {
 		
-		int maxRange = 2*Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 2;
+		int maxRange = 3*Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 3;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -345,7 +357,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 
 	private ArrayList <Pair <Creature, Integer>> locateMates() {
 
-		int maxRange = 2*creature.genome.getPerception() + 4;
+		int maxRange = 4*creature.genome.getPerception() + 4;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -359,13 +371,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			for (int x = creature.x - dist; x <= creature.x + dist; x++) {
 				
 				if (
-					mapState.isMate(creature, mapState.getCreature(x, dist), willAcceptOffSpeciesMating)) {
+					mapState.acceptsMating(creature, mapState.getCreature(x, dist), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(x, dist), 
 							getDistanceBasedTargetPriority(dist)
 								));
 				}
-				if (mapState.isMate(creature, mapState.getCreature(x, -dist), willAcceptOffSpeciesMating)) {
+				if (mapState.acceptsMating(creature, mapState.getCreature(x, -dist), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(x, -dist), 
 							getDistanceBasedTargetPriority(dist)
@@ -373,13 +385,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 				}
 			}
 			for (int y = creature.y - dist + 1; y <= creature.y + dist - 1; y++) {
-				if (mapState.isMate(creature, mapState.getCreature(dist, y), willAcceptOffSpeciesMating)) {
+				if (mapState.acceptsMating(creature, mapState.getCreature(dist, y), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(dist, y), 
 							getDistanceBasedTargetPriority(dist)
 								));
 				}
-				if (mapState.isMate(creature, mapState.getCreature(-dist, y), willAcceptOffSpeciesMating)) {
+				if (mapState.acceptsMating(creature, mapState.getCreature(-dist, y), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
 							mapState.getCreature(-dist, y), 
 							getDistanceBasedTargetPriority(dist)
@@ -400,6 +412,11 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	
 	public int getDistanceBasedTargetPriority(int distance) {
 		return (100-10*distance);
+	}
+
+	@Override
+	public CreatureGoal getStartingGoal() {
+		return CreatureGoal.WANDER;
 	}
 	
 }

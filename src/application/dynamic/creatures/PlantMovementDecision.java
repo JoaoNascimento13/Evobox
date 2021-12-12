@@ -64,6 +64,13 @@ public class PlantMovementDecision extends MovementDecisionStrategy  {
 		
 	}
 
+
+
+	@Override
+	public CreatureGoal getStartingGoal() {
+		return CreatureGoal.FLOAT;
+	}
+
 	
 	
 	

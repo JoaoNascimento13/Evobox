@@ -66,8 +66,8 @@ public class Simulator {
 	    settings.setPlantMutationsPerDietChange(80);
 	    settings.setPlantMutationsPerSizeChange(40);
 
-	    settings.setAnimalBirthsPerMutation(20);
-	    settings.setAnimalMutationsPerDietChange(10);
+	    settings.setAnimalBirthsPerMutation(10);
+	    settings.setAnimalMutationsPerDietChange(2);
 	    settings.setAnimalMutationsPerSizeChange(50);
 	    
 		MapStateSingleton.getInstance().initialize();
@@ -175,14 +175,14 @@ public class Simulator {
 			
 			mapState.increaseTurnCounter();
 			
-			if (mapState.tick % 50 == 0) {
+			if (mapState.turn % 50 == 0) {
 				renderer.changeVisibleMapScrollPane();
 			}
 			
 			render();
 
 			
-			if (settings.periodicRecordings > 0 && mapState.tick % settings.periodicRecordings == 0) {
+			if (settings.periodicRecordings > 0 && mapState.turn % settings.periodicRecordings == 0) {
 					
 					try {
 						record();
@@ -321,7 +321,7 @@ public class Simulator {
 				try {
 					FileOutputStream simulationFile = new FileOutputStream(
 							"simulations/" + String.format("%04d", simNumber) + "-" + 
-							String.format("%09d", MapStateSingleton.getInstance().tick));
+							String.format("%09d", MapStateSingleton.getInstance().turn));
 					ObjectOutputStream out = new ObjectOutputStream(simulationFile);
 					out.writeObject(getStateOnTick());
 					out.close();
@@ -450,7 +450,7 @@ public class Simulator {
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		for (FlowGenerator g : mapState.flowGenerators) {
-			g.tick(mapState.tick, randomizer);
+			g.tick(mapState.turn, randomizer);
 		}
 		
 	}
@@ -462,7 +462,7 @@ public class Simulator {
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		for (Creature c : mapState.activeCreatures) {
-			c.exposeToActivation(mapState.tick);
+			c.exposeToActivation(mapState.turn);
 		}
 		
 	}

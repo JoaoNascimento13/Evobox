@@ -205,13 +205,13 @@ public class Genome implements Serializable {
 	}
 	
 	
-	public boolean checkForMutationAndNewSpecies(Creature creature) {
-		int maxInnateDeviationRate = 1;
-		int innateDeviationRate = getDeviationRate(creature.species.baseGenome);
-		if (innateDeviationRate > 0) {
+	public boolean checkForMutationAndNewSpecies(Creature creature, Species originalSpecies) {
+		int maxDeviationRate = 1;
+		int deviationRate = getDeviationRate(originalSpecies.baseGenome);
+		if (deviationRate > 0) {
 			creature.mutated = true;
 		}
-		return (innateDeviationRate > maxInnateDeviationRate);
+		return (deviationRate > maxDeviationRate);
 	}
 	
 	public int getDeviationRate(Genome baseGenome) {
@@ -260,9 +260,11 @@ public class Genome implements Serializable {
 //	}
 	
 	
-	public void exposeToMutation(boolean canMutateDiet) {
+	public Genome getPossiblyMutatedGenome(boolean canMutateDiet) {
 		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		SettingsSingleton settings = SettingsSingleton.getInstance();
+		
+		Genome possiblyMutatedGenome = this.getCopyOfGenome();
 		
 		int birthsPerMutation;
 		if (diet == Diet.PHOTOSYNTHESIS) {
@@ -274,10 +276,11 @@ public class Genome implements Serializable {
 		if (randomizer.nextInt(birthsPerMutation) == 0) {
 			
 			valueToAvoidChanging = -1;
-			increaseRandomStat(canMutateDiet);
+			possiblyMutatedGenome.increaseRandomStat(canMutateDiet);
 
-			reduceStatsInNeeded();
+			possiblyMutatedGenome.reduceStatsInNeeded();
 		}
+		return possiblyMutatedGenome;
 	}
 	
 	
@@ -495,7 +498,7 @@ public class Genome implements Serializable {
 
 
 	public int getFoodNeededPerTick() {
-		return this.size;
+		return this.size+1;
 	}
 	public int getActivationSpeed() {
 		return this.speed;
@@ -504,13 +507,13 @@ public class Genome implements Serializable {
 		return this.toughness;
 	}
 	public int getMaxAge() {
-		return (this.ageExpectancy*800);
+		return (this.ageExpectancy*1500);
 	}
 	public int getTotalChildren() {
-		return ((this.fertility*2)+1);
+		return ((this.fertility*2)+4);
 	}
 	public int getChildrenPerBirth() {
-		return this.clutchSize;
+		return this.clutchSize+1;
 	}
 	
 

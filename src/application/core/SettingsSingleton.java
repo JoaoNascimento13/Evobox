@@ -63,7 +63,7 @@ public class SettingsSingleton {
 
 		genome.setDiet(Diet.PHOTOSYNTHESIS);
 		
-		genome.setSize(2);
+		genome.setSize(1);
 		genome.setSpeed(0);
 		genome.setPerception(0);
 		genome.setStealth(0);
@@ -73,13 +73,13 @@ public class SettingsSingleton {
 		genome.setDefenseDamage(0);
 		genome.setToughness(1);
 		
-		genome.setAgeExpectancy(2);
+		genome.setAgeExpectancy(1);
 		//maxAge = *500 -> 500 - 5000
 		
-		genome.setFertility(4);
+		genome.setFertility(1);
 		//children = *2+1 -> 3 - 21
 		
-		genome.setClutchSize(2);
+		genome.setClutchSize(1);
 		
 		genome.calculateAvailableEvoPoints();
 		

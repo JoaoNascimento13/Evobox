@@ -111,65 +111,58 @@ public class Renderer {
 
 	public void changeVisibleMapScrollPane() {
 		
-		if (activeMapScrollPane.mouseBeingPressed) {
-			
-			if (numberOfCanvasSwapsDelayed > 10) {
-				
-				Event.fireEvent(activeMapScrollPane, new MouseEvent(MouseEvent.MOUSE_RELEASED, 0,
-		                0, 0, 0, MouseButton.PRIMARY, 1, true, true, true, true,
-		                true, true, true, true, true, true, null));
-				
-			} else {
-
-				numberOfCanvasSwapsDelayed++;
-				return;
-			}
-			
-		}
 		
-		numberOfCanvasSwapsDelayed = 0;
-		
-		GraphicsContext gc = ((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D();
-
-		
-        PixelWriter p = gc.getPixelWriter();
-        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
-		
-        
-		
-		GridPane container = ((GridPane)activeMapScrollPane.getParent());
-		
-
-		activeMapScrollPane.backup.setHvalue(activeMapScrollPane.getHvalue());
-		activeMapScrollPane.backup.setVvalue(activeMapScrollPane.getVvalue());
-		
-		
-//        Pane container = ((Pane)activeMapScrollPane.getParent());
         
 		
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
 
-		    	changeVisibleMapScrollPaneSynch(container);
+		    	changeVisibleMapScrollPaneSynch();
 		    }
 		});
 		
 	}
 
 	
-	public void changeVisibleMapScrollPaneSynch(GridPane container) {
+	public void changeVisibleMapScrollPaneSynch() {
 
 		synchronized(Lock.MAINLOCK) {
 
+			
+			if (activeMapScrollPane.mouseBeingPressed) {
+				
+				if (numberOfCanvasSwapsDelayed > 10) {
+					
+					Event.fireEvent(activeMapScrollPane, new MouseEvent(MouseEvent.MOUSE_RELEASED, 0,
+			                0, 0, 0, MouseButton.PRIMARY, 1, true, true, true, true,
+			                true, true, true, true, true, true, null));
+					
+				} else {
+					numberOfCanvasSwapsDelayed++;
+					return;
+				}
+			}
+			numberOfCanvasSwapsDelayed = 0;
+			
+			
+			GraphicsContext gc = ((Canvas) activeMapScrollPane.backup.getTarget()).getGraphicsContext2D();
+			
+	        PixelWriter p = gc.getPixelWriter();
+	        p.setPixels(0, 0, canvasWidth, canvasHeight, pixelFormat, buffer, 0, canvasWidth);
+			
+			GridPane container = ((GridPane)activeMapScrollPane.getParent());
+			
+			activeMapScrollPane.backup.setHvalue(activeMapScrollPane.getHvalue());
+			activeMapScrollPane.backup.setVvalue(activeMapScrollPane.getVvalue());
+			
+			
+			
+			
 			container.getChildren().remove(activeMapScrollPane);
 			
 			container.getChildren().add(activeMapScrollPane.backup);
 			
-				
-//			root.getChildren().remove(activeMapScrollPane);
-//			
-//			root.add(activeMapScrollPane.backup, 1, 1);
 			
 			container.layout();
 			

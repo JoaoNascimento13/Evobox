@@ -346,6 +346,7 @@ public class Creature implements Serializable  {
 	
 	public void setMovementDecisionStrategy(MovementDecisionStrategy moveStrategy) {
 		this.movementDecisionStrategy = moveStrategy;
+		this.goal = movementDecisionStrategy.getStartingGoal();
 	}
 	public void setFeedingStrategy(FeedingStrategy feedingStrategy) {
 		this.feedingStrategy = feedingStrategy;
@@ -358,6 +359,9 @@ public class Creature implements Serializable  {
 	}
 	public void setRandomFertilityCooldown() {
 		this.reproductionStrategy.setRandomReproductionCooldown();
+	}
+	public int getReproductionCooldown() {
+		return this.reproductionStrategy.getReproductionCooldown();
 	}
 
 

@@ -27,8 +27,8 @@ public class SpeciesFactory {
 			parentSpecies.addChildren(species);
 		}
 		
-		species.originalParentIdA = originalParentIdA;
-		species.originalParentIdB = originalParentIdB;
+//		species.originalParentIdA = originalParentIdA;
+//		species.originalParentIdB = originalParentIdB;
 		
 		return species;
 	}

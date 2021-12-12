@@ -13,7 +13,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 
 	private Creature creature;
 	
-	private int reproductionCooldown;
+	public int reproductionCooldown;
 	
 	public SexualReproduction (Creature creature) {
 		this.creature = creature;
@@ -31,7 +31,26 @@ public class SexualReproduction extends ReproductionStrategy  {
 
 			RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 			
-			Direction partnerDir = getReproductionDirection(randomizer);
+			Direction partnerDir = null; 
+			
+			if (creature.goal == CreatureGoal.MATE) {
+
+				if (creature.targetCreature != null && 
+					Math.abs(creature.x - creature.targetCreature.x) < 2 && 
+					Math.abs(creature.y - creature.targetCreature.y) < 2
+					) {
+					
+					partnerDir = Direction.getDirection(
+							creature.targetCreature.x - creature.x, 
+							creature.targetCreature.y - creature.y);
+				}
+				
+				
+			} else {
+				partnerDir= getRandomReproductionDirection(randomizer);
+			}
+			
+			
 			
 			if (partnerDir != null) {
 
@@ -42,6 +61,13 @@ public class SexualReproduction extends ReproductionStrategy  {
 					Creature partner = MapStateSingleton.getInstance().getCreature(creature.x+partnerDir.x, creature.y+partnerDir.y);
 					
 					reproduce(tick, partner, spawnPoints);
+					
+					
+					if (creature.genome.diet == Diet.HERBIVOROUS && partner.species.id == creature.species.id) {
+						System.out.println("Two herbivores mated!");
+						System.out.println();
+					}
+							
 				}
 			}
 		}
@@ -82,7 +108,8 @@ public class SexualReproduction extends ReproductionStrategy  {
 			creature.numberOfOffspring++;
 			
 		}
-		
+
+		creature.goal = null;
 		creature.isFertile = false;
 		creature.food -= creature.feedingStrategy.getMaximumFoodStorage()/3;
 		startReproductionCooldown();
@@ -94,7 +121,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	
 	
-	public Direction getReproductionDirection(RandomizerSingleton randomizer) {
+	public Direction getRandomReproductionDirection(RandomizerSingleton randomizer) {
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		ArrayList<Direction> RandomDirs = Direction.randomArrayList(randomizer);
@@ -104,9 +131,12 @@ public class SexualReproduction extends ReproductionStrategy  {
 			
 			 partner = mapState.getCreature(creature.x+d.x, creature.y+d.y);
 			
-			if (partner != null &&
-				partner.isFertile && 
-				creature.species.isDirectRelative(partner.species)) {
+			if (mapState.acceptsMating(creature, partner, mapState.willAcceptOffSpeciesMating(creature))
+					
+//				partner != null &&
+//				partner.isFertile && 
+//				creature.species.isDirectRelative(partner.species)
+				) {
 				
 				reproductionDir = d;
 				break;
@@ -165,16 +195,23 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	
 	public void startReproductionCooldown() {
-		reproductionCooldown = getReproductionCooldown();
+		reproductionCooldown = getMaxReproductionCooldown();
 	}
 	
 	
-	public int getReproductionCooldown() {
+	public int getMaxReproductionCooldown() {
 		int expectedReproductionEvents = creature.genome.getTotalChildren() / creature.genome.getChildrenPerBirth();
-		return (creature.genome.getMaxAge() / expectedReproductionEvents);
+		return (creature.genome.getMaxAge() / (2*expectedReproductionEvents));
 	}
 
 	public void setRandomReproductionCooldown() {
 		reproductionCooldown = RandomizerSingleton.getInstance().nextInt(getReproductionCooldown());
+	}
+
+
+
+	@Override
+	int getReproductionCooldown() {
+		return reproductionCooldown;
 	}
 }

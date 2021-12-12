@@ -133,7 +133,9 @@ public class SimulatorController {
 	private Label creatureSpecies;
 	@FXML
 	private Label creatureSpeciesNumber;
-	
+
+	@FXML
+	private Label creatureGoal;
 	@FXML
 	private ProgressBar healthBar;
 	@FXML
@@ -296,7 +298,10 @@ public class SimulatorController {
 		creatureTrack.setSelected(MapStateSingleton.getInstance().toggleCreatureTracking());
 		if (creatureTrack.isSelected()) {
 			Creature c = MapStateSingleton.getInstance().getFocusedCreature();
-			SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.centerIn(c.x, c.y);
+			try {
+				SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.centerIn(c.x, c.y);
+			} catch (NullPointerException e) {
+			}
 		}
 		
 	}
@@ -311,54 +316,59 @@ public class SimulatorController {
 	
 	
 	public void updateSidePane() {
-		
-		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		
-		boolean forceGeneralView = false;
-		boolean forceSpeciesView = false;
-		if (mapState.getFocusedCreature() == null && inCreatureView()) {
+
+		synchronized(Lock.MAINLOCK) {
 			
-			if (mapState.getFocusedSpecies() == null) {
+
+			MapStateSingleton mapState = MapStateSingleton.getInstance();
+			
+			boolean forceGeneralView = false;
+			boolean forceSpeciesView = false;
+			if (mapState.getFocusedCreature() == null && inCreatureView()) {
+				
+				if (mapState.getFocusedSpecies() == null) {
+					forceGeneralView = true;
+					showGeneralView();
+				} else {
+					forceSpeciesView = true;
+					showSpeciesView();
+				}
+			} else if (mapState.getFocusedSpecies() == null && inSpeciesView()) {
 				forceGeneralView = true;
 				showGeneralView();
+			}
+			
+			
+			if (inGeneralView() || forceGeneralView) {
+				updateOverview();
+				
+			} else if (inSpeciesView() || forceSpeciesView) {
+				fillSpeciesDynamicDetails(mapState.getFocusedSpecies());
+				
 			} else {
-				forceSpeciesView = true;
-				showSpeciesView();
-			}
-		} else if (mapState.getFocusedSpecies() == null && inSpeciesView()) {
-			forceGeneralView = true;
-			showGeneralView();
-		}
-		
-		
-		if (inGeneralView() || forceGeneralView) {
-			updateOverview();
-			
-		} else if (inSpeciesView() || forceSpeciesView) {
-			fillSpeciesDynamicDetails(mapState.getFocusedSpecies());
-			
-		} else {
-			
-			boolean focusIsDead = false;
-			for (long i : mapState.deadCreaturesToRemoveIds) {
-				if (mapState.getFocusedCreature().id == i) {
-					focusIsDead = true;
-					break;
+				
+				boolean focusIsDead = false;
+				for (long i : mapState.deadCreaturesToRemoveIds) {
+					if (mapState.getFocusedCreature().id == i) {
+						focusIsDead = true;
+						break;
+					}
 				}
-			}
-			if (!focusIsDead) {
-				if (mapState.refreshFocusedCreature) {
-					selectAndViewCreature(mapState.getFocusedCreature());
-					mapState.refreshFocusedCreature = false;
+				if (!focusIsDead) {
+					if (mapState.refreshFocusedCreature) {
+						selectAndViewCreature(mapState.getFocusedCreature());
+						mapState.refreshFocusedCreature = false;
+					} else {
+						fillDynamicCreatureDetails(mapState.getFocusedCreature());
+					}
 				} else {
-					fillDynamicCreatureDetails(mapState.getFocusedCreature());
+					mapState.setFocusedSpecies(mapState.getFocusedCreature().species);
+					mapState.clearFocusedCreature();;
+					fillSpeciesPane();
+					showSpeciesView();
 				}
-			} else {
-				mapState.setFocusedSpecies(mapState.getFocusedCreature().species);
-				mapState.clearFocusedCreature();;
-				fillSpeciesPane();
-				showSpeciesView();
 			}
+			
 		}
 	}
 	
@@ -461,7 +471,11 @@ public class SimulatorController {
 		    public void run() {
 
 		    	try {
-		    		
+		    		try {
+						creatureGoal.setText(creature.goal.description);
+					} catch (Exception e) {
+						creatureGoal.setText(creature.movementDecisionStrategy.getStartingGoal().description);
+					}
 					foodBar.setProgress(((double)creature.food)/creature.getMaximumFoodStorage());
 					ageBar.setProgress(((double)creature.age)/creature.genome.getMaxAge());
 					healthBar.setProgress(((double)creature.health)/creature.genome.getMaxHealth());
@@ -535,49 +549,9 @@ public class SimulatorController {
 
 	public void addSpeciesToOverview(Species originalSpecies) {
 
-//		System.out.println("Set true addSpeciesToOverview");
-		
-		Label name = new Label(originalSpecies.name);
-		int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
-		ProgressBar percentage = new ProgressBar(((double)originalSpecies.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
-//		name.setId("name"+originalSpecies.id);
-		name.setPrefHeight(12);
-		name.setFont(Font.font("Calibri", FontWeight.BOLD, 12));
-		name.setMinWidth(80);
-		name.setPrefWidth(80);
-		name.setMaxWidth(80);
-//		percentage.setId("percentage"+originalSpecies.id);
-		percentage.setPrefHeight(12);
-		percentage.setPrefWidth(210);
-		
-		percentage.setStyle(originalSpecies.baseGenome.diet.getBarColorString());
-		
-		
-		
-		HBox speciesHbox = new HBox();
-		speciesHbox.setId("species" + originalSpecies.id);
-		speciesHbox.getChildren().add(name);
-		speciesHbox.getChildren().add(percentage);
-		
-		name.setOnMouseClicked(e -> {
-			if (e.getButton() == MouseButton.PRIMARY) {
-	            e.consume();
-	            viewSpeciesFromOverview(originalSpecies);
-//	            System.out.println("Clicked on species: " + originalSpecies.name);
-//	            MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
-//	            fillSpeciesPane();
-			}
-        });
-		percentage.setOnMouseClicked(e -> {
-			if (e.getButton() == MouseButton.PRIMARY) {
-	            e.consume();
-	            viewSpeciesFromOverview(originalSpecies);
-			}
-        });
-		
 		Platform.runLater(new Runnable() {
 		    @Override
-		    public void run() {addSpeciesToOverviewSynch(speciesHbox);}
+		    public void run() {addSpeciesToOverviewSynch(originalSpecies);}
 		});
 	}
 	
@@ -586,30 +560,82 @@ public class SimulatorController {
 	
 	public void viewSpeciesFromOverview(Species originalSpecies) {
 
-		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		
-		if (speciesHighlight.isSelected() && 
-			mapState.getFocusedSpecies() != null && 
-			mapState.getFocusedSpecies().id != originalSpecies.id
-			) {
-			
-			speciesHighlight.setSelected(mapState.toggleSpeciesHighlight());
-			if (mapState.getFocusedCreature() != null && mapState.getFocusedCreature() .species.id != originalSpecies.id) {
-				mapState.clearFocusedCreature();
-			}
-			renderer.render();
-		}
-        MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
-        fillSpeciesPane();
+		Platform.runLater(new Runnable() {
+		    @Override
+		    public void run() {
+
+				MapStateSingleton mapState = MapStateSingleton.getInstance();
+				
+				if (speciesHighlight.isSelected() && 
+					mapState.getFocusedSpecies() != null && 
+					mapState.getFocusedSpecies().id != originalSpecies.id
+					) {
+					
+					speciesHighlight.setSelected(mapState.toggleSpeciesHighlight());
+					if (mapState.getFocusedCreature() != null && mapState.getFocusedCreature() .species.id != originalSpecies.id) {
+						mapState.clearFocusedCreature();
+					}
+					renderer.render();
+				}
+		        MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
+		        fillSpeciesPane();
+		    }
+		});
 	}
 	
 	
 	
 	
-	public void addSpeciesToOverviewSynch(HBox speciesHbox) {
+	public void addSpeciesToOverviewSynch(Species originalSpecies) {
+		
 		synchronized (Lock.MAINLOCK) {
-			overviewSpeciesContainer.getChildren().add(speciesHbox);
-			overviewSpeciesContainer.layout();
+
+			Label name = new Label(originalSpecies.name);
+			int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
+			ProgressBar percentage = new ProgressBar(((double)originalSpecies.currentMembers)/maxNumberOfCreaturesOfSameSpecies);
+//			name.setId("name"+originalSpecies.id);
+			name.setPrefHeight(12);
+			name.setFont(Font.font("Calibri", FontWeight.BOLD, 12));
+			name.setMinWidth(80);
+			name.setPrefWidth(80);
+			name.setMaxWidth(80);
+//			percentage.setId("percentage"+originalSpecies.id);
+			percentage.setPrefHeight(12);
+			percentage.setPrefWidth(210);
+			
+			percentage.setStyle(originalSpecies.baseGenome.diet.getBarColorString());
+			
+			
+			
+			HBox speciesHbox = new HBox();
+			speciesHbox.setId("species" + originalSpecies.id);
+			speciesHbox.getChildren().add(name);
+			speciesHbox.getChildren().add(percentage);
+			
+			name.setOnMouseClicked(e -> {
+				if (e.getButton() == MouseButton.PRIMARY) {
+		            e.consume();
+		            viewSpeciesFromOverview(originalSpecies);
+//		            System.out.println("Clicked on species: " + originalSpecies.name);
+//		            MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
+//		            fillSpeciesPane();
+				}
+	        });
+			percentage.setOnMouseClicked(e -> {
+				if (e.getButton() == MouseButton.PRIMARY) {
+		            e.consume();
+		            viewSpeciesFromOverview(originalSpecies);
+				}
+	        });
+
+
+			Platform.runLater(new Runnable() {
+			    @Override
+			    public void run() {
+					overviewSpeciesContainer.getChildren().add(speciesHbox);
+					overviewSpeciesContainer.layout();
+			    }
+			});
 		}
 	}
 
@@ -646,7 +672,7 @@ public class SimulatorController {
 
 			int maxNumberOfCreaturesOfSameSpecies = MapStateSingleton.getInstance().getMaxNumberOfCreaturesOfSameSpecies();
 
-			turnLabel.setText(String.valueOf(MapStateSingleton.getInstance().tick));
+			turnLabel.setText(String.valueOf(MapStateSingleton.getInstance().turn));
 
 			ObservableList<Node> species = overviewSpeciesContainer.getChildren();
 			ArrayList<Species> activeSpecies = MapStateSingleton.getInstance().activeSpecies;
@@ -696,6 +722,18 @@ public class SimulatorController {
 	}
 	
 	
+	public void disableHighlightOnNewSpeciesView() {
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		if (mapState.getSpeciesHighlight() && 
+			mapState.getFocusedSpecies() != mapState.getFocusedCreature().species) {
+			
+			Platform.runLater(new Runnable() {
+			    @Override
+			    public void run() {mapState.toggleSpeciesHighlight();}
+				});
+			
+		}
+	}
 	
 	
 	public void showGeneralView() {

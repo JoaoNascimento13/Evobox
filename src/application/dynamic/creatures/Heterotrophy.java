@@ -58,7 +58,7 @@ public class Heterotrophy extends FeedingStrategy  {
 	private void clearTargetAndGoal() {
 		creature.goal = null;
 		creature.targetCreature = null;
-		creature.nextGoalChange = MapStateSingleton.getInstance().tick + 1;
+		creature.nextGoalChange = MapStateSingleton.getInstance().turn + 1;
 	}
 	
 	
@@ -69,13 +69,12 @@ public class Heterotrophy extends FeedingStrategy  {
 
 	@Override
 	public int getStartingFoodStorage() {
-		return 250 * creature.genome.getSize();
+		return 300 * creature.genome.getSize();
 	}
 	
 	@Override
 	public int getMaximumFoodStorage() {
-		//TODO: should take into account creature size, once implemented;
-		return 500 * creature.genome.getSize();
+		return 900 * creature.genome.getSize();
 	}
 	
 
