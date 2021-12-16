@@ -64,42 +64,45 @@ public class SexualReproductionCreatureFactory implements CreatureFactory {
 				}
 				
 				
-				int maxTurnsToReduceSpeciesChance = 10000;
-				
-				long lastTurnForSpeciesChanceReduction = mapState.turn - maxTurnsToReduceSpeciesChance;
-				
-				Species s;
-				for (int i = mapState.extinctSpecies.size()-1; i > -1; i--) {	
-					s = mapState.extinctSpecies.get(i);
+				if (genome.diet == possiblyMutatedGenome.diet) {
 					
-					if (s.extinctionTurn > lastTurnForSpeciesChanceReduction &&
-						s.baseGenome.sameAs(possiblyMutatedGenome)) {
+					int maxTurnsToReduceSpeciesChance = 5000;
+					long lastTurnForSpeciesChanceReduction = mapState.turn - maxTurnsToReduceSpeciesChance;
+					Species s;
+					for (int i = mapState.extinctSpecies.size()-1; i > -1; i--) {	
+						s = mapState.extinctSpecies.get(i);
+						
+						if (s.extinctionTurn > lastTurnForSpeciesChanceReduction &&
+							s.baseGenome.sameAs(possiblyMutatedGenome)) {
 
-						//Note: In this case, the mutated genome turned out to be similar to an extinct species.
-						//		To keep unsustainable species from reappearing and going extinct over and over,
-						//		we reduce the chance of them reappearing right after extinction.
-						//
-						// Species creation chance, based on turns since extinction:	
-						//
-						//	Turns since extinction             Chance
-						//
-						//	0                              --- 0
-						//
-						//	mapState.turn - extinctionTurn --- ?
-						//		
-						//	maxTurnsToReduceSpeciesChance  --- 1000
-						//
-						//We start from the end of the extinct species list, so more recently extinct species are checked first.
-						//We stop after the first match, regardless of result.
-						
-						int chanceOfSkippingPermilage = (int) ((1000*(mapState.turn - s.extinctionTurn))/maxTurnsToReduceSpeciesChance);
-						
-						if (randomizer.nextInt(1000) >= chanceOfSkippingPermilage) {
-							equalToExistingSpecies = true;
+							//Note: In this case, the mutated genome turned out to be similar to an extinct species.
+							//		To keep unsustainable species from reappearing and going extinct over and over,
+							//		we reduce the chance of them reappearing right after extinction.
+							//		(this does not apply to diet changes).
+							//
+							// Species creation chance, based on turns since extinction:	
+							//
+							//	Turns since extinction             Chance
+							//
+							//	0                              --- 0
+							//
+							//	mapState.turn - extinctionTurn --- ?
+							//		
+							//	maxTurnsToReduceSpeciesChance  --- 1000
+							//
+							//We start from the end of the extinct species list, so more recently extinct species are checked first.
+							//We stop after the first match, regardless of result.
+							
+							int chanceOfSkippingPermilage = (int) ((1000*(mapState.turn - s.extinctionTurn))/maxTurnsToReduceSpeciesChance);
+							
+							if (randomizer.nextInt(1000) >= chanceOfSkippingPermilage) {
+								equalToExistingSpecies = true;
+							}
+							break;
 						}
-						break;
 					}
 				}
+				
 				
 				
 				

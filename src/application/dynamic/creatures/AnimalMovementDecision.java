@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import application.core.RandomizerSingleton;
+import application.core.SettingsSingleton;
 import javafx.util.Pair;
 import application.core.Direction;
 import application.core.MapStateSingleton;
@@ -19,20 +20,22 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	}
 	
 	
+	private static int maxRange = 40;
+	
 
 	@Override
 	public Direction decideMovementDirection() {
 
 		
 		if (creature.targetCreature != null && creature.targetCreature.health == 0) {
-			creature.targetCreature = null;
+			creature.unregisterAttackerAndTarget();
 		}
 
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		if (creature.targetCreature == null || mapState.turn >= creature.nextGoalChange) {
 			creature.goal = null;
-			creature.targetCreature = null;
+			creature.unregisterAttackerAndTarget();
 		}
 		
 		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
@@ -47,7 +50,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 		}
 		
 		Creature immediateFood = null;
-		Creature immediateThreat = null;
+//		Creature immediateThreat = null;
 		Creature immediateMate = null;
 		
 		Creature adjacentCreature;
@@ -60,10 +63,10 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 					mapState.getCombatBasedTargetPriority(creature, adjacentCreature) > 0) {
 					immediateFood = adjacentCreature;
 					
-				} else if (
-						mapState.isFood(adjacentCreature, creature) && 
-						mapState.getCombatBasedTargetPriority(adjacentCreature, creature) > 0) {
-						immediateThreat = adjacentCreature;
+//				} else if (
+//						mapState.isFood(adjacentCreature, creature) && 
+//						mapState.getCombatBasedTargetPriority(adjacentCreature, creature) > 0) {
+//						immediateThreat = adjacentCreature;
 					
 				} else if (canReproduce && 
 						mapState.acceptsMating(creature, adjacentCreature, mapState.willAcceptOffSpeciesMating(creature))) {
@@ -72,36 +75,40 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			}
 		}
 		
-		if (immediateThreat != null) {
-			creature.goal = CreatureGoal.FLEE;
-			creature.targetCreature = immediateThreat;
-		} else if (immediateMate != null) {
+//		if (immediateThreat != null) {
+//			creature.goal = CreatureGoal.FLEE;
+//			creature.targetCreature = immediateThreat;
+//		} else 
+			
+		if (immediateMate != null) {
 			creature.goal = CreatureGoal.MATE;
 			creature.targetCreature = immediateMate;
 		} else if (immediateFood != null) {
 			creature.goal = CreatureGoal.FEED;
-			creature.targetCreature = immediateFood;
+			creature.registerAttackerAndTarget(immediateFood);
 		}
 		
 		
 		
 		if (creature.targetCreature == null) {
-			
-			ArrayList<Pair<Creature, Integer>> threatTargets = locateThreats();
-			Collections.shuffle(threatTargets, randomizer);
+
 			int maxThreatRate = 0;
 			int maxThreatRateInd = 0;
-			for (int i = 0; i < threatTargets.size(); i++) {
-				if (threatTargets.get(i).getValue() > maxThreatRate) {
-					maxThreatRate = threatTargets.get(i).getValue();
-					maxThreatRateInd = i;
+			ArrayList<Pair<Creature, Integer>> threatTargets = locateThreats();
+			if (threatTargets != null) {
+				Collections.shuffle(threatTargets, randomizer);
+				for (int i = 0; i < threatTargets.size(); i++) {
+					if (threatTargets.get(i).getValue() > maxThreatRate) {
+						maxThreatRate = threatTargets.get(i).getValue();
+						maxThreatRateInd = i;
+					}
 				}
 			}
 			
 			int maxFoodRate = 0;
 			int maxFoodRateInd = 0;
 			ArrayList<Pair<Creature, Integer>> foodTargets = null;
-			if (canFeed) {
+//			if (canFeed) {
 				foodTargets = locateAvailableFood();
 				Collections.shuffle(foodTargets, randomizer);
 				for (int i = 0; i < foodTargets.size(); i++) {
@@ -110,7 +117,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 						maxFoodRateInd = i;
 					}
 				}
-			}
+//			}
 
 			int maxMateRate = 0;
 			int maxMateRateInd = 0;
@@ -135,7 +142,9 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 					creature.nextGoalChange = mapState.turn + (20 * creature.genome.getActivationSpeed());
 					
 					
-				} else if (maxFoodRate == 0 || 
+				} else if (
+						((!canFeed || maxFoodRate == 0) && maxThreatRate > 0) 
+						|| 
 						maxThreatRate 
 						+ 10*creature.genome.getReactiveness() 
 						-  10*creature.genome.getAggression() 
@@ -146,9 +155,19 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 					creature.nextGoalChange = mapState.turn + (10 * creature.genome.getActivationSpeed());
 					
 				} else if (maxFoodRate > 0) {
-
-					creature.goal = CreatureGoal.FEED;
-					creature.targetCreature = foodTargets.get(maxFoodRateInd).getKey();
+					
+					if (canFeed) {
+						creature.goal = CreatureGoal.FEED;
+//						System.out.println("CreatureGoal.FEED"); 
+					} else {
+						creature.goal = CreatureGoal.WANDER;
+//						System.out.println("CreatureGoal.WANDER"); 
+						//Note: If the creature can't feed, she'll get the 'Wander' goal, 
+						//      but will still move towards food. 
+					}
+//					System.out.println("creature at: " + creature.x + ", " + creature.y); 
+//					System.out.println("target at: " + foodTargets.get(maxFoodRateInd).getKey().x + ", " + foodTargets.get(maxFoodRateInd).getKey().y); 
+					creature.registerAttackerAndTarget(foodTargets.get(maxFoodRateInd).getKey());
 					creature.nextGoalChange = mapState.turn + (10 * creature.genome.getActivationSpeed());
 				}
 			}
@@ -225,6 +244,9 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 //				" is trying to mate with " + creature.targetCreature.species.name + " " + creature.targetCreature.id + "!");
 //			System.out.println();
 //		}
+
+//		System.out.println("movement dir: " + Direction.getDirection(dirX, dirY)); 
+//		System.out.println();
 		
 		return Direction.getDirection(dirX, dirY);
 	}
@@ -233,11 +255,22 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	
 	private ArrayList <Pair <Creature, Integer>> locateAvailableFood() {
 		
-		int maxRange = 3*Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 3;
+//		int maxRange = 4*Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 4;
+		
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		Diet diet = creature.genome.diet;
+		
+		
+		int maxRangeExtensionFromNonOptimal = 20;
+		
+		int priority;
+		int distToNonOptimalFood = -1;
+		boolean optimalTargetFound = false;
+		boolean nonOptimalTargetFound = false;
+		int perpendicularDistA;
+		int perpendicularDistB;
 		
 		if (creature.genome.specificDiet == null) {
 			
@@ -249,44 +282,82 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	        //		skipping the first square (dist == 1) because we already checked adjacent tiles.
 	        
 			for (int dist = 2; dist <= maxRange; dist++) {
-				
+
+				perpendicularDistA = creature.y - dist;
+				perpendicularDistB = creature.y + dist;
 				for (int x = creature.x - dist; x <= creature.x + dist; x++) {
-					if (mapState.hasAccessibleFood(x, dist, diet, creature)) {
-						targets.add(new Pair<Creature, Integer>(
-								mapState.getCreature(x, dist), 
-								getDistanceBasedTargetPriority(dist) + 
-								mapState.getCombatBasedTargetPriority(creature, mapState.getCreature(x, dist))
-									));
+					if (mapState.hasAccessibleFood(x, perpendicularDistA, diet, creature)) {
+						priority = getFoodPriority(x, perpendicularDistA, dist);
+						if (priority > 0) {
+							if (isOptimalTarget(x, perpendicularDistA)) {
+								priority += 100000;
+								optimalTargetFound = true;
+							} else {
+								nonOptimalTargetFound = true;
+							}
+							targets.add(new Pair<Creature, Integer>(
+									mapState.getCreature(x, perpendicularDistA), priority));
+						}
 					}
-					if (mapState.hasAccessibleFood(x, -dist, diet, creature)) {
-						targets.add(new Pair<Creature, Integer>(
-								mapState.getCreature(x, -dist), 
-								getDistanceBasedTargetPriority(dist) + 
-								mapState.getCombatBasedTargetPriority(creature, mapState.getCreature(x, -dist))
-									));
+					if (mapState.hasAccessibleFood(x, perpendicularDistB, diet, creature)) {
+						priority = getFoodPriority(x, perpendicularDistB, dist);
+						if (priority > 0) {
+							if (isOptimalTarget(x, perpendicularDistB)) {
+								priority += 100000;
+								optimalTargetFound = true;
+							} else {
+								nonOptimalTargetFound = true;
+							}
+							targets.add(new Pair<Creature, Integer>(
+									mapState.getCreature(x, perpendicularDistB), priority));
+						}
 					}
 				}
+				perpendicularDistA = creature.x - dist;
+				perpendicularDistB = creature.x + dist;
 				for (int y = creature.y - dist + 1; y <= creature.y + dist - 1; y++) {
-					if (mapState.hasAccessibleFood(dist, y, diet, creature)) {
-						targets.add(new Pair<Creature, Integer>(
-								mapState.getCreature(dist, y), 
-								getDistanceBasedTargetPriority(dist) + 
-								mapState.getCombatBasedTargetPriority(creature, mapState.getCreature(dist, y))
-									));
+					if (mapState.hasAccessibleFood(perpendicularDistA, y, diet, creature)) {
+						priority = getFoodPriority(perpendicularDistA, y, dist);
+						if (priority > 0) {
+							if (isOptimalTarget(perpendicularDistA, y)) {
+								priority += 100000;
+								optimalTargetFound = true;
+							} else {
+								nonOptimalTargetFound = true;
+							}
+							targets.add(new Pair<Creature, Integer>(
+									mapState.getCreature(perpendicularDistA, y), priority));
+						}
 					}
-					if (mapState.hasAccessibleFood(-dist, y, diet, creature)) {
-						targets.add(new Pair<Creature, Integer>(
-								mapState.getCreature(-dist, y), 
-								getDistanceBasedTargetPriority(dist) + 
-								mapState.getCombatBasedTargetPriority(creature, mapState.getCreature(-dist, y))
-								));
+					if (mapState.hasAccessibleFood(perpendicularDistB, y, diet, creature)) {
+						priority = getFoodPriority(perpendicularDistB, y, dist);
+						if (priority > 0) {
+							if (isOptimalTarget(perpendicularDistB, y)) {
+								priority += 100000;
+								optimalTargetFound = true;
+							} else {
+								nonOptimalTargetFound = true;
+							}
+							targets.add(new Pair<Creature, Integer>(
+									mapState.getCreature(perpendicularDistB, y), priority));
+						}
 					}
 				}
-				//TODO: Performance allowing, maybe an intelligence stat would allow creatures to also 
-				//		analyze food farther away than the first source found, and choose the best target. 
-				if (targets.size() > 0) {
+				if (optimalTargetFound) {
 					break;
 				}
+				if (nonOptimalTargetFound) {
+					if (distToNonOptimalFood > maxRangeExtensionFromNonOptimal) {
+						break;
+					}
+					distToNonOptimalFood++;
+				}
+//				if (targets.size() > 0) {
+//					if (tilesAfterFirstChecked > tilesAfterFirstToCheck) {
+//						break;
+//					}
+//					tilesAfterFirstChecked ++;
+//				}
 			}
 			return targets;
 			
@@ -297,67 +368,98 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	}
 	
 	
+	private int getFoodPriority(int x, int y, int dist) {
+		return
+		getDistanceBasedTargetPriority(dist) + 
+		MapStateSingleton.getInstance().getCombatBasedTargetPriority(creature, MapStateSingleton.getInstance().getCreature(x, y)) +
+		getMapCenterPriorityMod(x, y);
+	}
 
 	private ArrayList <Pair <Creature, Integer>> locateThreats() {
 		
-		int maxRange = 2*Math.max(creature.genome.getPerception(), creature.genome.getReactiveness()) + 2;
-		
-		MapStateSingleton mapState = MapStateSingleton.getInstance();
-		
-        ArrayList <Pair <Creature, Integer>> threats = new ArrayList <Pair <Creature, Integer>> ();
-        
-		for (int dist = 2; dist <= maxRange; dist++) {
+		if (creature.threats.size() > 0) {
+			MapStateSingleton mapState = MapStateSingleton.getInstance();
+			ArrayList <Pair <Creature, Integer>> threats = new ArrayList <Pair <Creature, Integer>> ();
+			for (Creature c : creature.threats) {
+				int combatThreat = mapState.getCombatBasedTargetPriority(c, creature);
+				if (combatThreat > 0) {
+					int distX = Math.abs(creature.x - c.x);
+					int distY = Math.abs(creature.y - c.y);
+					int distanceThreat = Math.max(distX, distY) + Math.abs(distX - distY);
+
+					threats.add(new Pair<Creature, Integer>(c, distanceThreat + combatThreat));
+				}
+			}
 			
-			for (int x = creature.x - dist; x <= creature.x + dist; x++) {
-				
-				if (
-						
-					mapState.isThreat(creature, mapState.getCreature(x, dist))) {
-					threats.add(new Pair<Creature, Integer>(
-							mapState.getCreature(x, dist), 
-							getDistanceBasedTargetPriority(dist) + 
-							mapState.getCombatBasedTargetPriority(mapState.getCreature(x, dist), creature)
-								));
-				}
-				if (mapState.isThreat(creature, mapState.getCreature(x, -dist))) {
-					threats.add(new Pair<Creature, Integer>(
-							mapState.getCreature(x, -dist), 
-							getDistanceBasedTargetPriority(dist) + 
-							mapState.getCombatBasedTargetPriority(mapState.getCreature(x, -dist), creature)
-								));
-				}
-			}
-			for (int y = creature.y - dist + 1; y <= creature.y + dist - 1; y++) {
-				if (mapState.isThreat(creature, mapState.getCreature(dist, y))) {
-					threats.add(new Pair<Creature, Integer>(
-							mapState.getCreature(dist, y), 
-							getDistanceBasedTargetPriority(dist) + 
-							mapState.getCombatBasedTargetPriority(mapState.getCreature(dist, y), creature)
-								));
-				}
-				if (mapState.isThreat(creature, mapState.getCreature(-dist, y))) {
-					threats.add(new Pair<Creature, Integer>(
-							mapState.getCreature(-dist, y), 
-							getDistanceBasedTargetPriority(dist) + 
-							mapState.getCombatBasedTargetPriority(mapState.getCreature(-dist, y), creature)
-							));
-				}
-			}
-			//TODO: Performance allowing, maybe an intelligence stat would allow creatures to also 
-			//		analyze threats farther away than the first source found, and choose the biggest threat. 
-			if (threats.size() > 0) {
-				break;
-			}
 		}
-		return threats;
-		
+		return null;
 	}
+	
+//	private ArrayList <Pair <Creature, Integer>> locateThreats() {
+//		
+////		int maxRange = 2*Math.max(creature.genome.getPerception(), creature.genome.getReactiveness()) + 2;
+//		
+//		MapStateSingleton mapState = MapStateSingleton.getInstance();
+//		
+//        ArrayList <Pair <Creature, Integer>> threats = new ArrayList <Pair <Creature, Integer>> ();
+//        int perpendicularDistA;
+//        int perpendicularDistB;
+//		for (int dist = 2; dist <= maxRange/2; dist++) {
+//
+//			perpendicularDistA = creature.y - dist;
+//			perpendicularDistB = creature.y + dist;
+//			for (int x = creature.x - dist; x <= creature.x + dist; x++) {
+//				if (mapState.isThreat(creature, mapState.getCreature(x, perpendicularDistA))) {
+//					threats.add(new Pair<Creature, Integer>(
+//							mapState.getCreature(x, perpendicularDistA), 
+//							getDistanceBasedTargetPriority(dist)-maxRange/2 + 
+//							mapState.getCombatBasedTargetPriority(mapState.getCreature(x, perpendicularDistA), creature)
+//								));
+//				}
+//				if (mapState.isThreat(creature, mapState.getCreature(x, perpendicularDistB))) {
+//					threats.add(new Pair<Creature, Integer>(
+//							mapState.getCreature(x, perpendicularDistB), 
+//							getDistanceBasedTargetPriority(dist)-maxRange/2 + 
+//							mapState.getCombatBasedTargetPriority(mapState.getCreature(x, perpendicularDistB), creature)
+//								));
+//				}
+//			}
+//			perpendicularDistA = creature.x - dist;
+//			perpendicularDistB = creature.x + dist;
+//			for (int y = creature.y - dist + 1; y <= creature.y + dist - 1; y++) {
+//				if (mapState.isThreat(creature, mapState.getCreature(perpendicularDistA, y))) {
+//					threats.add(new Pair<Creature, Integer>(
+//							mapState.getCreature(perpendicularDistA, y), 
+//							getDistanceBasedTargetPriority(dist)-maxRange/2 + 
+//							mapState.getCombatBasedTargetPriority(mapState.getCreature(perpendicularDistA, y), creature)
+//								));
+//				}
+//				if (mapState.isThreat(creature, mapState.getCreature(perpendicularDistB, y))) {
+//					threats.add(new Pair<Creature, Integer>(
+//							mapState.getCreature(perpendicularDistB, y), 
+//							getDistanceBasedTargetPriority(dist)-maxRange/2 + 
+//							mapState.getCombatBasedTargetPriority(mapState.getCreature(perpendicularDistB, y), creature)
+//							));
+//				}
+//			}
+//			//TODO: Performance allowing, maybe an intelligence stat would allow creatures to also 
+//			//		analyze threats farther away than the first source found, and choose the biggest threat. 
+//			if (threats.size() > 0) {
+//				break;
+//			}
+//		}
+//		return threats;
+//		
+//	}
 	
 	
 
 	private ArrayList <Pair <Creature, Integer>> locateMates() {
 
-		int maxRange = 4*creature.genome.getPerception() + 4;
+//		int maxRange = 4*creature.genome.getPerception() + 4;
+
+		int tilesAfterFirstToCheck = 4;
+		int tilesAfterFirstChecked = 0;
 		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
@@ -365,53 +467,119 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 		
 		
         ArrayList <Pair <Creature, Integer>> mates = new ArrayList <Pair <Creature, Integer>> ();
-        
+        int perpendicularDistA;
+        int perpendicularDistB;
 		for (int dist = 2; dist <= maxRange; dist++) {
-			
+
+			perpendicularDistA = creature.y - dist;
+			perpendicularDistB = creature.y + dist;
 			for (int x = creature.x - dist; x <= creature.x + dist; x++) {
 				
 				if (
-					mapState.acceptsMating(creature, mapState.getCreature(x, dist), willAcceptOffSpeciesMating)) {
+					mapState.acceptsMating(creature, mapState.getCreature(x, perpendicularDistA), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
-							mapState.getCreature(x, dist), 
-							getDistanceBasedTargetPriority(dist)
+							mapState.getCreature(x, perpendicularDistA), 
+							getDistanceBasedTargetPriority(dist) +
+							getMapCenterPriorityMod(x, perpendicularDistA)
 								));
 				}
-				if (mapState.acceptsMating(creature, mapState.getCreature(x, -dist), willAcceptOffSpeciesMating)) {
+				if (mapState.acceptsMating(creature, mapState.getCreature(x, perpendicularDistB), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
-							mapState.getCreature(x, -dist), 
-							getDistanceBasedTargetPriority(dist)
+							mapState.getCreature(x, perpendicularDistB), 
+							getDistanceBasedTargetPriority(dist) +
+							getMapCenterPriorityMod(x, perpendicularDistB)
 								));
 				}
 			}
+			perpendicularDistA = creature.x - dist;
+			perpendicularDistB = creature.x + dist;
 			for (int y = creature.y - dist + 1; y <= creature.y + dist - 1; y++) {
-				if (mapState.acceptsMating(creature, mapState.getCreature(dist, y), willAcceptOffSpeciesMating)) {
+				if (mapState.acceptsMating(creature, mapState.getCreature(perpendicularDistA, y), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
-							mapState.getCreature(dist, y), 
-							getDistanceBasedTargetPriority(dist)
+							mapState.getCreature(perpendicularDistA, y), 
+							getDistanceBasedTargetPriority(dist) +
+							getMapCenterPriorityMod(perpendicularDistA, y)
 								));
 				}
-				if (mapState.acceptsMating(creature, mapState.getCreature(-dist, y), willAcceptOffSpeciesMating)) {
+				if (mapState.acceptsMating(creature, mapState.getCreature(perpendicularDistB, y), willAcceptOffSpeciesMating)) {
 					mates.add(new Pair<Creature, Integer>(
-							mapState.getCreature(-dist, y), 
-							getDistanceBasedTargetPriority(dist)
+							mapState.getCreature(perpendicularDistB, y), 
+							getDistanceBasedTargetPriority(dist) +
+							getMapCenterPriorityMod(perpendicularDistB, y)
 							));
 				}
 			}
-			//TODO: Performance allowing, maybe an intelligence stat would allow creatures to also 
-			//		analyze threats farther away than the first source found, and choose the biggest threat. 
 			if (mates.size() > 0) {
-				break;
+				if (tilesAfterFirstChecked > tilesAfterFirstToCheck) {
+					break;
+				}
+				tilesAfterFirstChecked ++;
 			}
 		}
 		return mates;
 	}
 	
+
+
+	private int getMapCenterPriorityMod(int targetX, int targetY) {
+		int mod = 0;
+		if ((targetX < creature.x && creature.x < SettingsSingleton.getInstance().mapCellsX/5) || 
+			(targetX > creature.x && creature.x > 3*SettingsSingleton.getInstance().mapCellsX/5)){
+			
+		} else {
+			mod += 50;
+		}
+		if ((targetY < creature.y && creature.y < SettingsSingleton.getInstance().mapCellsY/5) || 
+			(targetY > creature.y && creature.y > 4*SettingsSingleton.getInstance().mapCellsY/5)){
+				
+		} else {
+			mod += 50;
+		}
+		return mod;
+	}
+
+
+	private boolean isOptimalTarget(int x, int y) {
+		return (isOptimalBasedOnMapPosition(x, y) && isOptimalBasedOnCompetingAttackers(x, y));
+	}
 	
+	
+	private boolean isOptimalBasedOnMapPosition(int x, int y) {
+		
+		if ((x < creature.x && creature.x < SettingsSingleton.getInstance().mapCellsX/5) || 
+			(x > creature.x && creature.x > 4*SettingsSingleton.getInstance().mapCellsX/5)){
+			return false;
+			
+		} else if ((x == creature.x && creature.x < SettingsSingleton.getInstance().mapCellsX/8) || 
+				   (x == creature.x && creature.x > 7*SettingsSingleton.getInstance().mapCellsX/8)){
+					
+			return false;
+		}
+		
+		if ((y < creature.y && creature.y < SettingsSingleton.getInstance().mapCellsY/5) || 
+			(y > creature.y && creature.y > 4*SettingsSingleton.getInstance().mapCellsY/5)){
+			return false;
+			
+		} else if ((y == creature.y && creature.y < SettingsSingleton.getInstance().mapCellsY/8) || 
+				   (y == creature.y && creature.y > 7*SettingsSingleton.getInstance().mapCellsY/8)){
+					
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isOptimalBasedOnCompetingAttackers(int x, int y) {
+		for (Creature c : MapStateSingleton.getInstance().getCreature(x, y).threats) {
+			if (c.id != creature.id) {
+				return false;
+			}
+		}
+		return true;
+	}
 	
 	
 	public int getDistanceBasedTargetPriority(int distance) {
-		return (100-10*distance);
+		return 10*(maxRange-distance);
 	}
 
 	@Override

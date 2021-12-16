@@ -63,10 +63,10 @@ public class SexualReproduction extends ReproductionStrategy  {
 					reproduce(tick, partner, spawnPoints);
 					
 					
-					if (creature.genome.diet == Diet.HERBIVOROUS && partner.species.id == creature.species.id) {
-						System.out.println("Two herbivores mated!");
-						System.out.println();
-					}
+//					if (creature.genome.diet == Diet.HERBIVOROUS && partner.species.id == creature.species.id) {
+//						System.out.println("Two herbivores mated!");
+//						System.out.println();
+//					}
 							
 				}
 			}
@@ -201,7 +201,7 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	public int getMaxReproductionCooldown() {
 		int expectedReproductionEvents = creature.genome.getTotalChildren() / creature.genome.getChildrenPerBirth();
-		return (creature.genome.getMaxAge() / (2*expectedReproductionEvents));
+		return (creature.genome.getMaxAge() / (1+expectedReproductionEvents));
 	}
 
 	public void setRandomReproductionCooldown() {

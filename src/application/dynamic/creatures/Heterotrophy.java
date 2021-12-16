@@ -52,29 +52,30 @@ public class Heterotrophy extends FeedingStrategy  {
 	
 
 	private void consumeTarget() {
-		creature.food += 200 * creature.targetCreature.genome.getSize();
+		creature.food += 200 * creature.genome.diet.getFoodEfficiencyCoef() * creature.targetCreature.genome.getSize();
 	}
 
 	private void clearTargetAndGoal() {
+		creature.unregisterAttackerAndTarget();
 		creature.goal = null;
-		creature.targetCreature = null;
 		creature.nextGoalChange = MapStateSingleton.getInstance().turn + 1;
 	}
 	
 	
 	@Override
 	public int getFoodNeededPerTickModifier() {
-		return creature.genome.getSize();
+		return creature.genome.diet.getFoodEfficiencyCoef() * creature.genome.getSize();
 	}
 
 	@Override
 	public int getStartingFoodStorage() {
-		return 300 * creature.genome.getSize();
+		return 300 * creature.genome.diet.getFoodEfficiencyCoef() * creature.genome.getSize();
 	}
 	
 	@Override
 	public int getMaximumFoodStorage() {
-		return 900 * creature.genome.getSize();
+		
+		return 900 * creature.genome.diet.getFoodEfficiencyCoef() * creature.genome.getSize();
 	}
 	
 

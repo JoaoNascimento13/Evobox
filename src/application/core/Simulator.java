@@ -62,12 +62,12 @@ public class Simulator {
 		settings.setMapSize(320, 320);
 		settings.setPeriodicRecordings(0);
 		
-	    settings.setPlantBirthsPerMutation(200);
-	    settings.setPlantMutationsPerDietChange(80);
-	    settings.setPlantMutationsPerSizeChange(40);
+	    settings.setPlantBirthsPerMutation(50);
+	    settings.setPlantMutationsPerDietChange(200);
+	    settings.setPlantMutationsPerSizeChange(100);
 
-	    settings.setAnimalBirthsPerMutation(10);
-	    settings.setAnimalMutationsPerDietChange(2);
+	    settings.setAnimalBirthsPerMutation(20);
+	    settings.setAnimalMutationsPerDietChange(5);
 	    settings.setAnimalMutationsPerSizeChange(50);
 	    
 		MapStateSingleton.getInstance().initialize();

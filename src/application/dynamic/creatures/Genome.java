@@ -351,6 +351,8 @@ public class Genome implements Serializable {
 		case HERBIVOROUS:
 			if (RandomizerSingleton.getInstance().nextBoolean()) {
 				diet = Diet.CARNIVOROUS;
+				upgradeStatsToCarnivorous();
+				reduceStatsInNeeded();
 			} else {
 				diet = Diet.PHOTOSYNTHESIS;
 				convertStatsToPlant();
@@ -382,6 +384,12 @@ public class Genome implements Serializable {
 		setAggression(Math.max(aggression, 1));
 		setReactiveness(Math.max(reactiveness, 1));
 		setAttackDamage(Math.max(attack, 1));
+	}
+	public void upgradeStatsToCarnivorous() {
+		setSpeed(Math.min(speed+1, 10));
+		setPerception(Math.min(perception+1, 10));
+		setAggression(Math.min(aggression+1, 10));
+		setAttackDamage(Math.min(attack+1, 10));
 	}
 	
 	
@@ -498,22 +506,22 @@ public class Genome implements Serializable {
 
 
 	public int getFoodNeededPerTick() {
-		return this.size+1;
+		return size+1;
 	}
 	public int getActivationSpeed() {
-		return this.speed;
+		return speed;
 	}
 	public int getMaxHealth() {
-		return this.toughness;
+		return toughness;
 	}
 	public int getMaxAge() {
-		return (this.ageExpectancy*1500);
+		return (ageExpectancy*1500);
 	}
 	public int getTotalChildren() {
-		return ((this.fertility*2)+4);
+		return ((fertility+1)*diet.getFertilityCoef());
 	}
 	public int getChildrenPerBirth() {
-		return this.clutchSize+1;
+		return clutchSize+1;
 	}
 	
 

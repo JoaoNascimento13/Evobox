@@ -38,4 +38,30 @@ public enum Diet {
 			return "-fx-accent: black;";
     	}
 	}
+
+	int getFoodEfficiencyCoef() {
+    	switch(this) {
+		case PHOTOSYNTHESIS:
+			return 1;
+		case HERBIVOROUS:
+			return  1;
+		case CARNIVOROUS:
+			return  4;
+		default:
+			return 1;
+    	}
+	}
+
+	int getFertilityCoef() {
+    	switch(this) {
+		case PHOTOSYNTHESIS:
+			return 3;
+		case HERBIVOROUS:
+			return  2;
+		case CARNIVOROUS:
+			return  1;
+		default:
+			return 1;
+    	}
+	}
 }

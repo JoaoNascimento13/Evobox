@@ -1,6 +1,7 @@
 package application.dynamic.creatures;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import application.core.RandomizerSingleton;
 import application.core.Direction;
@@ -18,7 +19,8 @@ public class Creature implements Serializable  {
 	public int y;
 	
 	private int obstacleAvoidanceRotation; //1 to rotate clockwise, -1 to rotate counterclockwise
-	
+
+	public ArrayList<Creature> threats;
 	
 	public long nextActivation;
 	
@@ -44,6 +46,7 @@ public class Creature implements Serializable  {
 	public Creature (int x, int y) {
 		this.x = x;
 		this.y = y;
+		threats = new ArrayList<Creature>(); 
 	}
 	
 	
@@ -52,6 +55,7 @@ public class Creature implements Serializable  {
 	public FeedingStrategy feedingStrategy;
 
 	public ReproductionStrategy reproductionStrategy;
+
 	
 	
 	
@@ -394,6 +398,23 @@ public class Creature implements Serializable  {
 
 
 
+	public void registerAttackerAndTarget(Creature targetCreature) {
+		this.targetCreature = targetCreature;
+		targetCreature.threats.add(this);
+	}
+
+	public void unregisterAttackerAndTarget() {
+		if (this.targetCreature != null) {
+			for (int i = 0; i < this.targetCreature.threats.size(); i++) {
+				if (this.targetCreature.threats.get(i).id == this.id) {
+					this.targetCreature.threats.remove(i);
+					i--;
+				}
+			}
+			this.targetCreature = null;
+		}
+	}
+	
 
 
 }
