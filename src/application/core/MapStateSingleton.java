@@ -231,7 +231,11 @@ public class MapStateSingleton {
     public boolean hasAccessibleFood(int x, int y, Diet diet, Creature attacker) {
     	try {
 			Creature target = getCreature(x, y);
-			return isFood(attacker, target);
+			if (isTargetDetectedByObserver(attacker, target)) {
+				return isFood(attacker, target);
+			} else {
+				return false;
+			}
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return false;
 		}
@@ -309,6 +313,22 @@ public class MapStateSingleton {
 			return -99;
 		}
     }
+    public boolean isTargetDetectedByObserver(Creature observer, Creature target) {
+    	if (target == null) {
+    		return false;
+    	}
+    	int perception = observer.genome.getPerception();
+    	if (perception == 0) {
+    		return false;
+    	}
+    	int stealth = target.genome.getStealth();
+    	if (stealth == 0) {
+    		return true;
+    	}
+		return (RandomizerSingleton.getInstance().nextInt(perception+1) > RandomizerSingleton.getInstance().nextInt(stealth+1));
+    }
+    
+    
     public void clearCreature(Creature creature) {
     	creatureMap[creature.x][creature.y] = null;
     }

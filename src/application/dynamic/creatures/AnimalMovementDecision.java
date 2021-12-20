@@ -381,13 +381,15 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 			MapStateSingleton mapState = MapStateSingleton.getInstance();
 			ArrayList <Pair <Creature, Integer>> threats = new ArrayList <Pair <Creature, Integer>> ();
 			for (Creature c : creature.threats) {
-				int combatThreat = mapState.getCombatBasedTargetPriority(c, creature);
-				if (combatThreat > 0) {
-					int distX = Math.abs(creature.x - c.x);
-					int distY = Math.abs(creature.y - c.y);
-					int distanceThreat = Math.max(distX, distY) + Math.abs(distX - distY);
+				if (mapState.isTargetDetectedByObserver(creature, c)) {
+					int combatThreat = mapState.getCombatBasedTargetPriority(c, creature);
+					if (combatThreat > 0) {
+						int distX = Math.abs(creature.x - c.x);
+						int distY = Math.abs(creature.y - c.y);
+						int distanceThreat = Math.max(distX, distY) + Math.abs(distX - distY);
 
-					threats.add(new Pair<Creature, Integer>(c, distanceThreat + combatThreat));
+						threats.add(new Pair<Creature, Integer>(c, distanceThreat + combatThreat));
+					}
 				}
 			}
 			
