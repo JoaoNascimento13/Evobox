@@ -10,6 +10,7 @@ import application.dynamic.creatures.Creature;
 import application.dynamic.creatures.Species;
 import application.dynamic.factories.PreexistingCreatureFactory;
 import application.dynamic.factories.SpeciesFactory;
+import application.dynamic.flow.DirectionalFlowGenerator;
 import application.dynamic.flow.FlowGenerator;
 import application.dynamic.flow.PulsePointFlowGenerator;
 import application.gui.SimulatorController;
@@ -106,12 +107,26 @@ public class Simulator {
 		
 		
 		ArrayList<FlowGenerator> flowGenerators = MapStateSingleton.getInstance().flowGenerators;
-		
-		for (int i = 0; i < 10; i++) {
 
+//		DirectionalFlowGenerator
+//		PulsePointFlowGenerator
+		
+		for (int i = 0; i < 8; i++) {
+			
 			flowGenerators.add(new PulsePointFlowGenerator(
 					200, 
 					8+randomizer.nextInt(3), 
+					new Point(randomizer.nextInt(settings.mapCellsX), randomizer.nextInt(settings.mapCellsY)), 
+					randomizer.nextInt(21)-10, 
+					randomizer.nextBoolean(), 
+					Direction.random(randomizer)));
+		}
+
+		for (int i = 0; i < 8; i++) {
+			
+			flowGenerators.add(new DirectionalFlowGenerator(
+					100, 
+					10, 
 					new Point(randomizer.nextInt(settings.mapCellsX), randomizer.nextInt(settings.mapCellsY)), 
 					randomizer.nextInt(21)-10, 
 					randomizer.nextBoolean(), 

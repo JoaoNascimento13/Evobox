@@ -10,7 +10,7 @@ import java.awt.Point;
 import java.io.Serializable;
 
 
-public abstract class FlowGenerator  implements Cloneable, Serializable {
+public abstract class FlowGenerator  implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	
