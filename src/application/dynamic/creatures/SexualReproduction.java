@@ -91,9 +91,12 @@ public class SexualReproduction extends ReproductionStrategy  {
 	
 	public void reproduce (long tick, Creature partner, ArrayList<Point> spawnPoints) {
 		
+		int turnsForPlantToSprout = 200;
+		
 		SexualReproductionCreatureFactory factory = new SexualReproductionCreatureFactory();
 		
 		factory.setParents(creature, partner);
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		for (Point p : spawnPoints) {
 
@@ -101,9 +104,24 @@ public class SexualReproduction extends ReproductionStrategy  {
 			
 			Creature spawn = factory.createCreature(tick);
 			
-			MapStateSingleton.getInstance().queueCreatureRegister(spawn);
+			mapState.queueCreatureRegister(spawn);
 			
-			MapStateSingleton.getInstance().setCreatureInPoint(spawn);
+			if (spawn.genome.diet == Diet.PHOTOSYNTHESIS) {
+				
+				spawn.goal = CreatureGoal.SPROUT;
+				spawn.setNextActivation(tick + turnsForPlantToSprout*spawn.ticksPerTurn());
+
+//				System.out.println("Creature queing for sprouting on turn: " + (tick + turnsForPlantToSprout*spawn.ticksPerTurn()));
+				
+			} else {
+				MapStateSingleton.getInstance().setCreatureInPoint(spawn);
+
+				mapState.addCreatureToSpecies(spawn);
+				
+				
+//				System.out.println("Creature spawned immediately!" + this);
+			}
+			
 			
 			creature.numberOfOffspring++;
 			

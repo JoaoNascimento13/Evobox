@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 
 import application.dynamic.creatures.Creature;
+import application.dynamic.creatures.CreatureGoal;
 import application.dynamic.creatures.Species;
 import application.dynamic.factories.PreexistingCreatureFactory;
 import application.dynamic.factories.SpeciesFactory;
@@ -67,7 +68,7 @@ public class Simulator {
 	    settings.setPlantMutationsPerDietChange(200);
 	    settings.setPlantMutationsPerSizeChange(100);
 
-	    settings.setAnimalBirthsPerMutation(20);
+	    settings.setAnimalBirthsPerMutation(10);
 	    settings.setAnimalMutationsPerDietChange(5);
 	    settings.setAnimalMutationsPerSizeChange(50);
 	    
@@ -88,15 +89,15 @@ public class Simulator {
 		preexistingCreatureFactory.setStarterSpecies(originalSpecies);
 		
 		for (int i = 0; i < 10000; i++) {
-
-//			Species originalSpecies = new SpeciesFactory().createSpecies(settings.getStarterGenome(), null, -1, -1);
-//			originalSpecies.parent = originalSpecies;
-//			preexistingCreatureFactory.setStarterSpecies(originalSpecies);
-			
-			
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
+		for (int i = 0; i < 80000; i++) {
+			populateWorldWithSprout(preexistingCreatureFactory.createCreature(0));
+		}
 
+		
+		
+		
 		Species originalSpeciesB = new SpeciesFactory().createSpecies(settings.getStarterGenome(), null, -1, -1);
 		originalSpeciesB.parent = originalSpeciesB;
 		preexistingCreatureFactory.setStarterSpecies(originalSpeciesB);
@@ -104,6 +105,13 @@ public class Simulator {
 		for (int i = 0; i < 10000; i++) {
 			populateWorldWithCreature(preexistingCreatureFactory.createCreature(0));
 		}
+		for (int i = 0; i < 80000; i++) {
+			populateWorldWithSprout(preexistingCreatureFactory.createCreature(0));
+		}
+		
+		
+		
+		
 		
 		
 		ArrayList<FlowGenerator> flowGenerators = MapStateSingleton.getInstance().flowGenerators;
@@ -146,11 +154,21 @@ public class Simulator {
 	
 
 	public void populateWorldWithCreature(Creature creature) {
-		MapStateSingleton.getInstance().registerCreature(creature);
-		MapStateSingleton.getInstance().setCreatureInPoint(creature);
-		
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		mapState.registerCreature(creature);
+		mapState.setCreatureInPoint(creature);
+		mapState.addCreatureToSpecies(creature);
 	}
-	
+
+	public void populateWorldWithSprout(Creature creature) {
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
+		int turnsForPlantToSprout = 200;
+
+		mapState.registerCreature(creature);
+		creature.goal = CreatureGoal.SPROUT;
+		creature.setNextActivation(mapState.turn + randomizer.nextInt(turnsForPlantToSprout*creature.ticksPerTurn()));
+	}
 	
 	
 	public void animate() {

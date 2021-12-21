@@ -7,6 +7,7 @@ import application.dynamic.creatures.Creature;
 import application.dynamic.creatures.Diet;
 import application.dynamic.creatures.Species;
 import application.dynamic.flow.FlowGenerator;
+import application.gui.SceneManagerSingleton;
 
 public class MapStateSingleton {
 
@@ -105,21 +106,21 @@ public class MapStateSingleton {
     	nextCreatureId++;
     	activeCreatures.add(creature);
     	
+    }
+    
+    public void addCreatureToSpecies(Creature creature) {
     	creature.species.currentMembers++;
     	creature.species.totalMembers++;
     	creature.species.members.add(creature);
-    	
     	creature.numberInSpecies = creature.species.totalMembers;
-    	
     	if (creature.mutated) {
-//    		mapState.focusedCreature = creature;
-//    		mapState.refreshFocusedCreature = true;
-    		
         	creature.species.currentMutatedMembers++;
     	}
-		
+    	if (!creature.species.addedToOverview) {
+    		SceneManagerSingleton.getInstance().simulatorController.addSpeciesToOverview(creature.species);
+    		creature.species.addedToOverview = true;
+    	}
     }
-    
 
     public void registerSpecies(Species species) {
     	species.id = nextSpeciesId;

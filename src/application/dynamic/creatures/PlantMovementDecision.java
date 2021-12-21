@@ -18,12 +18,8 @@ public class PlantMovementDecision extends MovementDecisionStrategy  {
 
 	@Override
 	public Direction decideMovementDirection() {
-
-//		OutdatedPositionsSingleton outdatedPositions = OutdatedPositionsSingleton.getInstance();
-
-
-//		int lastPixelX = SettingsSingleton.getInstance().mapCellsX-1;
-//		int lastPixelY = SettingsSingleton.getInstance().mapCellsY-1;;
+		
+		creature.goal = CreatureGoal.FLOAT;
 
 		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
@@ -35,8 +31,6 @@ public class PlantMovementDecision extends MovementDecisionStrategy  {
 		
 		if (randomizer.nextInt(100) < Math.abs(flowMap[creature.x][creature.y].x)) {
 			
-//			outdatedPositions.addCreaturePosition(creature.x, creature.y);
-			
 			if (flowMap[creature.x][creature.y].x > 0) {
 				dirX = 1;
 			} else if (flowMap[creature.x][creature.y].x < 0) {
@@ -47,24 +41,30 @@ public class PlantMovementDecision extends MovementDecisionStrategy  {
 		
 		if (randomizer.nextInt(100) < Math.abs(flowMap[creature.x][creature.y].y)) {
 			
-//			outdatedPositions.addCreaturePosition(creature.x, creature.y);
-			
 			if (flowMap[creature.x][creature.y].y > 0) {
 				dirY = 1;
 			} else if (flowMap[creature.x][creature.y].y < 0) {
 				dirY = -1;
 			}
 		}
-		
-		creature.goal = CreatureGoal.FLOAT;
-		
 		return Direction.getDirection(dirX, dirY);
-		
-		
-		
 	}
-
-
+	
+	
+	
+	public Direction decideSproutingDirection() {
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		if (mapState.isAvailable(creature.x, creature.y)) {
+			return Direction.NONE;
+		}
+		for (Direction dir : Direction.randomArrayList(RandomizerSingleton.getInstance())) {
+			if (mapState.isAvailable(creature.x+dir.x, creature.y+dir.y)) {
+				return dir;
+			}
+		}
+		return null;
+	}
+	
 
 	@Override
 	public CreatureGoal getStartingGoal() {

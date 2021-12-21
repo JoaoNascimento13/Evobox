@@ -1,6 +1,5 @@
 package application.dynamic.creatures;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -20,7 +19,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	}
 	
 	
-	private static int maxRange = 40;
+	private static int maxRangeBase = 10;
 	
 
 	@Override
@@ -257,13 +256,13 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 		
 //		int maxRange = 4*Math.max(creature.genome.getPerception(), creature.genome.getAggression()) + 4;
 		
-		
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		Diet diet = creature.genome.diet;
+
+		int maxRange = maxRangeBase * diet.getFoodDetectionCoef();
 		
-		
-		int maxRangeExtensionFromNonOptimal = 20;
+		int maxRangeExtensionFromNonOptimal = maxRange/2;
 		
 		int priority;
 		int distToNonOptimalFood = -1;
@@ -466,7 +465,8 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 		MapStateSingleton mapState = MapStateSingleton.getInstance();
 		
 		boolean willAcceptOffSpeciesMating = mapState.willAcceptOffSpeciesMating(creature);
-		
+
+		int maxRange = maxRangeBase * creature.genome.diet.getFoodDetectionCoef();
 		
         ArrayList <Pair <Creature, Integer>> mates = new ArrayList <Pair <Creature, Integer>> ();
         int perpendicularDistA;
@@ -581,6 +581,7 @@ public class AnimalMovementDecision extends MovementDecisionStrategy  {
 	
 	
 	public int getDistanceBasedTargetPriority(int distance) {
+		int maxRange = maxRangeBase * creature.genome.diet.getFoodDetectionCoef();
 		return 10*(maxRange-distance);
 	}
 

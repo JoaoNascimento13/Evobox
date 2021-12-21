@@ -5,8 +5,6 @@ import java.util.ArrayList;
 
 import application.core.MapStateSingleton;
 import application.core.RandomizerSingleton;
-import application.gui.SceneManagerSingleton;
-import application.gui.SimulatorController;
 import javafx.scene.paint.Color;
 
 public class Species implements Serializable {
@@ -33,6 +31,7 @@ public class Species implements Serializable {
 
 	public transient ArrayList<Creature> members;
 	
+	public boolean addedToOverview;
 	
 	public Species() {
 		currentMembers = 0;
@@ -40,6 +39,7 @@ public class Species implements Serializable {
 		extinctionTurn = -1;
 		children = new ArrayList<Species>();
 		members = new ArrayList<Creature>();
+		addedToOverview = false;
 	}
 	
 	

@@ -205,6 +205,9 @@ public class Renderer {
 			
 			int creatureColor;
 			for (Creature c : mapState.activeCreatures) {
+				if (!c.isActive()) {
+					continue;
+				}
 				if (mapState.getSpeciesHighlight() && 
 					mapState.getFocusedSpecies() != null && 
 					mapState.getFocusedSpecies().id == c.species.id) {

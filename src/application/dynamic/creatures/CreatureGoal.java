@@ -7,8 +7,9 @@ public enum CreatureGoal {
 	FLEE ("Running from a threat."),
 	WANDER ("Wandering around."), 
 	
-	FLOAT ("Floating in the currents.");
-
+	FLOAT ("Floating in the currents."),
+	SPROUT ("About to sprout...");
+	
     public String description;
 	private CreatureGoal(String name) {
 		this.description = name;
@@ -19,6 +20,13 @@ public enum CreatureGoal {
 			return true;
 		} else {
 			return false;
+		}
+	}
+	public boolean isActive() {
+		if (this == SPROUT) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 }

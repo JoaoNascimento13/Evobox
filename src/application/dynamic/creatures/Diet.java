@@ -39,12 +39,23 @@ public enum Diet {
     	}
 	}
 
+	int getFoodDetectionCoef() {
+    	switch(this) {
+		case HERBIVOROUS:
+			return  1;
+		case CARNIVOROUS:
+			return  4;
+		default:
+			return 1;
+    	}
+	}
+
 	int getFoodEfficiencyCoef() {
     	switch(this) {
 		case PHOTOSYNTHESIS:
 			return 1;
 		case HERBIVOROUS:
-			return  1;
+			return  2;
 		case CARNIVOROUS:
 			return  4;
 		default:
@@ -55,7 +66,7 @@ public enum Diet {
 	int getFertilityCoef() {
     	switch(this) {
 		case PHOTOSYNTHESIS:
-			return 3;
+			return 6;
 		case HERBIVOROUS:
 			return  2;
 		case CARNIVOROUS:

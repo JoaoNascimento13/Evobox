@@ -7,8 +7,6 @@ import application.core.RandomizerSingleton;
 import application.core.Direction;
 import application.core.MapStateSingleton;
 import application.core.OutdatedPositionsSingleton;
-import application.core.SettingsSingleton;
-import application.core.Simulator;
 import application.gui.SceneManagerSingleton;
 
 public class Creature implements Serializable  {
@@ -94,13 +92,25 @@ public class Creature implements Serializable  {
 	}
 
 
+	public boolean isActive() {
+		if (goal == null || goal.isActive()) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	public void age() {
-		this.age += ticksPerTurn();
+		if (isActive()) {
+			this.age += ticksPerTurn();
+		}
 	}
 	public void useFood() {
-		this.food -= ticksPerTurn() * 
+		if (isActive()) {
+			this.food -= ticksPerTurn() * 
 					 genome.getFoodNeededPerTick() * 
 					 feedingStrategy.getFoodNeededPerTickModifier();
+		}
 	}
 
 
@@ -177,14 +187,28 @@ public class Creature implements Serializable  {
 	
 	public void move() {
 		
-		Direction dir = this.movementDecisionStrategy.decideMovementDirection();
+		if (isActive()) {
 
-		moveInDir(dir);
+			Direction dir = this.movementDecisionStrategy.decideMovementDirection();
+
+			moveInDir(dir);
+			
+		} else {
+
+			Direction dir = ((PlantMovementDecision) this.movementDecisionStrategy).decideSproutingDirection();
+			if (dir == null) {
+				//Do nothing for now, try again next activation.
+			} else {
+//				System.out.println("Creature sprouted!" + this);
+				sprout(dir);
+			}
+			
+		}
 	}
 
 
 
-	public void feed() {
+	private void feed() {
 		
 		this.feedingStrategy.exposeToFeeding();
 		
@@ -202,10 +226,19 @@ public class Creature implements Serializable  {
 	
 	
 	
+	public void sprout(Direction dir) {
+
+		this.x += dir.x;
+		this.y += dir.y;
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		mapState.setCreatureInPoint(this);
+		
+		mapState.addCreatureToSpecies(this);
+		
+		goal = CreatureGoal.FLOAT;
+	}
 	
-//	public boolean canMoveInDir(Direction dir, MapStateSingleton mapState) {
-//		return (mapState.isAvailable(x + dir.x, y + dir.y);
-//	}
 	
 	
 	public void moveInDir(Direction mainDir) {
@@ -213,8 +246,6 @@ public class Creature implements Serializable  {
 		if (mainDir == Direction.NONE) {
 			return;
 		}
-		
-//		System.out.println("moveInDir: " + this);
 		
 		RandomizerSingleton randomizer = RandomizerSingleton.getInstance();
 		
@@ -225,8 +256,6 @@ public class Creature implements Serializable  {
 		
 		if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
 			
-
-//			System.out.println("can't move in dir: " + movementDir);
 			
 			if (obstacleAvoidanceRotation == 0) {
 				obstacleAvoidanceRotation = (2*randomizer.nextInt(2))-1;
@@ -237,16 +266,10 @@ public class Creature implements Serializable  {
 				movementDir = movementDir.clockwise();
 				
 				if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
-
-//					System.out.println("can't move in dir: " + movementDir);
 					
 					movementDir = movementDir.clockwise();
 					
 					if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
-
-//						System.out.println("can't move in dir: " + movementDir);
-						
-						
 						
 						//If we can't move in a perpendicular direction to the original, 
 						//we'll stop on this turn and move on the opposite direction on the next
@@ -261,18 +284,11 @@ public class Creature implements Serializable  {
 				movementDir = movementDir.counterClockwise();
 				
 				if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
-
-
-//					System.out.println("can't move in dir: " + movementDir);
 					
 					
 					movementDir = movementDir.counterClockwise();
 					
 					if (!mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
-
-
-//						System.out.println("can't move in dir: " + movementDir);
-						
 						
 						//If we can't move in a perpendicular direction to the original, 
 						//we'll stop on this turn and move on the opposite direction on the next
@@ -285,21 +301,9 @@ public class Creature implements Serializable  {
 			
 		} else {
 			obstacleAvoidanceRotation = 0;
-
-//			System.out.println("can move in main dir: " + movementDir);
-			
-			
 		}
 		
 		if (movementDir != Direction.NONE) {
-
-//			System.out.println("moving in dir: " + movementDir);
-			
-//			if (mapState.isAvailable(this.x+movementDir.x, this.y+movementDir.y)) {
-//				System.out.println("is available");
-//			} else {
-//				System.out.println("IS NOT AVAILABLE");
-//			}
 			
 			OutdatedPositionsSingleton.getInstance().addCreaturePosition(x, y);
 			mapState.clearCreature(this);
@@ -310,15 +314,8 @@ public class Creature implements Serializable  {
 			mapState.setCreatureInPoint(this);
 			
 			if (mapState.getCreatureTracking() && mapState.getFocusedCreatureId() == this.id) {
-				
-//				if (this.x < 17 || this.x > SettingsSingleton.getInstance().mapCellsX - 17 || 
-//					this.y < 17 || this.y > SettingsSingleton.getInstance().mapCellsY - 17) {
-//					SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.centerIn(this.x, this.y);
-//				} else {
-					SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.moveInDir(movementDir);
-//				}
+				SceneManagerSingleton.getInstance().renderer.activeMapScrollPane.moveInDir(movementDir);
 			}
-			
 		}
 	}
 	

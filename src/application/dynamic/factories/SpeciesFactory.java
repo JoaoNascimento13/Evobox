@@ -3,7 +3,6 @@ package application.dynamic.factories;
 import application.core.MapStateSingleton;
 import application.dynamic.creatures.Genome;
 import application.dynamic.creatures.Species;
-import application.gui.SceneManagerSingleton;
 
 public class SpeciesFactory {
 	
@@ -16,10 +15,8 @@ public class SpeciesFactory {
 		species.setName();
 		species.setBaseGenome(genome);
 		species.setColor();
-
 		
 		MapStateSingleton.getInstance().registerSpecies(species);
-		SceneManagerSingleton.getInstance().simulatorController.addSpeciesToOverview(species);
 		
 		species.parent = parentSpecies;
 		

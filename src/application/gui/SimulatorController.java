@@ -264,7 +264,7 @@ public class SimulatorController {
 			Creature chosenCreature = null;
 			while (true) {
 				c = creatures.get(i);
-				if (c.species.id == targetSpeciesId) {
+				if (c.species.id == targetSpeciesId && c.isActive()) {
 					chosenCreature = c;
 					break;
 				}
@@ -369,6 +369,7 @@ public class SimulatorController {
 				}
 			}
 			
+			generalView.getParent().layout();
 		}
 	}
 	
@@ -404,7 +405,6 @@ public class SimulatorController {
 		    	fillCreatureGenomeLabelDetails(creature);
 		    }
 		});
-		
 	}
 	
 
