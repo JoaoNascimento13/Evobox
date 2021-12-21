@@ -5,6 +5,7 @@ import java.util.Random;
 
 import application.core.Lock;
 import application.core.MapStateSingleton;
+import application.core.OutdatedPositionsSingleton;
 import application.core.Renderer;
 import application.core.Simulator;
 import application.dynamic.creatures.Creature;
@@ -277,10 +278,10 @@ public class SimulatorController {
 				}
 			}
 			if (chosenCreature != null) {
+		    	MapStateSingleton.getInstance().setFocusedCreature(chosenCreature);
 				if (speciesHighlight.isSelected()) {
 					toggleSpeciesHighlight();
 				}
-		    	MapStateSingleton.getInstance().setFocusedCreature(chosenCreature);
 				locateCreature();
 				selectAndViewCreature(chosenCreature);
 			}
@@ -289,7 +290,12 @@ public class SimulatorController {
 	}
 	
 	public void toggleSpeciesHighlight() {
-		speciesHighlight.setSelected(MapStateSingleton.getInstance().toggleSpeciesHighlight());
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		speciesHighlight.setSelected(mapState.toggleSpeciesHighlight());
+		if (mapState.getFocusedCreature() != null && mapState.getFocusedCreature().species.id != mapState.getFocusedSpecies().id) {
+			mapState.clearFocusedCreature();
+//			OutdatedPositionsSingleton.getInstance().addCreaturePosition(focusedCreature.x, focusedCreature.y);
+		}
 		renderer.render();
 	}
 	
@@ -380,8 +386,11 @@ public class SimulatorController {
     	fillDynamicCreatureDetails(creature);
     	updateCreatureTrackingStatus(creature);
     	showCreatureView();
-    	
-    	MapStateSingleton.getInstance().setFocusedCreature(creature);
+
+    	MapStateSingleton mapState = MapStateSingleton.getInstance();
+    	mapState.disableSpeciesHighlight();
+    	mapState.setFocusedSpecies(null);
+    	mapState.setFocusedCreature(creature);
     	
     	simulator.render();
 	}
@@ -564,26 +573,47 @@ public class SimulatorController {
 		    @Override
 		    public void run() {
 
-				MapStateSingleton mapState = MapStateSingleton.getInstance();
-				
-				if (speciesHighlight.isSelected() && 
-					mapState.getFocusedSpecies() != null && 
-					mapState.getFocusedSpecies().id != originalSpecies.id
-					) {
-					
-					speciesHighlight.setSelected(mapState.toggleSpeciesHighlight());
-					if (mapState.getFocusedCreature() != null && mapState.getFocusedCreature() .species.id != originalSpecies.id) {
-						mapState.clearFocusedCreature();
-					}
-					renderer.render();
-				}
-		        MapStateSingleton.getInstance().setFocusedSpecies(originalSpecies);
+		    	updateSpeciesHighlight(originalSpecies);
 		        fillSpeciesPane();
 		    }
 		});
 	}
 	
 	
+	private void updateSpeciesHighlight(Species species) {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		if (speciesHighlight.isSelected() && 
+			mapState.getFocusedSpecies() != null && 
+			mapState.getFocusedSpecies().id != species.id
+			) {
+			
+			speciesHighlight.setSelected(mapState.toggleSpeciesHighlight());
+			if (mapState.getFocusedCreature() != null && mapState.getFocusedCreature() .species.id != species.id) {
+				mapState.clearFocusedCreature();
+			}
+			renderer.render();
+		}
+        MapStateSingleton.getInstance().setFocusedSpecies(species);
+	}
+	
+	
+	private void updateSpeciesHighlight() {
+
+		MapStateSingleton mapState = MapStateSingleton.getInstance();
+		
+		if (speciesHighlight.isSelected() && 
+			mapState.getFocusedSpecies() != null) {
+			
+			speciesHighlight.setSelected(mapState.highlightSpecies);
+			if (mapState.getFocusedCreature() != null && 
+				mapState.getFocusedCreature().species.id != mapState.getFocusedSpecies().id) {
+				mapState.clearFocusedCreature();
+			}
+			renderer.render();
+		}
+	}
 	
 	
 	public void addSpeciesToOverviewSynch(Species originalSpecies) {
@@ -748,6 +778,9 @@ public class SimulatorController {
 		Platform.runLater(new Runnable() {
 		    @Override
 		    public void run() {
+
+		    	updateSpeciesHighlight();
+		    	
 		    	speciesView.toFront();
 		    }
 		});

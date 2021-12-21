@@ -39,7 +39,7 @@ public class MapStateSingleton {
 	private Creature focusedCreature;
 	private Species focusedSpecies;
 	
-	transient private boolean highlightSpecies;
+	public transient boolean highlightSpecies;
 	transient private boolean trackFocusedCreature;
 	
 	transient public boolean refreshFocusedCreature;
@@ -355,6 +355,12 @@ public class MapStateSingleton {
 
     
 	public void setFocusedCreature(Creature focusedCreature) {
+		if (this.focusedCreature != null && 
+			focusedCreature != null && 
+			this.focusedCreature.id != focusedCreature.id) {
+			
+			OutdatedPositionsSingleton.getInstance().addCreaturePosition(focusedCreature.x, focusedCreature.y);
+		}
 		this.focusedCreature = focusedCreature;
 	}
 
@@ -376,7 +382,7 @@ public class MapStateSingleton {
 	}
 
 	public void clearFocusedCreature() {
-//		OutdatedPositionsSingleton.getInstance().addCreaturePosition(focusedCreature.x, focusedCreature.y);
+		OutdatedPositionsSingleton.getInstance().addCreaturePosition(focusedCreature.x, focusedCreature.y);
 		this.focusedCreature = null;
 	}
 
@@ -384,6 +390,9 @@ public class MapStateSingleton {
 		this.focusedSpecies = null;
 	}
 
+	public void disableSpeciesHighlight() {
+		highlightSpecies = false;
+	}
 	public boolean toggleSpeciesHighlight() {
 		highlightSpecies = !highlightSpecies;
 		return highlightSpecies;
@@ -402,7 +411,7 @@ public class MapStateSingleton {
 		return highlightSpecies;
 	}
 	
-
+	
 	public boolean toggleCreatureTracking() {
 		trackFocusedCreature = !trackFocusedCreature;
 		return trackFocusedCreature;
